@@ -1,0 +1,33 @@
+{
+  "name": "Rescroller",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "Decorate your scrollbars.",
+  "icons": {
+	  "16": "icon16.png",
+	  "48": "icon48.png",
+	  "128": "icon128.png"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["jquery.js", "sbformatter.js"],
+	  "run_at": "document_start",
+	  "all_frames" : true
+    }
+  ],
+  "background": {
+	  "scripts" : ["background.js"]
+  },
+  "permissions": [
+  	"<all_urls>",
+	"tabs"
+  ],
+  "web_accessible_resources": [
+	  "images/defaults/up.png",
+	  "images/defaults/down.png",
+	  "images/defaults/left.png",
+	  "images/defaults/right.png"
+  ]
+}
