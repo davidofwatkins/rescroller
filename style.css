@@ -2,7 +2,7 @@ body {
 	text-align: center;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 13px;
-	background: url("bg.png"); /* http://subtlepatterns.com/patterns/dark_wall.png */
+	background: url("images/bg.png"); /* http://subtlepatterns.com/patterns/dark_wall.png */
 	color: white;
 	overflow: scroll;
 }
