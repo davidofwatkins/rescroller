@@ -21,8 +21,9 @@
 	  "scripts" : ["background.js"]
   },
   "permissions": [
-  	"<all_urls>",
-	"tabs"
+    "<all_urls>",
+    "storage",
+    "tabs"
   ],
   "web_accessible_resources": [
 	  "images/defaults/up.png",
