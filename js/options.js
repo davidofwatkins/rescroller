@@ -19,7 +19,21 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
   * -Enable sync (using chrome.storage API instead of localStorage)
   * -Add "restore defaults" to images with defaults
   * -Show "saved" button so that people know it autosaves
+  * -Update jQuery
+  * -Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
 */ 
+
+function refreshScrollbars() {
+	//location.reload(true);
+	$("#rescroller").html(chrome.extension.getBackgroundPage().getCSSString());
+	var originalOverflow = $("body").css("overflow");
+	$("body").css("overflow", "hidden");
+	setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
+}
+
+$(document).ready(function() {
+	console.log("page has loaded!");
+});
 
 //Following "plugin" function found here: http://stackoverflow.com/questions/10253663/how-to-detect-the-dragleave-event-in-firefox-when-dragging-outside-the-window/10310815#10310815
 $.fn.draghover = function(options) {
@@ -63,17 +77,11 @@ function hideErrorMessage() {
 	$("#errorbox").slideUp("fast");
 }
 
-function refreshScrollbars() {
-	//location.reload(true);
-	$("#rescroller").html(chrome.extension.getBackgroundPage().getCSSString());
-	var originalOverflow = $("body").css("overflow");
-	$("body").css("overflow", "hidden");
-	setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
-}
-
 function restoreDefaults() {
 	
-	chrome.extension.getBackgroundPage().saveCSS({
+	console.log("restoring defaults...");
+
+	saveProperties({
 		
 		//General
 		"sb-size" : 15,
@@ -171,19 +179,22 @@ function restoreDefaults() {
 }"
 	});
 	
-	if (!localStorage["sb-excludedsites"]) { localStorage["sb-excludedsites"] = ""; }
-}
-
-//If there is no previously-saved scrollbar CSS in local storage, save it!
-if (!localStorage["sb-size"] || localStorage["sb-size"] == "") {
-	restoreDefaults();
+	
 }
 
 //Convert the styling stored in local storage into CSS:
 var newCSS = chrome.extension.getBackgroundPage().getCSSString();
-			
+
 //Write the newly formatted CSS (from local storage) to the (beginning of the) page:
 document.write('<style id="rescroller">' + newCSS + "</style>");
+
+//If there is no previously-saved scrollbar CSS in local storage, save it!
+if (!getProperty("sb-size") || getProperty("sb-size") == "") {
+	restoreDefaults();
+}
+
+if (!getProperty("sb-excludedsites")) { saveProperty("sb-excludedsites", ""); }
+
 
 //When the page has loaded:
 $(document).ready(function() {
@@ -194,15 +205,15 @@ $(document).ready(function() {
 	$("#generatedcss").html(newCSS);
 	
 	//Fill the excludedsites textarea with the list of excluded sites:
-	$("#excludedsites").val(localStorage["sb-excludedsites"]);
+	$("#excludedsites").val(getProperty("sb-excludedsites"));
 	$("#excludedsites").change(function() {
-		localStorage["sb-excludedsites"] = $(this).val();
+		saveProperty("sb-excludedsites", $(this).val());
 	});
 	
 	//Fill the custom CSS form with the custom CSS
-	$("#customcss").val(localStorage["sb-customcss"]);
+	$("#customcss").val(getProperty("sb-customcss"));
 	$("#customcss").change(function() {
-		localStorage["sb-customcss"] = $(this).val();
+		saveProperty("sb-customcss", $(this).val());
 		refreshScrollbars();
 	});
 	
@@ -214,13 +225,13 @@ $(document).ready(function() {
 			if ($(this).attr("type") == "checkbox") { //If it's a check box...
 				
 				//If local storage says this option should be checked, check it
-				if (localStorage[$(this).attr("id")] == "checked") {
-					$(this).attr("checked", localStorage[$(this).attr("id")]);
+				if (getProperty($(this).attr("id")) == "checked") {
+					$(this).attr("checked", getProperty($(this).attr("id")));
 				}
 			}
 			//If it's an ordinary input, just fill the input with the corresponding value from local storage
 			else {
-				$(this).val(localStorage[$(this).attr("id")]);
+				$(this).val(getProperty($(this).attr("id")));
 			}
 		}
 	});
@@ -262,7 +273,7 @@ $(document).ready(function() {
 	});
 	
 	//Expand/collapse all non-custom css areas when that checkbox is checked	
-	if (localStorage["sb-usecustomcss"] == "checked") {
+	if (getProperty("sb-usecustomcss") == "checked") {
 		$(".section").not("#misc").not($("#general")).hide();
 		$(".customcss-collapsible").hide();
 	}
@@ -281,7 +292,7 @@ $(document).ready(function() {
 	//Clear picture buttons
 	$(".clearimage").click(function() {
 		var key = $(this).parent().parent().attr("id");
-		localStorage.removeItem(key);
+		removeProperty(key);
 		$(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
 		
 		//Hide the thumbframe and restore it with the "Select Image" button
@@ -295,7 +306,7 @@ $(document).ready(function() {
 	//Set correct value for <select>s
 	$("select").each(function() {
 		var thisProperty = $(this).attr('id');
-		var thisPropertyValue = localStorage[thisProperty];
+		var thisPropertyValue = getProperty(thisProperty);
 		$(this).children().each(function() {
 			if($(this).val() == thisPropertyValue) {
 				$(this).attr("selected", "selected");
@@ -307,7 +318,7 @@ $(document).ready(function() {
 	$("select").change(function() {
 		var thisProperty = $(this).attr('id');
 		var currentValue = $(this).val();
-		localStorage[thisProperty] = currentValue;
+		saveProperty(thisProperty, currentValue);
 		refreshScrollbars();
 	});
 	
@@ -341,11 +352,11 @@ $(document).ready(function() {
 		else { units = "%"; }
 		
 		//Fill slider value with value from local storage
-		$("#" + propertyName + " .slider-value").html(localStorage[propertyName] + units);
+		$("#" + propertyName + " .slider-value").html(getProperty(propertyName) + units);
 		
 		//Set up slider for this property
 		$("#" + propertyName + " .slider").slider({
-			value: localStorage[propertyName],
+			value: getProperty(propertyName),
 			orientation: theOrientation,
 			slide: function(event, ui) {
 				$(this).siblings(".slider-value").html(ui.value + units);
@@ -353,7 +364,7 @@ $(document).ready(function() {
 			change: function(event, ui) {
 				console.log("The slider has been changed to " + ui.value);
 				//Update value in local storage
-				localStorage[propertyName] = ui.value;
+				saveProperty(propertyName, ui.value);
 				refreshScrollbars();
 			}
 		});
@@ -370,14 +381,14 @@ $(document).ready(function() {
 		$(this).miniColors({
 			change: function(hex, rgb) {
 				//console.log("localStorage[" + localStorageKey + "] will be updated to " + hex);
-				localStorage[localStorageKey] = hex;
+				saveProperty(localStorageKey, hex);
 				self.siblings(".colorvalue").val(hex);
 			},
 			"close": function() { refreshScrollbars(); }
 		});
 		
 		//Set default color to whatever it's been saved to
-		$(this).miniColors("value", localStorage[$(this).parent().attr("id")]);
+		$(this).miniColors("value", getProperty($(this).parent().attr("id")));
 	});
 	
 	//Loop through all image frames and fill them:
@@ -412,8 +423,8 @@ $(document).ready(function() {
 	
 	for (var i = 0; i < keys.length; i++) {
 		
-		if (localStorage[keys[i]]) {
-			$("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + localStorage[keys[i]] + '" />');
+		if (getProperty(keys[i])) {
+			$("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + getProperty(keys[i]) + '" />');
 			$("#" + keys[i] + " .thumbframe").css("display", "inline-block"); //show the image frame for this image
 		}
 		else {
@@ -427,7 +438,7 @@ $(document).ready(function() {
 	
 	//Fill "colorvalue" inputs with color values
 	$(".colorvalue").each(function() {
-		$(this).val(localStorage[$(this).parent().attr("id")]);
+		$(this).val(getProperty($(this).parent().attr("id")));
 	});
 	
 	//Automatically select text when clicking a color value
@@ -455,7 +466,7 @@ $(document).ready(function() {
 		}
 		//If it's just a bad value, restore original
 		else {
-			$(this).val(localStorage[$(this).parent().attr("id")]);
+			$(this).val(getProperty($(this).parent().attr("id")));
 		}
 		
 	});
@@ -474,11 +485,11 @@ $(document).ready(function() {
 
 		//Expand/collapse wrapper & save value to local storage
 		if ($(this).is(":checked")) {
-			localStorage[$(this).attr("id")] = "checked";
+			saveProperty($(this).attr("id"), "checked");
 			$("#buttons-toggleable").slideDown("fast", function() { refreshScrollbars(); });
 		}
 		else {
-			localStorage[$(this).attr("id")] = "unchecked";
+			saveProperty($(this).attr("id"), "unchecked");
 			$("#buttons-toggleable").slideUp("fast", function() { refreshScrollbars(); });
 		}
 	 });
@@ -499,12 +510,12 @@ $(document).ready(function() {
 		
 		if ($(this).is(":checked")) {
 			//alert("Checked!");
-			localStorage[$(this).attr("id")] = "checked";
+			saveProperty($(this).attr("id"), "checked");
 			$("#" + $(this).attr("data-wrapperid")).slideDown("slow", function() { refreshScrollbars(); });
 		}
 		else {
 			//alert("Unchecked!");
-			localStorage[$(this).attr("id")] = "unchecked";
+			saveProperty($(this).attr("id"), "unchecked");
 			$("#" + $(this).attr("data-wrapperid")).slideUp("slow", function() { refreshScrollbars(); });
 		}
 		
@@ -543,7 +554,7 @@ function handleFiles(files, frame, key) {
 				aImg.src = e.target.result;
 				
 				//Save to local storage
-				localStorage[key] = aImg.src;
+				saveProperty(key, aImg.src);
 				
 				//Change the "Select Image" button to an image frame
 				var container = $(frame).parents(".imagepicker-container");
@@ -592,3 +603,100 @@ $(document).ready(function() {
 		
 	});
 });
+
+//Saves to local storage via localStorage[] or chrome.storage
+//Shortcut for saveProperties()
+/*function saveProperty(key, value) {
+	//localStorage[key] = value;
+
+	//tmp:
+	scrollbarSettings[key] = value;
+
+	var newProps = JSON.parse('{ "' + key + '" : "' + value + '" }');
+	saveProperties(newProps);
+}
+
+function saveProperties(keyvals) {
+	chrome.storage.sync.set(keyvals, function() {
+		refreshLocalSettings();
+		chrome.extension.getBackgroundPage().refreshLocalSettings();
+	});
+}
+
+function getProperty(key) {
+	//return localStorage[key];
+	try {
+		return scrollbarSettings[key];
+	}
+	catch(e) {}
+}
+function removeProperty(key) {
+	//localStorage.removeItem(key);
+	chrome.storage.sync.remove(key);
+}
+
+//Updates var scrollbarSettings
+function refreshLocalSettings(callback) {
+	//Chrome storage API is slower than localStorage[]
+	chrome.storage.sync.get(function(items) {
+		scrollbarSettings = items;
+		console.log("Scrollbar settings ready.");
+		if (callback)
+			callback();
+	});
+}*/
+
+function saveProperty(key, value) {
+	localStorage[key] = value;
+	saveToChromeStorage(key, value);
+}
+
+function saveProperties(props) {
+	for (var key in props) {
+		var attrName = key;
+		var attrValue = props[key];
+
+		localStorage[attrName] = attrValue;
+	}
+
+	//Export to Chrome.storage
+	saveToChromeStorage(props);
+}
+
+/*function saveProperties(keyvals) {
+	chrome.storage.sync.set(keyvals, function() {
+		refreshLocalSettings();
+		chrome.extension.getBackgroundPage().refreshLocalSettings();
+	});
+}*/
+
+function getProperty(key) {
+	return localStorage[key];
+}
+function removeProperty(key) {
+	localStorage.removeItem(key);
+}
+
+//Updates var scrollbarSettings
+/*function refreshLocalSettings(callback) {
+	//Chrome storage API is slower than localStorage[]
+	chrome.storage.sync.get(function(items) {
+		scrollbarSettings = items;
+		console.log("Scrollbar settings ready.");
+		if (callback)
+			callback();
+});*/
+
+function saveToChromeStorage(key, value) {
+	if (arguments.length == 2) {
+		var newProps = JSON.parse('{ "' + key + '" : "' + value + '" }');
+		//chrome.storage.sync.set(newProps);
+	}
+	else if (arguments.length == 1) {
+		//chrome.storage.sync.set(key); //key  is JSON of all properties
+	}
+}
+
+function exportToChromeStorage() {
+	chrome.storage.local.set({ "test" : "testvalue" });
+}
