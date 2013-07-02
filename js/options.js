@@ -657,5 +657,7 @@ $(document).ready(function() {
 /* TODO:
  
  -Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
- -Check to see if chrome.storage needs to be polled for changes to be saved back to localStorage, or if the event listener will fire even for incoming changes from the cloud
- -Apply appropriate downward sync (^)
+ -Detect when sync is incoming or outgoing - when incoming, save chrome.storage to localStorage (background page)
+ -When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
+
+ */
