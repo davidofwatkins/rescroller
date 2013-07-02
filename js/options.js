@@ -604,51 +604,13 @@ $(document).ready(function() {
 	});
 });
 
-//Saves to local storage via localStorage[] or chrome.storage
-//Shortcut for saveProperties()
-/*function saveProperty(key, value) {
-	//localStorage[key] = value;
 
-	//tmp:
-	scrollbarSettings[key] = value;
 
-	var newProps = JSON.parse('{ "' + key + '" : "' + value + '" }');
-	saveProperties(newProps);
-}
-
-function saveProperties(keyvals) {
-	chrome.storage.sync.set(keyvals, function() {
-		refreshLocalSettings();
-		chrome.extension.getBackgroundPage().refreshLocalSettings();
-	});
-}
-
-function getProperty(key) {
-	//return localStorage[key];
-	try {
-		return scrollbarSettings[key];
-	}
-	catch(e) {}
-}
-function removeProperty(key) {
-	//localStorage.removeItem(key);
-	chrome.storage.sync.remove(key);
-}
-
-//Updates var scrollbarSettings
-function refreshLocalSettings(callback) {
-	//Chrome storage API is slower than localStorage[]
-	chrome.storage.sync.get(function(items) {
-		scrollbarSettings = items;
-		console.log("Scrollbar settings ready.");
-		if (callback)
-			callback();
-	});
-}*/
+//Saves to local storage via localStorage[] and chrome.storage
 
 function saveProperty(key, value) {
 	localStorage[key] = value;
-	saveToChromeStorage(key, value);
+	exportLocalSettings();
 }
 
 function saveProperties(props) {
@@ -660,15 +622,8 @@ function saveProperties(props) {
 	}
 
 	//Export to Chrome.storage
-	saveToChromeStorage(props);
+	exportLocalSettings();
 }
-
-/*function saveProperties(keyvals) {
-	chrome.storage.sync.set(keyvals, function() {
-		refreshLocalSettings();
-		chrome.extension.getBackgroundPage().refreshLocalSettings();
-	});
-}*/
 
 function getProperty(key) {
 	return localStorage[key];
@@ -677,26 +632,30 @@ function removeProperty(key) {
 	localStorage.removeItem(key);
 }
 
-//Updates var scrollbarSettings
-/*function refreshLocalSettings(callback) {
-	//Chrome storage API is slower than localStorage[]
-	chrome.storage.sync.get(function(items) {
-		scrollbarSettings = items;
-		console.log("Scrollbar settings ready.");
-		if (callback)
-			callback();
-});*/
+function exportLocalSettings() {
 
-function saveToChromeStorage(key, value) {
-	if (arguments.length == 2) {
-		var newProps = JSON.parse('{ "' + key + '" : "' + value + '" }');
-		//chrome.storage.sync.set(newProps);
+	var lsJSON = {};
+	for (var mykey in localStorage) {
+		lsJSON[mykey] = localStorage[mykey];
 	}
-	else if (arguments.length == 1) {
-		//chrome.storage.sync.set(key); //key  is JSON of all properties
-	}
+
+	chrome.storage.sync.set(lsJSON);
 }
 
-function exportToChromeStorage() {
-	chrome.storage.local.set({ "test" : "testvalue" });
-}
+//For debugging
+/*
+$(document).ready(function() {
+	chrome.storage.onChanged.addListener(function(changes, namespace) {
+	  for (key in changes) {
+	    var storageChange = changes[key];
+	    alert('Storage key "' + key + '" in namespace "' + namespace + '" changed from "' + storageChange.oldValue + '" to "' + storageChange.newValue + '".');
+	  }
+	});
+});
+*/
+
+/* TODO:
+ 
+ -Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
+ -Check to see if chrome.storage needs to be polled for changes to be saved back to localStorage, or if the event listener will fire even for incoming changes from the cloud
+ -Apply appropriate downward sync (^)

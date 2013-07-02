@@ -314,3 +314,12 @@ function getProperty(key) {
 function removeProperty(key) {
 	localStorage.removeItem(key);
 }
+
+
+// Debug - may be used to sync chrome.storage back to localStorage
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (key in changes) {
+    var storageChange = changes[key];
+    console.log('Storage key "' + key + '" in namespace "' + namespace + '" changed from "' + storageChange.oldValue + '" to "' + storageChange.newValue + '".');
+  }
+});
