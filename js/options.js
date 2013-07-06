@@ -21,7 +21,8 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
   * -Show "saved" button so that people know it autosaves
   * -Update jQuery
   * -Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
-*/ 
+  * -Add button in chrome for easy access to settings
+*/
 
 function refreshScrollbars() {
 	//location.reload(true);
@@ -610,7 +611,7 @@ $(document).ready(function() {
 
 function saveProperty(key, value) {
 	localStorage[key] = value;
-	exportLocalSettings();
+	queueExportLocalSettings();
 }
 
 function saveProperties(props) {
@@ -622,7 +623,7 @@ function saveProperties(props) {
 	}
 
 	//Export to Chrome.storage
-	exportLocalSettings();
+	queueExportLocalSettings();
 }
 
 function getProperty(key) {
@@ -632,32 +633,15 @@ function removeProperty(key) {
 	localStorage.removeItem(key);
 }
 
-function exportLocalSettings() {
-
-	var lsJSON = {};
-	for (var mykey in localStorage) {
-		lsJSON[mykey] = localStorage[mykey];
-	}
-
-	chrome.storage.sync.set(lsJSON);
+//Shortcut to queueExportLocalSettings() in background page
+function queueExportLocalSettings() {
+	chrome.extension.getBackgroundPage().queueExportLocalSettings();
 }
-
-//For debugging
-/*
-$(document).ready(function() {
-	chrome.storage.onChanged.addListener(function(changes, namespace) {
-	  for (key in changes) {
-	    var storageChange = changes[key];
-	    alert('Storage key "' + key + '" in namespace "' + namespace + '" changed from "' + storageChange.oldValue + '" to "' + storageChange.newValue + '".');
-	  }
-	});
-});
-*/
 
 /* TODO:
  
- -Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
- -Detect when sync is incoming or outgoing - when incoming, save chrome.storage to localStorage (background page)
- -When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
+ - DONE - Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
+ - NOT NECESSARY (?) - Detect when sync is incoming or outgoing - when incoming, save chrome.storage to localStorage (background page)
+ - DONE (I THINK!) - When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
 
  */

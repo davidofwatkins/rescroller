@@ -14,12 +14,20 @@ Special thanks to the following:
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
 */
 
+var exportBuffer; //used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
+const EXPORT_BUFFER_TIME = 20000; //20 seconds
+
 //If this is the first time running the extension (if it's just been installed), open options page
-if (!localStorage.getItem("install_time")) {
-	var now = new Date().getTime();
-	localStorage["install_time"] = now;
-	chrome.tabs.create({ url: "options.html" });
-}
+// ...and Download latest Chrome Storage to Local Storage
+refreshLocalStorage(function() {
+	console.log("calling callback!");
+	//if (!localStorage.getItem("install_time")) {
+	if (!getProperty("install_time")) {
+		var now = new Date().getTime();
+		localStorage["install_time"] = now;
+		chrome.tabs.create({ url: "options.html" });
+	}
+});
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
@@ -315,11 +323,47 @@ function removeProperty(key) {
 	localStorage.removeItem(key);
 }
 
+//Used for first-time install refresh from Chrome Storage -> Local Storage
+function refreshLocalStorage(callback) {
 
-// Debug - may be used to sync chrome.storage back to localStorage
+	chrome.storage.sync.get(function(items) {
+		for (var key in items) {
+			localStorage[key] = items[key];
+		}
+	});
+
+	callback();
+}
+
+//Save the local settings to chrome.storage in 30 seconds.
+function queueExportLocalSettings() {
+	clearTimeout(exportBuffer);
+	exportBuffer = setTimeout(function() {
+		exportLocalSettings();
+	}, EXPORT_BUFFER_TIME);
+}
+
+function exportLocalSettings() {
+
+	console.log("EXPORTING");
+
+	var lsJSON = {};
+	for (var mykey in localStorage) {
+		lsJSON[mykey] = localStorage[mykey];
+	}
+
+	chrome.storage.sync.set(lsJSON);
+}
+
+
+//Detect changes to Chrome Storage, and import them into Local Storage
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   for (key in changes) {
-    var storageChange = changes[key];
-    console.log('Storage key "' + key + '" in namespace "' + namespace + '" changed from "' + storageChange.oldValue + '" to "' + storageChange.newValue + '".');
+  	//Debugging:
+    /*var storageChange = changes[key];
+    console.log('(Chrome Storage ' + namespace + ') "' + key + '": \t "' + storageChange.oldValue + '" \t --> \t "' + storageChange.newValue + '".');*/
+
+    //Import these to localStorage
+    localStorage[key] = storageChange.newValue;
   }
 });
