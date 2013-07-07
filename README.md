@@ -8,7 +8,7 @@ Rescroller allows you to customize the look and feel of scrollbars on webpages w
 
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
 
-## Planned &amp; Upcoming Features:
+## Planned & Upcoming Features:
 
 - (Next version) Figure out how to disable for sites that already have customized scrollbars (if even possible)
 - Enable sync (using chrome.storage API instead of localStorage)
@@ -18,7 +18,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 - Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
 - Add button in chrome for easy access to settings
 
-## Dependencies &amp; Credit:
+## Dependencies & Credit:
 
 - Alte Mo for background image: <http://subtlepatterns.com/?p=1293>
 - jQuery for options page functionality: <http://jquery.com/>
