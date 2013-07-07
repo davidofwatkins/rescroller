@@ -15,7 +15,8 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 */
 
 var exportBuffer; //used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
-const EXPORT_BUFFER_TIME = 20000; //20 seconds
+const EXPORT_BUFFER_TIME = 10000; //10 seconds
+var version = chrome.app.getDetails().version;
 
 //If this is the first time running the extension (if it's just been installed), open options page
 // ...and Download latest Chrome Storage to Local Storage
@@ -323,16 +324,28 @@ function removeProperty(key) {
 	localStorage.removeItem(key);
 }
 
-//Used for first-time install refresh from Chrome Storage -> Local Storage
+//Used for first-time install refresh from Chrome Storage -> Local Storage (or old localStorage -> Chrome Storage)
 function refreshLocalStorage(callback) {
 
-	chrome.storage.sync.get(function(items) {
-		for (var key in items) {
-			localStorage[key] = items[key];
-		}
-	});
+	//If this install is upgrading from version 1.0 (no support for Chrome Sync),
+	//save the current localStorage data to Chrome Storage
+	if (version <= 1.0) {
+		queueExportLocalSettings();
+		callback();
+	}
+	
+	//Otherwise, if this is a fresh install or is an upgrade from a version that supports Chrome Sync,
+	//check for settings from Chrome Storage
+	else {
+		chrome.storage.sync.get(function(items) {
+			for (var key in items) {
+				localStorage[key] = items[key];
+			}
+			callback();
+		});
+	}
 
-	callback();
+	
 }
 
 //Save the local settings to chrome.storage in 30 seconds.
@@ -364,6 +377,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     console.log('(Chrome Storage ' + namespace + ') "' + key + '": \t "' + storageChange.oldValue + '" \t --> \t "' + storageChange.newValue + '".');*/
 
     //Import these to localStorage
+    var storageChange = changes[key];
     localStorage[key] = storageChange.newValue;
   }
 });

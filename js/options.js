@@ -642,6 +642,6 @@ function queueExportLocalSettings() {
  
  - DONE - Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
  - NOT NECESSARY (?) - Detect when sync is incoming or outgoing - when incoming, save chrome.storage to localStorage (background page)
- - DONE (I THINK!) - When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
+ - DONE - When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
 
  */
