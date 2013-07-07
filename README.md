@@ -8,6 +8,8 @@ Rescroller allows you to customize the look and feel of scrollbars on webpages w
 
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
 
+[View **Rescroller** on the Chrome Webstore](https://chrome.google.com/webstore/detail/rescroller/ddehdnnhjimbggeeenghijehnpakijod)
+
 ## Planned & Upcoming Features:
 
 - (Next version) Figure out how to disable for sites that already have customized scrollbars (if even possible)
