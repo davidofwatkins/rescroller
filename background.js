@@ -31,6 +31,11 @@ chrome.extension.onRequest.addListener(
 });
 
 
+//Handle action button in Chrome toolbar
+chrome.browserAction.onClicked.addListener(function(tab) {
+  	chrome.tabs.create({ url: "options.html" });
+})
+
 function getListOfDisabledSites() {
 	var rawString = getProperty("sb-excludedsites");
 	
