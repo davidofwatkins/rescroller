@@ -605,13 +605,21 @@ $(document).ready(function() {
 	});
 });
 
-
+//Show "saved" confirmation box
+function showSaveConfirmationBox() {
+	$("#save-confirm").fadeIn("slow");
+	setTimeout(function() {
+		$("#save-confirm").fadeOut("slow");
+	}, 3000)
+}
 
 //Saves to local storage via localStorage[] and chrome.storage
 
 function saveProperty(key, value) {
+	console.log("Saving " + key + " -> " + value);
 	localStorage[key] = value;
 	queueExportLocalSettings();
+	showSaveConfirmationBox();
 }
 
 function saveProperties(props) {

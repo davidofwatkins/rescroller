@@ -355,6 +355,30 @@ input[type=checkbox] {
 	border-color: transparent #BBB transparent transparent;
 	z-index: 5;
 }
+
+#save-confirm {
+	position: fixed;
+	top: 50px;
+	right: 20px;
+	width: 160px;
+	background: rgb(220, 221, 112);
+	color: black;
+	box-shadow: 0 0 20px black;
+	padding: 10px;
+	border-radius: 5px;
+	display: none;
+}
+
+#save-confirm:after {
+	content: "";
+	position: absolute;
+	width: 0;
+	height: 0;
+	right: -20px;
+	top: 15px;
+	border: 10px solid;
+	border-color: transparent transparent transparent rgb(220, 221, 112);
+}
 	
 /* Background picture possibilities
 
