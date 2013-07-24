@@ -24,6 +24,23 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
   * -Add button in chrome for easy access to settings
 */
 
+var startingLoadTimestamp = Date.now();
+var showSaveConfirmation;
+if (localStorage["showSaveConfirmation"] != 0 && localStorage["showSaveConfirmation"] != 1) {
+	localStorage["showSaveConfirmation"] = 1;
+}
+var showSaveConfirmTime = 4000;
+var saveconfirmationTimeout;
+
+//Enable functionality of Confirm Box "Never Show Again" button
+$(document).ready(function() {
+	$("#save-confirm #hide-saved-confirm").click(function() {
+		localStorage["showSaveConfirmation"] = 0;
+		$("#save-confirm").fadeOut("slow");
+		return false;
+	});
+});
+
 function refreshScrollbars() {
 	//location.reload(true);
 	$("#rescroller").html(chrome.extension.getBackgroundPage().getCSSString());
@@ -31,10 +48,6 @@ function refreshScrollbars() {
 	$("body").css("overflow", "hidden");
 	setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
 }
-
-$(document).ready(function() {
-	console.log("page has loaded!");
-});
 
 //Following "plugin" function found here: http://stackoverflow.com/questions/10253663/how-to-detect-the-dragleave-event-in-firefox-when-dragging-outside-the-window/10310815#10310815
 $.fn.draghover = function(options) {
@@ -607,19 +620,22 @@ $(document).ready(function() {
 
 //Show "saved" confirmation box
 function showSaveConfirmationBox() {
-	$("#save-confirm").fadeIn("slow");
-	setTimeout(function() {
-		$("#save-confirm").fadeOut("slow");
-	}, 3000)
+	clearTimeout(saveconfirmationTimeout);
+	if (localStorage["showSaveConfirmation"] == 1) {
+		$("#save-confirm").fadeIn("slow");
+		saveconfirmationTimeout = setTimeout(function() {
+			$("#save-confirm").fadeOut("slow");
+		}, showSaveConfirmTime)
+	}
 }
 
 //Saves to local storage via localStorage[] and chrome.storage
-
 function saveProperty(key, value) {
 	console.log("Saving " + key + " -> " + value);
 	localStorage[key] = value;
 	queueExportLocalSettings();
-	showSaveConfirmationBox();
+	if ((Date.now() - 500) > startingLoadTimestamp) 
+		showSaveConfirmationBox(); //Do not show this message if the page just loaded
 }
 
 function saveProperties(props) {

@@ -360,8 +360,8 @@ input[type=checkbox] {
 	position: fixed;
 	top: 50px;
 	right: 20px;
-	width: 160px;
-	background: rgb(220, 221, 112);
+	width: 225px;
+	background: rgb(180, 180, 116);
 	color: black;
 	box-shadow: 0 0 20px black;
 	padding: 10px;
@@ -377,7 +377,14 @@ input[type=checkbox] {
 	right: -20px;
 	top: 15px;
 	border: 10px solid;
-	border-color: transparent transparent transparent rgb(220, 221, 112);
+	border-color: transparent transparent transparent rgb(180, 180, 116);
+}
+
+#save-confirm a#hide-saved-confirm {
+	color: #003A91;
+}
+#save-confirm a#hide-saved-confirm:hover {
+	color: #005CE7;
 }
 	
 /* Background picture possibilities
