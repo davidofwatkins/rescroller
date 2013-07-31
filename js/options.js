@@ -635,7 +635,8 @@ function showSaveConfirmationBox() {
 function saveProperty(key, value, callback) {
 	console.log("Saving " + key + " -> " + value);
 	localStorage[key] = value;
-	callback();
+	if (callback)
+		callback();
 	queueExportLocalSettings();
 	if ((Date.now() - 500) > startingLoadTimestamp) 
 		showSaveConfirmationBox(); //Do not show this message if the page just loaded
