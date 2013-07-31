@@ -15,11 +15,10 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 */
 
 /**********TODO******************
-  * -(Next version) Figure out how to disable for sites that already have customized scrollbars (if even possible)
   * - TESTING Enable sync (using chrome.storage API instead of localStorage)
-  * -Add "restore defaults" to images with defaults
-  * - TESTING Show "saved" button so that people know it autosaves
-  * -Update jQuery
+  * - Add "restore defaults" to images with defaults
+  * - Adjust "Saved" button color - TESTING Show "saved" button so that people know it autosaves
+  * - TESTING Update jQuery
   * - TESTING Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
   * - TESTING Add button in chrome for easy access to settings
 */
