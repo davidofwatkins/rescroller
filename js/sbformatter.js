@@ -68,3 +68,27 @@ chrome.extension.sendRequest({ message: "css_string" }, function(response) {
 		}
 	}
 });
+
+//Failsafe for pages that don't show redesigned scrollbars before page has loaded
+document.addEventListener('DOMContentLoaded', function() { //like $(document).ready()
+	redrawScrollbars();
+}, false);
+
+function redrawScrollbars() {
+	//Get existing scrollbar properties
+	var html = document.getElementsByTagName("html")[0];
+	var body = document.getElementsByTagName("body")[0];
+
+    var htmlCurrentOverflow = html.style.overflow
+    var bodyCurrentOverflow = body.style.overflow
+
+    //Hide <html> and <body> scrollbars
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    //Show <html> and <body> scrollbars again (using their previously set properties)
+    setTimeout(function() {
+    	html.style.overflow = htmlCurrentOverflow;
+    	body.style.overflow = bodyCurrentOverflow;
+    }, 1);
+}

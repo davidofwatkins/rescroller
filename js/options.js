@@ -16,12 +16,12 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 
 /**********TODO******************
   * -(Next version) Figure out how to disable for sites that already have customized scrollbars (if even possible)
-  * -Enable sync (using chrome.storage API instead of localStorage)
+  * - TESTING Enable sync (using chrome.storage API instead of localStorage)
   * -Add "restore defaults" to images with defaults
-  * -Show "saved" button so that people know it autosaves
+  * - TESTING Show "saved" button so that people know it autosaves
   * -Update jQuery
-  * -Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
-  * -Add button in chrome for easy access to settings
+  * - TESTING Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
+  * - TESTING Add button in chrome for easy access to settings
 */
 
 var startingLoadTimestamp = Date.now();
