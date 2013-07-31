@@ -361,7 +361,7 @@ input[type=checkbox] {
 	top: 50px;
 	right: 20px;
 	width: 225px;
-	background: rgb(180, 180, 116);
+	background: rgb(245, 245, 164);
 	color: black;
 	box-shadow: 0 0 20px black;
 	padding: 10px;
@@ -377,7 +377,7 @@ input[type=checkbox] {
 	right: -20px;
 	top: 15px;
 	border: 10px solid;
-	border-color: transparent transparent transparent rgb(180, 180, 116);
+	border-color: transparent transparent transparent rgb(245, 245, 164);
 }
 
 #save-confirm a#hide-saved-confirm {

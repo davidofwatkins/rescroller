@@ -17,10 +17,12 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 /**********TODO******************
   * - TESTING Enable sync (using chrome.storage API instead of localStorage)
   * - Add "restore defaults" to images with defaults
-  * - Adjust "Saved" button color - TESTING Show "saved" button so that people know it autosaves
+  * - Maybe add "done" or "save" link/button to bottom of color picker that closes the picker and saves (...?)
+  * - TESTING Show "saved" button so that people know it autosaves
   * - TESTING Update jQuery
   * - TESTING Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
   * - TESTING Add button in chrome for easy access to settings
+  * - Clean up debugging and console output
 */
 
 var startingLoadTimestamp = Date.now();
@@ -394,10 +396,11 @@ $(document).ready(function() {
 		$(this).miniColors({
 			change: function(hex, rgb) {
 				//console.log("localStorage[" + localStorageKey + "] will be updated to " + hex);
-				saveProperty(localStorageKey, hex);
 				self.siblings(".colorvalue").val(hex);
 			},
-			"close": function() { refreshScrollbars(); }
+			"close": function(hex, rgb) {
+				saveProperty(localStorageKey, hex, function() { refreshScrollbars(); });
+			}
 		});
 		
 		//Set default color to whatever it's been saved to
@@ -629,12 +632,14 @@ function showSaveConfirmationBox() {
 }
 
 //Saves to local storage via localStorage[] and chrome.storage
-function saveProperty(key, value) {
+function saveProperty(key, value, callback) {
 	console.log("Saving " + key + " -> " + value);
 	localStorage[key] = value;
+	callback();
 	queueExportLocalSettings();
 	if ((Date.now() - 500) > startingLoadTimestamp) 
 		showSaveConfirmationBox(); //Do not show this message if the page just loaded
+	
 }
 
 function saveProperties(props) {
