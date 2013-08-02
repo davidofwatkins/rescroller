@@ -418,7 +418,7 @@ $(document).ready(function() {
 
 	//Set functionality of "apply" button
 	$("body").on("click", ".miniColors-apply a", function() { //applies listener to the <a> that hasn't been created yet
-		var colorSelectorInput = $("#" + lastClickedColorPickerPropertyID).children("input.colorselection")
+		var colorSelectorInput = $("#" + lastClickedColorPickerPropertyID).children("input.colorselection");
 		colorSelectorInput.miniColors("hide");
 
 		return false;
