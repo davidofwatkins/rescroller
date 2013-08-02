@@ -32,6 +32,7 @@ if (localStorage["showSaveConfirmation"] != 0 && localStorage["showSaveConfirmat
 }
 var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
+var lastClickedColorPickerPropertyID;
 
 //Enable functionality of Confirm Box "Never Show Again" button
 $(document).ready(function() {
@@ -405,6 +406,26 @@ $(document).ready(function() {
 		
 		//Set default color to whatever it's been saved to
 		$(this).miniColors("value", getProperty($(this).parent().attr("id")));
+
+		//Add "apply" button
+		$(".miniColors-selector").append('<p><a href="#">Apply</a></p>');
+	});
+
+	//save the last-clicked color picker
+	$("a.miniColors-trigger").click(function() {
+		lastClickedColorPickerPropertyID = $(this).parent().attr("id");
+	});
+
+	//Set functionality of "apply" button
+	$("body").on("click", ".miniColors-apply a", function() { //applies listener to the <a> that hasn't been created yet
+		var colorSelectorInput = $("#" + lastClickedColorPickerPropertyID).children("input.colorselection")
+		//colorSelectorInput.miniColors("value", lastClickedColorPickerPropertyID);
+		
+		//$(".miniColors-selector").fadeOut("fast");
+
+		colorSelectorInput.miniColors("hide");
+
+		return false;
 	});
 	
 	//Loop through all image frames and fill them:
@@ -472,13 +493,15 @@ $(document).ready(function() {
 		//If the value is a hex value, save it
 		if (val.indexOf("#") == 0 && (val.length == 4 || val.length == 7)) {
 			$(this).siblings(".colorselection").miniColors("value", val);
-			refreshScrollbars();
+			//refreshScrollbars();
+			saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
 		}
 		//If the user just forgot the #, add it automatically and save
 		else if (val.indexOf("#") != 0 && (val.length == 3 || val.length == 6)) {
 			$(this).siblings(".colorselection").miniColors("value", "#" + val);
 			$(this).val("#" + val);
-			refreshScrollbars();
+			//refreshScrollbars();
+			saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
 		}
 		//If it's just a bad value, restore original
 		else {
