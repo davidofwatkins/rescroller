@@ -310,6 +310,7 @@ $(document).ready(function() {
 		var key = $(this).parent().parent().attr("id");
 		removeProperty(key);
 		$(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
+		$(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
 		
 		//Hide the thumbframe and restore it with the "Select Image" button
 		$("#" + key).children(".thumbframe").hide();
