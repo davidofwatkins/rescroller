@@ -6,6 +6,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses
  *
 */
+
 if(jQuery) (function($) {
 	
 	$.extend($.fn, {
@@ -134,13 +135,14 @@ if(jQuery) (function($) {
 				// Hide all other instances 
 				hide();				
 				
-				//Lines 145 and 146 were modified below by dwat to display color picker to the right of the "trigger"
+				//Lines 145 and 146 and 147 were modified below by dwat to display color picker to the right of the "trigger" and the "apply" button
 				
 				// Generate the selector
 				var selector = $('<div class="miniColors-selector"></div>');
 				selector
 					.append('<div class="miniColors-colors" style="background-color: #FFF;"><div class="miniColors-colorPicker"><div class="miniColors-colorPicker-inner"></div></div>')
 					.append('<div class="miniColors-hues"><div class="miniColors-huePicker"></div></div>')
+					.append('<div class="miniColors-apply"><a href="#">Apply</a></div>') //Added by dwat
 					.css({
 						top: input.is(':visible') ? input.offset().top + input.outerHeight() : input.data('trigger').offset().top + input.data('trigger').outerHeight() - ($(".miniColors-trigger").outerHeight() * 2.5),
 						left: input.is(':visible') ? input.offset().left : input.data('trigger').offset().left + $(".miniColors-trigger").outerWidth() + 3,
@@ -503,7 +505,15 @@ if(jQuery) (function($) {
 			
 			// Handle calls to $([selector]).miniColors()
 			switch(o) {
-			
+				
+				//Added by dwat (this case: hide...):
+				case 'hide':
+					$(this).each(function() {
+						if( !$(this).hasClass('miniColors') ) return;
+						hide($(this));
+					});
+					return $(this);
+
 				case 'readonly':
 					
 					$(this).each( function() {
