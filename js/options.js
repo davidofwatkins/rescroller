@@ -314,7 +314,7 @@ $(document).ready(function() {
 		
 		//Hide the thumbframe and restore it with the "Select Image" button
 		$("#" + key).children(".thumbframe").hide();
-		$("#" + key).children(".selector-button").show();
+		$("#" + key).children(".selector-button").css("display", "block");
 		
 		refreshScrollbars();
 		return false;
@@ -509,15 +509,15 @@ $(document).ready(function() {
  
  /********** Collapsable Checkboxes *********************/
 	 
-	 //Scroll buttons
-	 var showButtons = $("#sb-showbuttons");
+	//Scroll buttons
+	var showButtons = $("#sb-showbuttons");
 	 
-	 //Make sure wrapper is correctly expanded on load
-	 if (showButtons.is(":checked")) { $("#buttons-toggleable").show(); }
-	 else { $("#buttons-toggleable").hide(); }
-	 
-	 //When checkbox is changed:
-	 showButtons.change(function() {
+	//Make sure wrapper is correctly expanded on load
+	if (showButtons.is(":checked")) { $("#buttons-toggleable").show(); }
+	else { $("#buttons-toggleable").hide(); }
+	
+	//When checkbox is changed:
+	showButtons.change(function() {
 
 		//Expand/collapse wrapper & save value to local storage
 		if ($(this).is(":checked")) {
@@ -528,21 +528,21 @@ $(document).ready(function() {
 			saveProperty($(this).attr("id"), "unchecked");
 			$("#buttons-toggleable").slideUp("fast", function() { refreshScrollbars(); });
 		}
-	 });
+	});
 	 
-	 /************* Slider Hover/Active Checkboxes **************/
+	/************* Slider Hover/Active Checkboxes **************/
 	 
-	 //Make sure wrappers are correctly expanded/collapsed on load
-	 $(".toggle-hover-active").each(function() {
+	//Make sure wrappers are correctly expanded/collapsed on load
+	$(".toggle-hover-active").each(function() {
 		 
-		 var targetWrapper = $("#" + $(this).attr("data-wrapperid"));
+		var targetWrapper = $("#" + $(this).attr("data-wrapperid"));
 		 
-		 if ($(this).is(":checked")) { targetWrapper.show(); }
-		 else { targetWrapper.hide(); }
-	 });
+		if ($(this).is(":checked")) { targetWrapper.show(); }
+		else { targetWrapper.hide(); }
+	});
 	 
-	 //Expand/collapse and write to local Storage
-	 $(".toggle-hover-active").change(function() {
+	//Expand/collapse and write to local Storage
+	$(".toggle-hover-active").change(function() {
 		
 		if ($(this).is(":checked")) {
 			//alert("Checked!");
@@ -557,7 +557,37 @@ $(document).ready(function() {
 		
 		refreshScrollbars();
 		
-	 });
+	});
+
+	/** Set functionality of "restore default buttons" link (for scrollbar buttons) **/
+	setRestoreArrowsDefaultImages("restore-arrow-defaults", "sb-buttons-background-image-", "");
+	setRestoreArrowsDefaultImages("restore-arrow-defaults-hover", "sb-buttons-background-image-", "-hover");
+	setRestoreArrowsDefaultImages("restore-arrow-defaults-active", "sb-buttons-background-image-", "-active");
+
+	function setRestoreArrowsDefaultImages(triggerID, propertyPrefix, propertySuffix) {
+	 	$("#" + triggerID).click(function() {
+
+	 		var up = propertyPrefix + "up" + propertySuffix;
+	 		var down = propertyPrefix + "down" + propertySuffix;
+	 		var left = propertyPrefix + "left" + propertySuffix;
+	 		var right = propertyPrefix + "right" + propertySuffix;
+
+		 	saveProperty(down, chrome.extension.getURL("images/defaults/down.png"));
+		 	saveProperty(up, chrome.extension.getURL("images/defaults/up.png"));
+		 	saveProperty(left, chrome.extension.getURL("images/defaults/left.png"));
+		 	saveProperty(right, chrome.extension.getURL("images/defaults/right.png"));
+
+		 	$("#" + down + ", #" + up + ", #" + left + ", #" + right).each(function() {
+
+		 		$(this).children(".thumbframe").children(".thumbcontainer").html('<img src="' + getProperty($(this).attr("id")) + '" />');
+		 		$(this).children(".selector-button").hide();
+	 			$(this).children(".thumbframe").show();
+		 	});
+
+		 	refreshScrollbars();
+		 	return false;
+	 	});
+	}
 	 
  });
  
