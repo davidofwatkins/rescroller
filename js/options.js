@@ -16,8 +16,8 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 
 /**********TODO******************
   * - TESTING Enable sync (using chrome.storage API instead of localStorage)
-  * - Add "restore defaults" to images with defaults
-  * - Maybe add "done" or "save" link/button to bottom of color picker that closes the picker and saves (...?)
+  * - TESTING Add "restore defaults" to images with defaults
+  * - TESTING Maybe add "done" or "save" link/button to bottom of color picker that closes the picker and saves (...?)
   * - TESTING Show "saved" button so that people know it autosaves
   * - TESTING Update jQuery
   * - TESTING Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
@@ -53,29 +53,46 @@ function refreshScrollbars() {
 
 //Following "plugin" function found here: http://stackoverflow.com/questions/10253663/how-to-detect-the-dragleave-event-in-firefox-when-dragging-outside-the-window/10310815#10310815
 $.fn.draghover = function(options) {
-	return this.each(function() {
+    return this.each(function() {
+    
+      var collection = $(),
+          self = $(this);
+    
+	//Note: "dragenter", "dragleave", and "dragover" need to be e.preventDefault()-ed
+	//in order for the webpage not to redirect to the dragged-in image:
+	//See explanation here: http://stackoverflow.com/a/8938581/477632
+	
+      self.on('dragenter', function(e) {
+		e.stopPropagation();
+        e.preventDefault();
 		
-		var collection = $(), self = $(this);
-			
-		self.on('dragenter', function(e) {
-			if (collection.size() === 0) {
-				self.trigger('draghoverstart');
-			}
-			collection = collection.add(e.target);
+        if (collection.size() === 0) {
+          self.trigger('draghoverstart');
+        }
+        collection = collection.add(e.target);
+      });
+    
+      self.on('dragleave', function(e) {
+		e.stopPropagation();  
+        e.preventDefault();
+		
+        // timeout is needed because Firefox 3.6 fires the dragleave event on
+        // the previous element before firing dragenter on the next one
+        setTimeout( function() {
+          collection = collection.not(e.target);
+          if (collection.size() === 0) {
+            self.trigger('draghoverend');
+          }          
+        }, 1);
+		
+		self.on('dragover', function(e) {
+			e.stopPropagation();  
+			e.preventDefault();
 		});
-			
-		self.on('dragleave', function(e) {
-			// timeout is needed because Firefox 3.6 fires the dragleave event on
-			// the previous element before firing dragenter on the next one
-			setTimeout( function() {
-				collection = collection.not(e.target);
-				if (collection.size() === 0) {
-					self.trigger('draghoverend');
-				}          
-			}, 1);
-		});
-	});
+      });
+    });
 };
+
 
 function showErrorMessage(msg) {
 	
@@ -271,6 +288,7 @@ function resetDragHoveringEventTriggering() {
 			//console.log("A file has been dragged out of the window.");
 			$(".selector-button").html(originalText);
 			$(".selector-button").animate({ "background-color" : originalBackground }, "slow");
+			return false;
 		}
 	});
 }
@@ -595,6 +613,8 @@ $(document).ready(function() {
 
 function handleFiles(files, frame, key) {
 	
+	console.log("Handling file");
+
 	var file = files[0];
 	var imageType = /image.*/;
 	
