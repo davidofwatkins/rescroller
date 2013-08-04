@@ -1,18 +1,10 @@
 /*
-
 Rescroller Chrome Extension
 Author: David Watkins (@dwat91)
 
-Special thanks to the following:
-
--Alte Mo for background image: http://subtlepatterns.com/?p=1293
--jQuery for options page functionality: http://jquery.com/
--jQuery UI for slider widgets on options page: http://jqueryui.com/
--MiniColors for image selector widgets on options page: https://github.com/claviska/jquery-miniColors/
--"Righteous" font: http://www.google.com/webfonts/specimen/Righteous
-
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
 */
+
 
 var exportBuffer; //used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
 const EXPORT_BUFFER_TIME = 10000; //10 seconds
@@ -251,68 +243,9 @@ function getCSSString() {
 		background-color: " + getProperty("sb-resizer-background") + " !important;\
 	}"; */
 			
-	return newCSS;
-	
-	// Not super necesssary, but: perhaps create a "cached css string" in local storage that's
-	// calculated every time the settings are saved, so the browser doesn't have to compile the string EVERY
-	// page load...?
-	
+	return newCSS;	
 }
 
-
-//Direct Copy From options.js -- For now...
-//Saves to local storage via localStorage[] or chrome.storage
-/*function saveProperty(key, value) {
-	localStorage[key] = value;
-	//chrome.extension.getBackgroundPage.console.log("Saving property...");
-}
-
-function getProperty(key) {
-	//chrome.extension.getBackgroundPage.console.log("Reading property...");
-	return localStorage[key];
-}
-function removeProperty(key) {
-	localStorage.removeItem(key);
-	chrome.extension.getBackgroundPage.console.log("Removing property...");
-}*/
-
-//Shortcut for saveProperties()
-/*function saveProperty(key, value) {
-	//localStorage[key] = value;
-	var newProps = JSON.parse('{ "' + key + '" : "' + value + '" }');
-	saveProperties(newProps);
-	console.log("Saving property... (bg page)");
-}
-
-function saveProperties(keyvals) {
-	chrome.storage.sync.set(keyvals, function() {
-		refreshLocalSettings();
-	});
-	console.log("Saved a lot of properties!");
-}
-
-function getProperty(key) {
-	console.log("Reading property... (bg page)");
-	//return localStorage[key];
-	return scrollbarSettings[key];
-}
-function removeProperty(key) {
-	//localStorage.removeItem(key);
-	chrome.storage.sync.remove(key);
-	console.log("Removing property...");
-}
-
-//Updates var scrollbarSettings
-function refreshLocalSettings() {
-	chrome.storage.sync.get(function(items) {
-		scrollbarSettings = items;
-		console.log("Scrollbar settings ready.");
-	});
-}
-
-function setScrollbarSettings(settings) {
-	scrollbarSettings = settings;
-}*/
 
 function saveProperty(key, value) {
 	localStorage[key] = value;
@@ -343,9 +276,7 @@ function refreshLocalStorage(callback) {
 			}
 			callback();
 		});
-	}
-
-	
+	}	
 }
 
 //Save the local settings to chrome.storage in 30 seconds.

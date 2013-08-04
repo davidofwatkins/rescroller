@@ -1,24 +1,10 @@
 /*
-
 Rescroller Chrome Extension
 Author: David Watkins (@dwat91)
 
-Special thanks to the following:
-
--Alte Mo for background image: http://subtlepatterns.com/?p=1293
--jQuery for options page functionality: http://jquery.com/
--jQuery UI for slider widgets on options page: http://jqueryui.com/
--MiniColors for image selector widgets on options page: https://github.com/claviska/jquery-miniColors/
--"Righteous" font: http://www.google.com/webfonts/specimen/Righteous
-
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
-
------------
-This script is injected into pages on the web to transform the styling of their
-scrollbars. It grabs style data saved into local storage and converts it to CSS
-styling that the browser will be able to interpret.
-
 */
+
 
 var restrictedSites;
 var customCSS;

@@ -1,28 +1,8 @@
 /*
-
 Rescroller Chrome Extension
 Author: David Watkins (@dwat91)
 
-Special thanks to the following:
-
--Alte Mo for background image: http://subtlepatterns.com/?p=1293
--jQuery for options page functionality: http://jquery.com/
--jQuery UI for slider widgets on options page: http://jqueryui.com/
--MiniColors for image selector widgets on options page: https://github.com/claviska/jquery-miniColors/
--"Righteous" font: http://www.google.com/webfonts/specimen/Righteous
-
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
-*/
-
-/**********TODO******************
-  * - TESTING Enable sync (using chrome.storage API instead of localStorage)
-  * - TESTING Add "restore defaults" to images with defaults
-  * - TESTING Maybe add "done" or "save" link/button to bottom of color picker that closes the picker and saves (...?)
-  * - TESTING Show "saved" button so that people know it autosaves
-  * - TESTING Update jQuery
-  * - TESTING Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
-  * - TESTING Add button in chrome for easy access to settings
-  * - Clean up debugging and console output
 */
 
 var startingLoadTimestamp = Date.now();
@@ -51,7 +31,7 @@ function refreshScrollbars() {
 	setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
 }
 
-//Following "plugin" function found here: http://stackoverflow.com/questions/10253663/how-to-detect-the-dragleave-event-in-firefox-when-dragging-outside-the-window/10310815#10310815
+//Following "plugin" function found here: http://stackoverflow.com/a/10310815/477632
 $.fn.draghover = function(options) {
     return this.each(function() {
     
@@ -111,8 +91,6 @@ function hideErrorMessage() {
 }
 
 function restoreDefaults() {
-	
-	console.log("restoring defaults...");
 
 	saveProperties({
 		
@@ -278,14 +256,12 @@ function resetDragHoveringEventTriggering() {
 	//Following is a pain using "dragenter" and "dragleave" events. draghover() plugin (above) makes it easy!
 	$(window).draghover().on({
 		"draghoverstart" : function() {
-			//console.log("A file has been dragged into the window...");
 			originalBackground = $(".selector-button").css("background");
 			originalText = $(".selector-button").html();
 			$(".selector-button").animate({ "background-color" : "#C91313" }, "slow");
 			$(".selector-button").html("Drop Here");
 		},
 		"draghoverend" : function() {
-			//console.log("A file has been dragged out of the window.");
 			$(".selector-button").html(originalText);
 			$(".selector-button").animate({ "background-color" : originalBackground }, "slow");
 			return false;
@@ -397,7 +373,6 @@ $(document).ready(function() {
 				$(this).siblings(".slider-value").html(ui.value + units);
 			},
 			change: function(event, ui) {
-				console.log("The slider has been changed to " + ui.value);
 				//Update value in local storage
 				saveProperty(propertyName, ui.value);
 				refreshScrollbars();
@@ -415,7 +390,6 @@ $(document).ready(function() {
 		
 		$(this).miniColors({
 			change: function(hex, rgb) {
-				//console.log("localStorage[" + localStorageKey + "] will be updated to " + hex);
 				self.siblings(".colorvalue").val(hex);
 			},
 			"close": function(hex, rgb) {
@@ -612,8 +586,6 @@ $(document).ready(function() {
 /***********Image selector functionality*****************/
 
 function handleFiles(files, frame, key) {
-	
-	console.log("Handling file");
 
 	var file = files[0];
 	var imageType = /image.*/;
@@ -703,14 +675,12 @@ function showSaveConfirmationBox() {
 
 //Saves to local storage via localStorage[] and chrome.storage
 function saveProperty(key, value, callback) {
-	console.log("Saving " + key + " -> " + value);
 	localStorage[key] = value;
 	if (callback)
 		callback();
 	queueExportLocalSettings();
 	if ((Date.now() - 500) > startingLoadTimestamp) 
 		showSaveConfirmationBox(); //Do not show this message if the page just loaded
-	
 }
 
 function saveProperties(props) {
@@ -736,11 +706,3 @@ function removeProperty(key) {
 function queueExportLocalSettings() {
 	chrome.extension.getBackgroundPage().queueExportLocalSettings();
 }
-
-/* TODO:
- 
- - DONE - Add buffering mechanism to prevent several pushes to chrome.storage at once (maybe limit to once every 60 minutes)
- - NOT NECESSARY (?) - Detect when sync is incoming or outgoing - when incoming, save chrome.storage to localStorage (background page)
- - DONE - When installing for the first time, check chrome.storage before setting defaults to see if the user has already specified scrollbars from another computer
-
- */

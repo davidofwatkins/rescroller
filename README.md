@@ -10,15 +10,20 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 
 [View **Rescroller** on the Chrome Webstore](https://chrome.google.com/webstore/detail/rescroller/ddehdnnhjimbggeeenghijehnpakijod)
 
-## Planned & Upcoming Features:
+## Changelog
 
-- (Next version) Figure out how to disable for sites that already have customized scrollbars (if even possible)
-- Enable sync (using chrome.storage API instead of localStorage)
-- Add "restore defaults" to images with defaults
-- Show "saved" button so that people know it autosaves
-- Update jQuery
-- Example of site not working: http://answers.yahoo.com - fix by setting <html> tag to overflow: hidden and then reverting to what it was
-- Add button in chrome for easy access to settings
+### v1.5
+
+- Added syncronization between Chrome installations via Google Accounts
+- Added "restore defaults" option to scrollbar button selectors
+- Added confirmation message that appears after saving
+- Added "apply" link to the color picker
+- Added icon to toolbar next to address bar for easier access to scrollbar settings
+- Updated jQuery to v2.0.3
+- Fixed issues where scrollbars would not apply on specific sites (e.g., answers.yahoo.com)
+- Fixed drag-and-drop functionality
+- Fixed issue where image selector failed on successive selections of the same file
+- Fixed issue where scrollbars did not update when manually entering color hex
 
 ## Dependencies & Credit:
 
