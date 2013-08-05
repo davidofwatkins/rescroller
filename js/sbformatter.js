@@ -35,30 +35,15 @@ chrome.extension.sendRequest({ message: "css_string" }, function(response) {
 			
 			//Fill the freshly created <style> tag with the generated CSS from the background page:
 			cssNode.innerText = customCSS;
-			headID.appendChild(cssNode);			
-			
-			//In case the scrollbars loaded before the custom style was injected, regenerate all scrollbars
-			window.addEventListener("load", function() { //Add to window.onload "queue"
-				
-				var originalOverflow = document.getElementsByTagName("body")[0].style.overflow;
-				/*if (document.getElementsByTagName("body")[0].style.overflow == "" || document.getElementsByTagName("body")[0].style.overflow == "scroll") {
-					originalOverflow = "scroll";
-				}
-				else { originalOverflow = document.getElementsByTagName("body")[0].style.overflow; }*/
-				
-				document.getElementsByTagName("body")[0].style.overflow = "hidden";
-				setTimeout(function() {
-					document.getElementsByTagName("body")[0].style.overflow = originalOverflow;
-				}, 10);
+			headID.appendChild(cssNode);
+
+			//Failsafe for pages that don't show redesigned scrollbars before page has loaded
+			document.addEventListener('DOMContentLoaded', function() { //like $(document).ready()
+				redrawScrollbars();
 			}, false);
 		}
 	}
 });
-
-//Failsafe for pages that don't show redesigned scrollbars before page has loaded
-document.addEventListener('DOMContentLoaded', function() { //like $(document).ready()
-	redrawScrollbars();
-}, false);
 
 function redrawScrollbars() {
 	//Get existing scrollbar properties
