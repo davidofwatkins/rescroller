@@ -13,8 +13,6 @@ var version = chrome.app.getDetails().version;
 //If this is the first time running the extension (if it's just been installed), open options page
 // ...and Download latest Chrome Storage to Local Storage
 refreshLocalStorage(function() {
-	console.log("calling callback!");
-	//if (!localStorage.getItem("install_time")) {
 	if (!getProperty("install_time")) {
 		var now = new Date().getTime();
 		localStorage["install_time"] = now;
@@ -24,12 +22,11 @@ refreshLocalStorage(function() {
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-	//console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-	if (request.message == "css_string") {
-		
-		sendResponse({ css_string: getCSSString(), restricted_sites: getListOfDisabledSites() });
+		if (request.message == "css_string") {
+			sendResponse({ css_string: getCSSString(), restricted_sites: getListOfDisabledSites() });
+		}
 	}
-});
+);
 
 
 //Handle action button in Chrome toolbar
@@ -62,7 +59,6 @@ function replaceAll(theString, toReplace, replaceWith) {
 
 //Get number of pixels from percentage
 function pixels(percentage, doNotReduceByHalf) {
-	//console.log("Converting " + percentage + "% to " + result + "px");
 	if (!doNotReduceByHalf) { return ((percentage / 100) * getProperty("sb-size")) / 2; }
 	else { return (percentage / 100) * getProperty("sb-size"); }
 }
@@ -288,8 +284,6 @@ function queueExportLocalSettings() {
 }
 
 function exportLocalSettings() {
-
-	console.log("EXPORTING");
 
 	var lsJSON = {};
 	for (var mykey in localStorage) {
