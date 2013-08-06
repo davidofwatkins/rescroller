@@ -14,7 +14,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 
 ### v1.5
 
-- Added syncronization between Chrome installations via Google Accounts
+- Added synchronization between Chrome installations via Google Accounts
 - Added "restore defaults" option to scrollbar button selectors
 - Added confirmation message that appears after saving
 - Added "apply" link to the color picker
