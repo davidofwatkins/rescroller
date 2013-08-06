@@ -5,13 +5,15 @@
   "description": "Decorate your scrollbars.",
   "icons": {
 	  "16": "appicons/icon16.png",
-	  "48": "appicons/icon48.png",
+    "19": "appicons/icon19.png",
+	  "48": "appicons/icon38.png",
+    "48": "appicons/icon48.png",
 	  "128": "appicons/icon128.png"
   },
   "options_page": "options.html",
   "browser_action": {
     "default_title": "Rescroller Settings",
-    "default_icon": "appicons/icon48.png"
+    "default_icon": "appicons/icon19.png"
   },
   "content_scripts": [
     {
