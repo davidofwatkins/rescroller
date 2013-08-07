@@ -3,8 +3,8 @@ Rescroller Chrome Extension
 Author: David Watkins (@dwat91)
 
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
-*/
-
+*
+/
 
 var exportBuffer; //used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
 const EXPORT_BUFFER_TIME = 10000; //10 seconds
