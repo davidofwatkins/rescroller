@@ -37,9 +37,10 @@ chrome.extension.sendRequest({ message: "css_string" }, function(response) {
 			cssNode.innerText = customCSS;
 			headID.appendChild(cssNode);
 
-			//Failsafe for pages that don't show redesigned scrollbars before page has loaded
+			//Refresh the scrollbars
 			document.addEventListener('DOMContentLoaded', function() { //like $(document).ready()
 				redrawScrollbars();
+				setTimeout(function() { redrawScrollbars(); }, 500); //failsafe: draw them again in case it didn't work the first time
 			}, false);
 		}
 	}
@@ -50,8 +51,12 @@ function redrawScrollbars() {
 	var html = document.getElementsByTagName("html")[0];
 	var body = document.getElementsByTagName("body")[0];
 
-    var htmlCurrentOverflow = html.style.overflow
-    var bodyCurrentOverflow = body.style.overflow
+    var htmlCurrentOverflow = getComputedStyle(html, null).overflow;
+    var htmlCurrentOverflowX = getComputedStyle(html, null).overflowX;
+    var htmlCurrentOverflowY = getComputedStyle(html, null).overflowY;
+    var bodyCurrentOverflow = getComputedStyle(body, null).overflow;
+    var bodyCurrentOverflowX = getComputedStyle(body, null).overflowX;
+    var bodyCurrentOverflowY = getComputedStyle(body, null).overflowY;
 
     //Hide <html> and <body> scrollbars
     html.style.overflow = "hidden";
@@ -60,6 +65,10 @@ function redrawScrollbars() {
     //Show <html> and <body> scrollbars again (using their previously set properties)
     setTimeout(function() {
     	html.style.overflow = htmlCurrentOverflow;
+    	html.style.overflowX = htmlCurrentOverflowX;
+    	html.style.overflowY = htmlCurrentOverflowY;
     	body.style.overflow = bodyCurrentOverflow;
-    }, 1);
+    	body.style.overflow = bodyCurrentOverflowX;
+    	body.style.overflow = bodyCurrentOverflowY;
+    }, 10);
 }
