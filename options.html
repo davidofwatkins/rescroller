@@ -30,7 +30,9 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
     </div>
         <form id="theform">
         <div id="welcomemsg">
-        	Welcome to Rescroller! Using the tools below, you can customize the look and feel of scrollbars across the internet. Please take a moment to stylize each scrollbar element and their properties, including the sizes and colors of shadows and borders. This extention will override the styling of scrollbars on all websites&mdash;even if they have already been styled by the websites' author&mdash;unless you specify them in the list of disabled sites.
+        	<p>Welcome to Rescroller! Using the tools below, you can customize the look and feel of scrollbars across your Chrome browser. Please take a moment to style each scrollbar element and their properties, including the sizes and colors of shadows and borders. This extension will override scrollbars on all websites, including those that have their own customized scrollbars, unless you specify them in the blacklist below.</p>
+
+            <p><small>(Please note that, due to general restrictions for Chrome extensions, your scrollbars will not appear on the Chrome Webstore, or URLS that begin with "<code>chrome://</code>". However, you can enable Rescroller for local webpages and incognito browsing in Chrome's extension manager.)</small></p>
         </div>
         <div class="section" id="general">
             <h1 class="sectionheader">General</h1>
@@ -41,6 +43,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                 <div style="clear: both;"></div>
             </div>
             <div id="resetformatting" class="button">Restore Default Formatting</div>
+            <p style="margin: 20px auto 10px"><b>Blacklist:</b></p>
             <p class="small-description">Enter any sites for which you would not like to override scrollbar styling, below (separated by commas):</p>
             <textarea id="excludedsites" placeholder="Example: mail.google.com, facebook.com"></textarea>
         </div>

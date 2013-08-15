@@ -12,7 +12,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 
 ## Changelog
 
-### v1.5
+### v1.1
 
 - Added synchronization between Chrome installations via Google Accounts
 - Added "restore defaults" option to scrollbar button options
