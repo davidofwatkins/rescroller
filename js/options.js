@@ -166,6 +166,21 @@ function restoreDefaults() {
 		"sb-buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
 		"sb-buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
 		
+		//Reset all non-button images to 0
+		"sb-slider-background-image-vertical" : 0,
+		"sb-slider-background-image-horizontal" : 0,
+		"sb-slider-background-image-vertical-hover" : 0,
+		"sb-slider-background-image-horizontal-hover" : 0,
+		"sb-slider-background-image-vertical-active" : 0,
+		"sb-slider-background-image-horizontal-active" : 0,
+		
+		"sb-background-background-image-vertical" : 0,
+		"sb-background-background-image-horizontal" : 0,
+		"sb-background-background-image-vertical-hover" : 0,
+		"sb-background-background-image-horizontal-hover" : 0,
+		"sb-background-background-image-vertical-active" : 0,
+		"sb-background-background-image-horizontal-active" : 0,
+
 		//Custom CSS
 		"sb-customcss" : "::-webkit-scrollbar {\
 \n\n\
