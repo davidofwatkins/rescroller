@@ -6,7 +6,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 */
 
 var exportBuffer; //used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
-const EXPORT_BUFFER_TIME = 10000; //10 seconds
+const EXPORT_BUFFER_TIME = 7000; //7 seconds
 var version = chrome.app.getDetails().version;
 
 //If this is the first time running the extension (if it's just been installed), open options page
