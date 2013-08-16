@@ -302,7 +302,7 @@ $(document).ready(function() {
 	//Clear picture buttons
 	$(".clearimage").click(function() {
 		var key = $(this).parent().parent().attr("id");
-		removeProperty(key);
+		saveProperty(key, 0);
 		$(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
 		$(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
 		
@@ -449,7 +449,7 @@ $(document).ready(function() {
 	
 	for (var i = 0; i < keys.length; i++) {
 		
-		if (getProperty(keys[i])) {
+		if (getProperty(keys[i]) && getProperty(keys[i]) != 0) {
 			$("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + getProperty(keys[i]) + '" />');
 			$("#" + keys[i] + " .thumbframe").css("display", "inline-block"); //show the image frame for this image
 		}
