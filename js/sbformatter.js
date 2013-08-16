@@ -40,8 +40,25 @@ chrome.extension.sendRequest({ message: "css_string" }, function(response) {
 			//Refresh the scrollbars
 			document.addEventListener('DOMContentLoaded', function() { //like $(document).ready()
 				redrawScrollbars();
-				setTimeout(function() { redrawScrollbars(); }, 500); //failsafe: draw them again in case it didn't work the first time
+				setTimeout(function() { redrawScrollbars(); }, 1000); //failsafe: draw them again in case it didn't work the first time
 			}, false);
+
+			/**
+				Developer Note:
+
+				The document.DOMContentLoaded event listener will work fine for most
+				pages. However, it may fire before some pages have fully downloaded everything,
+				causing it to fail. The window.load listener would solve this problem, but
+				it does not refresh the scrollbars when the tab is not in focus (for some
+				reason). Setting a window.onfocus event might fix this, but it would not be ideal
+				to redraw the scrollbars every time the user leaves and comes back to the page.
+
+				For now, the fix is to redrawScrollbars() at document.DOMContentLoaded, and then
+				redrawScrollbars() again in 1 second. For most pages, this will be enough time before
+				refreshing the bars, though for some (with slow connections), it may not be sufficient.
+				Still, this is only a problem for pages that don't work the first time anyway.
+			**/
+
 		}
 	}
 });
@@ -52,11 +69,7 @@ function redrawScrollbars() {
 	var body = document.getElementsByTagName("body")[0];
 
     var htmlCurrentOverflow = getComputedStyle(html, null).overflow;
-    var htmlCurrentOverflowX = getComputedStyle(html, null).overflowX;
-    var htmlCurrentOverflowY = getComputedStyle(html, null).overflowY;
     var bodyCurrentOverflow = getComputedStyle(body, null).overflow;
-    var bodyCurrentOverflowX = getComputedStyle(body, null).overflowX;
-    var bodyCurrentOverflowY = getComputedStyle(body, null).overflowY;
 
     //Hide <html> and <body> scrollbars
     html.style.overflow = "hidden";
@@ -65,10 +78,6 @@ function redrawScrollbars() {
     //Show <html> and <body> scrollbars again (using their previously set properties)
     setTimeout(function() {
     	html.style.overflow = htmlCurrentOverflow;
-    	html.style.overflowX = htmlCurrentOverflowX;
-    	html.style.overflowY = htmlCurrentOverflowY;
     	body.style.overflow = bodyCurrentOverflow;
-    	body.style.overflow = bodyCurrentOverflowX;
-    	body.style.overflow = bodyCurrentOverflowY;
     }, 10);
 }

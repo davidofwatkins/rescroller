@@ -20,7 +20,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 - Added "apply" link to the color picker
 - Added icon to Chrome toolbar for easier access to scrollbar settings
 - Updated jQuery to v2.0.3
-- Fixed issues where scrollbars would not apply on some sites (e.g., answers.yahoo.com)
+- Fixed some issues where scrollbars would not apply on some sites (e.g., answers.yahoo.com)
 - Fixed drag-and-drop functionality
 - Fixed issue where image selector failed on successive selections of the same file
 - Fixed issue where scrollbars did not update when manually entering color hex
