@@ -221,7 +221,7 @@ function getCSSString() {
 		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}\
 	::-webkit-scrollbar-thumb:horizontal {";
-		value = getProperty("sb-slider-background-image-vertical");
+		value = getProperty("sb-slider-background-image-horizontal");
 		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}";
 	
@@ -251,7 +251,7 @@ function getCSSString() {
 		}\
 		\
 		::-webkit-scrollbar-thumb:horizontal:active {";
-			value = getProperty("sb-slider-background-image-vertical-active");
+			value = getProperty("sb-slider-background-image-horizontal-active");
 			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}";
 	}
