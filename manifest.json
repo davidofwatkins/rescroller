@@ -1,7 +1,7 @@
 {
   "name": "Rescroller",
-  "version": "1.1",
-  "manifest_version": 2,
+  "version": "1.1.1",
+  "manifest_version": 3,
   "description": "Decorate your scrollbars.",
   "icons": {
 	  "16": "appicons/icon16.png",
