@@ -19,10 +19,35 @@ refreshLocalStorage(function() {
 	}
 });
 
+/**
+ * Listen for commands from our content script (sbformatter.js)
+ */
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
-		if (request.message == "css_string") {
-			sendResponse({ css_string: getCSSString(), restricted_sites: getListOfDisabledSites() });
+
+		/**
+		 * Inject our customized CSS into the webpage.
+		 */
+		if (request.message == 'perform_css_injection') {
+			chrome.tabs.query({ active: true, lastFocusedWindow: true }, function (tabs) { // first, get current tab url
+			    var currentTab = tabs[0];
+
+			    // Check to make sure this url isn't blacklisted. Exit early if so
+			    var restrictedSites = getListOfDisabledSites();
+				for (var restricted in restrictedSites) {
+					var restricted = restrictedSites[restricted];
+
+					if (!restricted) { continue; } // make sure it's not ''
+					if (currentTab.url.indexOf(restricted) >= 0) { return; }
+				}
+
+				// Aaaaand inject!
+			    chrome.tabs.insertCSS(null, { // null = current tab
+			    	code: getCSSString(),
+			    	allFrames: true,
+			    	runAt: 'document_start'
+			    });
+			});
 		}
 	}
 );
