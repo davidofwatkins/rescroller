@@ -90,6 +90,8 @@ function pixels(percentage, doNotReduceByHalf) {
 //Grab data from local storage and convert it into a CSS string
 function getCSSString() {
 	
+	var value;
+
 	//If user has chosen to specify his own CSS, just return that
 	if (getProperty("sb-usecustomcss") == "checked") { return getProperty("sb-customcss"); }
 		  
@@ -117,50 +119,62 @@ function getCSSString() {
 		::-webkit-scrollbar-button:horizontal {\
 			width: " + getProperty("sb-buttons-size") + "px !important;\
 		}\
-		::-webkit-scrollbar-button:vertical:decrement {\
-			background-image: url('" + getProperty("sb-buttons-background-image-up") + "') !important;\
+		::-webkit-scrollbar-button:vertical:decrement {";
+			value =  getProperty("sb-buttons-background-image-up");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-button:vertical:increment {\
-			background-image: url('" + getProperty("sb-buttons-background-image-down") + "') !important;\
+		::-webkit-scrollbar-button:vertical:increment {";
+			value = getProperty("sb-buttons-background-image-down");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-button:horizontal:increment {\
-			background-image: url('" + getProperty("sb-buttons-background-image-right") + "') !important;\
+		::-webkit-scrollbar-button:horizontal:increment {";
+			value = getProperty("sb-buttons-background-image-right");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-button:horizontal:decrement {\
-			background-image: url('" + getProperty("sb-buttons-background-image-left") + "') !important;\
+		::-webkit-scrollbar-button:horizontal:decrement {";
+			value = getProperty("sb-buttons-background-image-left");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}";
 		
 		if (getProperty("sb-buttons-use-hover") == "checked") {
-			newCSS += "::-webkit-scrollbar-button:vertical:decrement:hover {\
-				background-image: url('" + getProperty("sb-buttons-background-image-up-hover") + "') !important;\
+			newCSS += "::-webkit-scrollbar-button:vertical:decrement:hover {";
+				value = getProperty("sb-buttons-background-image-up-hover");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:vertical:increment:hover {\
-				background-image: url('" + getProperty("sb-buttons-background-image-down-hover") + "') !important;\
+			::-webkit-scrollbar-button:vertical:increment:hover {";
+				value = getProperty("sb-buttons-background-image-down-hover");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:horizontal:increment:hover {\
-				background-image: url('" + getProperty("sb-buttons-background-image-right-hover") + "') !important;\
+			::-webkit-scrollbar-button:horizontal:increment:hover {";
+				value = getProperty("sb-buttons-background-image-right-hover");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:horizontal:decrement:hover {\
-				background-image: url('" + getProperty("sb-buttons-background-image-left-hover") + "') !important;\
+			::-webkit-scrollbar-button:horizontal:decrement:hover {";
+				value = getProperty("sb-buttons-background-image-left-hover");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
 			::-webkit-scrollbar-button:hover {\
-			background-color: " + getProperty("sb-buttons-color-hover") + " !important;\
+				background-color: " + getProperty("sb-buttons-color-hover") + " !important;\
 				box-shadow: inset 0 0 " + pixels(getProperty("sb-buttons-shadow-size-hover"), true) + "px " + getProperty("sb-buttons-shadow-color-hover") + "; !important\
 			}";
 		}
 		
 		if (getProperty("sb-buttons-use-active") == "checked") {
-			newCSS += "::-webkit-scrollbar-button:vertical:decrement:active {\
-				background-image: url('" + getProperty("sb-buttons-background-image-up-active") + "') !important;\
+			newCSS += "::-webkit-scrollbar-button:vertical:decrement:active {";
+				value = getProperty("sb-buttons-background-image-up-active");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:vertical:increment:active {\
-				background-image: url('" + getProperty("sb-buttons-background-image-down-active") + "') !important;\
+			::-webkit-scrollbar-button:vertical:increment:active {";
+				value = getProperty("sb-buttons-background-image-down-active");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:horizontal:increment:active {\
-				background-image: url('" + getProperty("sb-buttons-background-image-right-active") + "') !important;\
+			::-webkit-scrollbar-button:horizontal:increment:active {";
+				value = getProperty("sb-buttons-background-image-right-active");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
-			::-webkit-scrollbar-button:horizontal:decrement:active {\
-				background-image: url('" + getProperty("sb-buttons-background-image-left-active") + "') !important;\
+			::-webkit-scrollbar-button:horizontal:decrement:active {";
+				value = getProperty("sb-buttons-background-image-left-active");
+				newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 			}\
 			::-webkit-scrollbar-button:active {\
 				background-color: " + getProperty("sb-buttons-color-active") + " !important;\
@@ -182,19 +196,23 @@ function getCSSString() {
 		border: " + pixels(getProperty("sb-background-border-size")) + "px " + getProperty("sb-background-border-style") + " " + getProperty("sb-background-border-color") + " !important;\
 		border-radius: " + pixels(getProperty("sb-background-radius")) + "px !important;\
 	}\
-	::-webkit-scrollbar-track-piece:vertical {\
-		background-image: url('" + getProperty("sb-background-background-image-vertical") + "') !important;\
+	::-webkit-scrollbar-track-piece:vertical {";
+		value = getProperty("sb-background-background-image-vertical");
+		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}\
-	::-webkit-scrollbar-track-piece:horizontal {\
-		background-image: url('" + getProperty("sb-background-background-image-horizontal") + "') !important;\
+	::-webkit-scrollbar-track-piece:horizontal {";
+		value = getProperty("sb-background-background-image-horizontal");
+		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}";
-	
+
 	if (getProperty("sb-background-use-hover") == "checked") {
-		newCSS += "::-webkit-scrollbar-track-piece:vertical:hover {\
-			background-image: url('" + getProperty("sb-background-background-image-vertical-hover") + "') !important;\
+		newCSS += "::-webkit-scrollbar-track-piece:vertical:hover {";
+			value = getProperty("sb-background-background-image-vertical-hover");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-track-piece:horizontal:hover {\
-			background-image: url('" + getProperty("sb-background-background-image-horizontal-hover") + "') !important;\
+		::-webkit-scrollbar-track-piece:horizontal:hover {";
+			value = getProperty("sb-background-background-image-horizontal-hover");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
 		::-webkit-scrollbar-track-piece:hover {\
 			background-color: " + getProperty("sb-background-color-hover") + " !important;\
@@ -203,11 +221,13 @@ function getCSSString() {
 	}
 	
 	if (getProperty("sb-background-use-active") == "checked") {
-		newCSS += "::-webkit-scrollbar-track-piece:vertical:active {\
-			background-image: url('" + getProperty("sb-background-background-image-vertical-active") + "') !important;\
+		newCSS += "::-webkit-scrollbar-track-piece:vertical:active {";
+			value = getProperty("sb-background-background-image-vertical-active");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-track-piece:horizontal:active {\
-			background-image: url('" + getProperty("sb-background-background-image-horizontal-active") + "') !important;\
+		::-webkit-scrollbar-track-piece:horizontal:active {";
+			value = getProperty("sb-background-background-image-horizontal-active");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
 		::-webkit-scrollbar-track-piece:active {\
 			background-color: " + getProperty("sb-background-color-active") + " !important;\
@@ -221,11 +241,13 @@ function getCSSString() {
 		border-radius: " + pixels(getProperty("sb-slider-radius")) + "px !important;\
 		border: " + pixels(getProperty("sb-slider-border-size")) + "px " + getProperty("sb-slider-border-style") + " " + getProperty("sb-slider-border-color") + " !important;\
 	}\
-	::-webkit-scrollbar-thumb:vertical {\
-		background-image: url('" + getProperty("sb-slider-background-image-vertical") + "') !important;\
+	::-webkit-scrollbar-thumb:vertical {";
+		value = getProperty("sb-slider-background-image-vertical");
+		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}\
-	::-webkit-scrollbar-thumb:horizontal {\
-		background-image: url('" + getProperty("sb-slider-background-image-horizontal") + "') !important;\
+	::-webkit-scrollbar-thumb:horizontal {";
+		value = getProperty("sb-slider-background-image-horizontal");
+		newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 	}";
 	
 	if (getProperty("sb-slider-use-hover") == "checked") {
@@ -233,11 +255,13 @@ function getCSSString() {
 			background-color: " + getProperty("sb-slider-color-hover") + " !important;\
 			box-shadow: inset 0 0 " + pixels(getProperty("sb-slider-shadow-size-hover"), true) + "px " + getProperty("sb-slider-shadow-color-hover") + " !important;\
 		}\
-		::-webkit-scrollbar-thumb:vertical:hover {\
-			background-image: url('" + getProperty("sb-slider-background-image-vertical-hover") + "') !important;\
+		::-webkit-scrollbar-thumb:vertical:hover {";
+			value = getProperty("sb-slider-background-image-vertical-hover");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
-		::-webkit-scrollbar-thumb:horizontal:hover {\
-			background-image: url('" + getProperty("sb-slider-background-image-horizontal-hover") + "') !important;\
+		::-webkit-scrollbar-thumb:horizontal:hover {";
+			value = getProperty("sb-slider-background-image-horizontal-hover");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}";
 	}
 	
@@ -246,12 +270,14 @@ function getCSSString() {
 			background-color: " + getProperty("sb-slider-color-active") + " !important;\
 			box-shadow: inset 0 0 " + pixels(getProperty("sb-slider-shadow-size-active"), true) +  "px " + getProperty("sb-slider-shadow-color-active") + " !important;\
 		}\
-		::-webkit-scrollbar-thumb:vertical:active {\
-			background-image: url('" + getProperty("sb-slider-background-image-vertical-active") + "') !important;\
+		::-webkit-scrollbar-thumb:vertical:active {";
+			value = getProperty("sb-slider-background-image-vertical-active");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}\
 		\
-		::-webkit-scrollbar-thumb:horizontal:active {\
-			background-image: url('" + getProperty("sb-slider-background-image-horizontal-active") + "') !important;\
+		::-webkit-scrollbar-thumb:horizontal:active {";
+			value = getProperty("sb-slider-background-image-horizontal-active");
+			newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
 		}";
 	}
 	

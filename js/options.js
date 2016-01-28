@@ -24,7 +24,6 @@ $(document).ready(function() {
 });
 
 function refreshScrollbars() {
-	//location.reload(true);
 	$("#rescroller").html(chrome.extension.getBackgroundPage().getCSSString());
 	var originalOverflow = $("body").css("overflow");
 	$("body").css("overflow", "hidden");
@@ -293,6 +292,7 @@ $(document).ready(function() {
 	
 	//Reset formatting button
 	$("#resetformatting").click(function() {
+		if (!confirm("Are you sure you would like to reset your scrollbars to default? This cannot be undone.")) { return false; }
 		restoreDefaults();
 		location.reload(true);
 	});
