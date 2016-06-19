@@ -14,6 +14,17 @@ var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
 
+// Show "saved" confirmation box
+function showSaveConfirmationBox() {
+	clearTimeout(saveconfirmationTimeout);
+	if (localStorage["showSaveConfirmation"] == 1) {
+		$("#save-confirm").fadeIn("slow");
+		saveconfirmationTimeout = setTimeout(function() {
+			$("#save-confirm").fadeOut("slow");
+		}, showSaveConfirmTime)
+	}
+}
+
 //Enable functionality of Confirm Box "Never Show Again" button
 $(document).ready(function() {
 	$("#save-confirm #hide-saved-confirm").click(function() {
@@ -24,7 +35,7 @@ $(document).ready(function() {
 });
 
 function refreshScrollbars() {
-	$("#rescroller").html(chrome.extension.getBackgroundPage().getCSSString());
+	$("#rescroller").html(Rescroller.getCSSString());
 	var originalOverflow = $("body").css("overflow");
 	$("body").css("overflow", "hidden");
 	setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
@@ -91,7 +102,7 @@ function hideErrorMessage() {
 
 function restoreDefaults() {
 
-	saveProperties({
+	Rescroller.saveProperties({
 		
 		//General
 		"sb-size" : 15,
@@ -208,17 +219,17 @@ function restoreDefaults() {
 }
 
 //Convert the styling stored in local storage into CSS:
-var newCSS = chrome.extension.getBackgroundPage().getCSSString();
+var newCSS = Rescroller.getCSSString();
 
 //Write the newly formatted CSS (from local storage) to the (beginning of the) page:
 document.write('<style id="rescroller">' + newCSS + "</style>");
 
 //If there is no previously-saved scrollbar CSS in local storage, save it!
-if (!getProperty("sb-size") || getProperty("sb-size") == "") {
+if (!Rescroller.getProperty("sb-size") || Rescroller.getProperty("sb-size") == "") {
 	restoreDefaults();
 }
 
-if (!getProperty("sb-excludedsites")) { saveProperty("sb-excludedsites", ""); }
+if (!Rescroller.getProperty("sb-excludedsites")) { Rescroller.saveProperty("sb-excludedsites", ""); }
 
 
 //When the page has loaded:
@@ -230,15 +241,15 @@ $(document).ready(function() {
 	$("#generatedcss").html(newCSS);
 	
 	//Fill the excludedsites textarea with the list of excluded sites:
-	$("#excludedsites").val(getProperty("sb-excludedsites"));
+	$("#excludedsites").val(Rescroller.getProperty("sb-excludedsites"));
 	$("#excludedsites").change(function() {
-		saveProperty("sb-excludedsites", $(this).val());
+		Rescroller.saveProperty("sb-excludedsites", $(this).val());
 	});
 	
 	//Fill the custom CSS form with the custom CSS
-	$("#customcss").val(getProperty("sb-customcss"));
+	$("#customcss").val(Rescroller.getProperty("sb-customcss"));
 	$("#customcss").change(function() {
-		saveProperty("sb-customcss", $(this).val());
+		Rescroller.saveProperty("sb-customcss", $(this).val());
 		refreshScrollbars();
 	});
 	
@@ -250,13 +261,13 @@ $(document).ready(function() {
 			if ($(this).attr("type") == "checkbox") { //If it's a check box...
 				
 				//If local storage says this option should be checked, check it
-				if (getProperty($(this).attr("id")) == "checked") {
-					$(this).attr("checked", getProperty($(this).attr("id")));
+				if (Rescroller.getProperty($(this).attr("id")) == "checked") {
+					$(this).attr("checked", Rescroller.getProperty($(this).attr("id")));
 				}
 			}
 			//If it's an ordinary input, just fill the input with the corresponding value from local storage
 			else {
-				$(this).val(getProperty($(this).attr("id")));
+				$(this).val(Rescroller.getProperty($(this).attr("id")));
 			}
 		}
 	});
@@ -298,7 +309,7 @@ $(document).ready(function() {
 	});
 	
 	//Expand/collapse all non-custom css areas when that checkbox is checked	
-	if (getProperty("sb-usecustomcss") == "checked") {
+	if (Rescroller.getProperty("sb-usecustomcss") == "checked") {
 		$(".section").not("#misc").not($("#general")).hide();
 		$(".customcss-collapsible").hide();
 	}
@@ -317,7 +328,7 @@ $(document).ready(function() {
 	//Clear picture buttons
 	$(".clearimage").click(function() {
 		var key = $(this).parent().parent().attr("id");
-		saveProperty(key, 0);
+		Rescroller.saveProperty(key, 0);
 		$(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
 		$(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
 		
@@ -332,7 +343,7 @@ $(document).ready(function() {
 	//Set correct value for <select>s
 	$("select").each(function() {
 		var thisProperty = $(this).attr('id');
-		var thisPropertyValue = getProperty(thisProperty);
+		var thisPropertyValue = Rescroller.getProperty(thisProperty);
 		$(this).children().each(function() {
 			if($(this).val() == thisPropertyValue) {
 				$(this).attr("selected", "selected");
@@ -344,7 +355,7 @@ $(document).ready(function() {
 	$("select").change(function() {
 		var thisProperty = $(this).attr('id');
 		var currentValue = $(this).val();
-		saveProperty(thisProperty, currentValue);
+		Rescroller.saveProperty(thisProperty, currentValue);
 		refreshScrollbars();
 	});
 	
@@ -378,18 +389,18 @@ $(document).ready(function() {
 		else { units = "%"; }
 		
 		//Fill slider value with value from local storage
-		$("#" + propertyName + " .slider-value").html(getProperty(propertyName) + units);
+		$("#" + propertyName + " .slider-value").html(Rescroller.getProperty(propertyName) + units);
 		
 		//Set up slider for this property
 		$("#" + propertyName + " .slider").slider({
-			value: getProperty(propertyName),
+			value: Rescroller.getProperty(propertyName),
 			orientation: theOrientation,
 			slide: function(event, ui) {
 				$(this).siblings(".slider-value").html(ui.value + units);
 			},
 			change: function(event, ui) {
 				//Update value in local storage
-				saveProperty(propertyName, ui.value);
+				Rescroller.saveProperty(propertyName, ui.value);
 				refreshScrollbars();
 			}
 		});
@@ -408,12 +419,12 @@ $(document).ready(function() {
 				self.siblings(".colorvalue").val(hex);
 			},
 			"close": function(hex, rgb) {
-				saveProperty(localStorageKey, hex, function() { refreshScrollbars(); });
+				Rescroller.saveProperty(localStorageKey, hex, function() { refreshScrollbars(); });
 			}
 		});
 		
 		//Set default color to whatever it's been saved to
-		$(this).miniColors("value", getProperty($(this).parent().attr("id")));
+		$(this).miniColors("value", Rescroller.getProperty($(this).parent().attr("id")));
 
 		//Add "apply" button
 		$(".miniColors-selector").append('<p><a href="#">Apply</a></p>');
@@ -464,8 +475,8 @@ $(document).ready(function() {
 	
 	for (var i = 0; i < keys.length; i++) {
 		
-		if (getProperty(keys[i]) && getProperty(keys[i]) != 0) {
-			$("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + getProperty(keys[i]) + '" />');
+		if (Rescroller.getProperty(keys[i]) && Rescroller.getProperty(keys[i]) != 0) {
+			$("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + Rescroller.getProperty(keys[i]) + '" />');
 			$("#" + keys[i] + " .thumbframe").css("display", "inline-block"); //show the image frame for this image
 		}
 		else {
@@ -479,7 +490,7 @@ $(document).ready(function() {
 	
 	//Fill "colorvalue" inputs with color values
 	$(".colorvalue").each(function() {
-		$(this).val(getProperty($(this).parent().attr("id")));
+		$(this).val(Rescroller.getProperty($(this).parent().attr("id")));
 	});
 	
 	//Automatically select text when clicking a color value
@@ -498,18 +509,18 @@ $(document).ready(function() {
 		if (val.indexOf("#") == 0 && (val.length == 4 || val.length == 7)) {
 			$(this).siblings(".colorselection").miniColors("value", val);
 			//refreshScrollbars();
-			saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
+			Rescroller.saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
 		}
 		//If the user just forgot the #, add it automatically and save
 		else if (val.indexOf("#") != 0 && (val.length == 3 || val.length == 6)) {
 			$(this).siblings(".colorselection").miniColors("value", "#" + val);
 			$(this).val("#" + val);
 			//refreshScrollbars();
-			saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
+			Rescroller.saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
 		}
 		//If it's just a bad value, restore original
 		else {
-			$(this).val(getProperty($(this).parent().attr("id")));
+			$(this).val(Rescroller.getProperty($(this).parent().attr("id")));
 		}
 		
 	});
@@ -528,11 +539,11 @@ $(document).ready(function() {
 
 		//Expand/collapse wrapper & save value to local storage
 		if ($(this).is(":checked")) {
-			saveProperty($(this).attr("id"), "checked");
+			Rescroller.saveProperty($(this).attr("id"), "checked");
 			$("#buttons-toggleable").slideDown("fast", function() { refreshScrollbars(); });
 		}
 		else {
-			saveProperty($(this).attr("id"), "unchecked");
+			Rescroller.saveProperty($(this).attr("id"), "unchecked");
 			$("#buttons-toggleable").slideUp("fast", function() { refreshScrollbars(); });
 		}
 	});
@@ -553,12 +564,12 @@ $(document).ready(function() {
 		
 		if ($(this).is(":checked")) {
 			//alert("Checked!");
-			saveProperty($(this).attr("id"), "checked");
+			Rescroller.saveProperty($(this).attr("id"), "checked");
 			$("#" + $(this).attr("data-wrapperid")).slideDown("slow", function() { refreshScrollbars(); });
 		}
 		else {
 			//alert("Unchecked!");
-			saveProperty($(this).attr("id"), "unchecked");
+			Rescroller.saveProperty($(this).attr("id"), "unchecked");
 			$("#" + $(this).attr("data-wrapperid")).slideUp("slow", function() { refreshScrollbars(); });
 		}
 		
@@ -579,14 +590,14 @@ $(document).ready(function() {
 	 		var left = propertyPrefix + "left" + propertySuffix;
 	 		var right = propertyPrefix + "right" + propertySuffix;
 
-		 	saveProperty(down, chrome.extension.getURL("images/defaults/down.png"));
-		 	saveProperty(up, chrome.extension.getURL("images/defaults/up.png"));
-		 	saveProperty(left, chrome.extension.getURL("images/defaults/left.png"));
-		 	saveProperty(right, chrome.extension.getURL("images/defaults/right.png"));
+		 	Rescroller.saveProperty(down, chrome.extension.getURL("images/defaults/down.png"));
+		 	Rescroller.saveProperty(up, chrome.extension.getURL("images/defaults/up.png"));
+		 	Rescroller.saveProperty(left, chrome.extension.getURL("images/defaults/left.png"));
+		 	Rescroller.saveProperty(right, chrome.extension.getURL("images/defaults/right.png"));
 
 		 	$("#" + down + ", #" + up + ", #" + left + ", #" + right).each(function() {
 
-		 		$(this).children(".thumbframe").children(".thumbcontainer").html('<img src="' + getProperty($(this).attr("id")) + '" />');
+		 		$(this).children(".thumbframe").children(".thumbcontainer").html('<img src="' + Rescroller.getProperty($(this).attr("id")) + '" />');
 		 		$(this).children(".selector-button").hide();
 	 			$(this).children(".thumbframe").show();
 		 	});
@@ -627,7 +638,7 @@ function handleFiles(files, frame, key) {
 				aImg.src = e.target.result;
 				
 				//Save to local storage
-				saveProperty(key, aImg.src);
+				Rescroller.saveProperty(key, aImg.src);
 				
 				//Change the "Select Image" button to an image frame
 				var container = $(frame).parents(".imagepicker-container");
@@ -676,48 +687,3 @@ $(document).ready(function() {
 		
 	});
 });
-
-//Show "saved" confirmation box
-function showSaveConfirmationBox() {
-	clearTimeout(saveconfirmationTimeout);
-	if (localStorage["showSaveConfirmation"] == 1) {
-		$("#save-confirm").fadeIn("slow");
-		saveconfirmationTimeout = setTimeout(function() {
-			$("#save-confirm").fadeOut("slow");
-		}, showSaveConfirmTime)
-	}
-}
-
-//Saves to local storage via localStorage[] and chrome.storage
-function saveProperty(key, value, callback) {
-	localStorage[key] = value;
-	if (callback)
-		callback();
-	queueExportLocalSettings();
-	if ((Date.now() - 500) > startingLoadTimestamp) 
-		showSaveConfirmationBox(); //Do not show this message if the page just loaded
-}
-
-function saveProperties(props) {
-	for (var key in props) {
-		var attrName = key;
-		var attrValue = props[key];
-
-		localStorage[attrName] = attrValue;
-	}
-
-	//Export to Chrome.storage
-	queueExportLocalSettings();
-}
-
-function getProperty(key) {
-	return localStorage[key];
-}
-function removeProperty(key) {
-	localStorage.removeItem(key);
-}
-
-//Shortcut to queueExportLocalSettings() in background page
-function queueExportLocalSettings() {
-	chrome.extension.getBackgroundPage().queueExportLocalSettings();
-}

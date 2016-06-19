@@ -24,7 +24,7 @@
     }
   ],
   "background": {
-	  "scripts" : ["js/background.js"]
+	  "scripts" : ["js/rescroller.js", "js/background.js"]
   },
   "permissions": [
     "<all_urls>",
