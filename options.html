@@ -13,12 +13,12 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/jquery-ui/jquery-ui.js"></script>
     <script type="text/javascript" src="js/rescroller.js"></script>
-	<script type="text/javascript" src="js/options.js"></script>
+    <script type="text/javascript" src="js/options.js"></script>
     <script type="text/javascript" src="js/jquery-minicolors/jquery.miniColors.js"></script>
-	<link type="text/css" rel="stylesheet" href="js/jquery-minicolors/jquery.miniColors.css" />
+    <link type="text/css" rel="stylesheet" href="js/jquery-minicolors/jquery.miniColors.css" />
 </head>
 <body>
-	<div id="errorbox">Error!</div>
+    <div id="errorbox">Error!</div>
     <div id="save-confirm">
         <p><b>Settings Saved</b></p>
         <p>Your scrollbar settings are saved automatically. If you are signed into Chrome with sync, your scrollbars will follow you across computers.</p>
@@ -31,15 +31,15 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
     </div>
         <form id="theform">
         <div id="welcomemsg">
-        	<p>Welcome to Rescroller! Using the tools below, you can customize the look and feel of scrollbars across your Chrome browser. Please take a moment to style each scrollbar element and their properties, including the sizes and colors of shadows and borders. This extension will override scrollbars on all websites, including those that have their own customized scrollbars, unless you specify them in the blacklist below.</p>
+            <p>Welcome to Rescroller! Using the tools below, you can customize the look and feel of scrollbars across your Chrome browser. Please take a moment to style each scrollbar element and their properties, including the sizes and colors of shadows and borders. This extension will override scrollbars on all websites, including those that have their own customized scrollbars, unless you specify them in the blacklist below.</p>
 
             <p><small>(Please note that, due to general restrictions for Chrome extensions, your scrollbars will not appear on the Chrome Webstore, or URLS that begin with "<code>chrome://</code>". However, you can enable Rescroller for local webpages and incognito browsing in Chrome's extension manager.)</small></p>
         </div>
         <div class="section" id="general">
             <h1 class="sectionheader">General</h1>
             <div id="sb-size" class="slider-property customcss-collapsible" style="display: block;">
-            	<div class="property-title">Scrollbar Size</div>
-            	<div class="slider slider-h"></div>
+                <div class="property-title">Scrollbar Size</div>
+                <div class="slider slider-h"></div>
                 <div class="slider-value"></div>
                 <div style="clear: both;"></div>
             </div>
@@ -52,18 +52,18 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
         <div class="section" id="scrollbar-slider">
             <h1 class="sectionheader">Slider</h1>
             <div id="sb-slider-color" class="colorpicker-container" style="display: block">
-            	<b>Color:</b>
+                <b>Color:</b>
                 <input type="hidden" id="colortext" class="colorselection" />
                 <input type="text" class="colorvalue" />
             </div>
             <table>
-            	<tr>
-                	<td><p class="imagepicker-label">Vertical Image:</p></td>
+                <tr>
+                    <td><p class="imagepicker-label">Vertical Image:</p></td>
                     <td><p class="imagepicker-label">Horizontal Image:</p></td>
                 </tr>
                 <tr>
-                	<td>
-                    	<div id="sb-slider-background-image-vertical" class="imagepicker-container">
+                    <td>
+                        <div id="sb-slider-background-image-vertical" class="imagepicker-container">
                             <input type="file" class="selector" />
                             <a href="#" class="selector-button">Select Image</a>
                             <div class="thumbframe">
@@ -74,7 +74,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                         </div>
                     </td>
                     <td>
-                    	<div id="sb-slider-background-image-horizontal" class="imagepicker-container">
+                        <div id="sb-slider-background-image-horizontal" class="imagepicker-container">
                             <input type="file" class="selector" />
                             <a href="#" class="selector-button">Select Image</a>
                             <div class="thumbframe">
@@ -114,10 +114,10 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                     <input type="text" class="colorvalue" />
                 </div>
                 <p>
-                	Style:
+                    Style:
                     <!--<input type="text" id="sb-slider-border-style" />-->
                     <select id="sb-slider-border-style">
-                    	<option value="solid">Solid</option>
+                        <option value="solid">Solid</option>
                         <option value="dashed">Dashed</option>
                         <option value="dotted">Dotted</option>
                         <option value="double">Double</option>
@@ -130,7 +130,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
             </div>
             <p class="sectionsubheader">Rounded Corners</p>
             <div id="sb-slider-radius" class="slider-property">
-            	<div class="slider slider-h"></div>
+                <div class="slider slider-h"></div>
                 <div class="slider-value"></div>
                 <div style="clear: both;"></div>
             </div>
@@ -400,7 +400,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                 </div>
             </div>
         </div>
-   	</div>
+    </div>
         
     <!-- ********************** Scrollbar Buttons ************************ -->
         
@@ -536,7 +536,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                 </div>
                 
                 <p class="custom-hover-active-label">Customize Style When Hovering: <input type="checkbox" id="sb-buttons-use-hover" class="toggle-hover-active" data-wrapperid="buttons-hover-wrapper" /></p>
-        		<div id="buttons-hover-wrapper">
+                <div id="buttons-hover-wrapper">
                     <p class="sectionsubheader">Hovering State</p>
                     <div class="subsection">
                         <div id="sb-buttons-color-hover" class="colorpicker-container" style="display: block;">
@@ -603,7 +603,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
                 </div>
                 
                 <p class="custom-hover-active-label">Customize Style When Clicking: <input type="checkbox" id="sb-buttons-use-active" class="toggle-hover-active" data-wrapperid="buttons-active-wrapper" /></p>
-        		<div id="buttons-active-wrapper">
+                <div id="buttons-active-wrapper">
                     <p class="sectionsubheader">Active State</p>
                     <div class="subsection">
                         <div id="sb-buttons-color-active" class="colorpicker-container" style="display: block;">
@@ -676,7 +676,7 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
         <div class="section"  id="misc">
             <h1 class="sectionheader">Miscellaneous</h1>
             <div id="sb-subbackground-color" class="colorpicker-container customcss-collapsible" style="display: block;">
-            	<b>Sub-Background Color:</b>
+                <b>Sub-Background Color:</b>
                 <input type="hidden" id="colortext" class="colorselection" />
                 <input type="text" class="colorvalue" />
             </div>
@@ -687,8 +687,8 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
             </div>
             <p>Use Custom CSS (Advanced Users Only): <input type="checkbox" id="sb-usecustomcss" class="toggle-hover-active" data-wrapperid="customcss-wrapper" /></p>
             <div id="customcss-wrapper">
-            	<p class="small-description">While the tools above are useful in designing a unique scrollbar, they do not allow for complete customization of scrollbars within Google Chrome. If you are a web developer or are familiar with CSS styling, <a href="http://css-tricks.com/custom-scrollbars-in-webkit/" target="_blank">you may enter custom CSS</a> to override the above tools, below:</p>
-            	<textarea id="customcss" placeholder="Enter CSS here"></textarea>
+                <p class="small-description">While the tools above are useful in designing a unique scrollbar, they do not allow for complete customization of scrollbars within Google Chrome. If you are a web developer or are familiar with CSS styling, <a href="http://css-tricks.com/custom-scrollbars-in-webkit/" target="_blank">you may enter custom CSS</a> to override the above tools, below:</p>
+                <textarea id="customcss" placeholder="Enter CSS here"></textarea>
             </div>
         </div>
         <br />

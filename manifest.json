@@ -4,11 +4,11 @@
   "manifest_version": 2,
   "description": "Decorate your scrollbars.",
   "icons": {
-	  "16": "appicons/icon16.png",
+    "16": "appicons/icon16.png",
     "19": "appicons/icon19.png",
-	  "48": "appicons/icon38.png",
+    "48": "appicons/icon38.png",
     "48": "appicons/icon48.png",
-	  "128": "appicons/icon128.png"
+    "128": "appicons/icon128.png"
   },
   "options_page": "options.html",
   "browser_action": {
@@ -19,12 +19,12 @@
     {
       "matches": ["<all_urls>"],
       "js": ["js/sbformatter.js"],
-	  "run_at": "document_start",
-	  "all_frames" : true
+    "run_at": "document_start",
+    "all_frames" : true
     }
   ],
   "background": {
-	  "scripts" : ["js/rescroller.js", "js/background.js"]
+    "scripts" : ["js/rescroller.js", "js/background.js"]
   },
   "permissions": [
     "<all_urls>",
@@ -32,9 +32,9 @@
     "tabs"
   ],
   "web_accessible_resources": [
-	  "images/defaults/up.png",
-	  "images/defaults/down.png",
-	  "images/defaults/left.png",
-	  "images/defaults/right.png"
+    "images/defaults/up.png",
+    "images/defaults/down.png",
+    "images/defaults/left.png",
+    "images/defaults/right.png"
   ]
 }
