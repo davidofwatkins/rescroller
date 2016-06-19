@@ -13,7 +13,7 @@ window.Rescroller = {
     /**
      * Migration from 1.2 --> 1.3. Migrate all our "sb-*" keys in localStorage to a single key.
      */
-    migrateDataToSingleKey: function() {
+    _migrateDataToSingleKey: function() {
         if (!localStorage['sb-size']) { return; } // already migrated
 
         // @todo:david we should probably store the fake-CSS values of the scrollbars themselves in a sub-settings
@@ -28,12 +28,30 @@ window.Rescroller = {
             if (key == 'sb-excludedsites') { return true; } // continue - we'll keep this out of our settings to keep our background page lightweight
             if (key.indexOf('sb-') !== 0) { return true; } // continue
 
-            json[key.substr(3, key.length -1)] = localStorage[key]; // set new key as old without the 'sb-' prefix
+            // set new key as old without the 'sb-' prefix
+            json[key.substr(3, key.length -1)] = parseInt(localStorage[key]) === NaN ? localStorage[key] : parseInt(localStorage[key]) ;
             localStorage.removeItem(key);
         });
 
         this._settings = json;
         localStorage['rescroller_settings'] = JSON.stringify(json)
+    },
+
+    _migrateBackgroundImageNullValues: function() {
+        
+        // For whatever reason, we were setting default values for images as 0. They should be empty string
+        var settings = Rescroller.getSettings();
+        for (key in settings) {
+            if (key.indexOf('background-image') <= -1) { continue; }
+            if (parseInt(settings[key]) === 0) { settings[key] = '' }
+        }
+
+        localStorage['rescroller_settings'] = JSON.stringify(settings)
+    },
+
+    performMigrations: function() {
+        this._migrateDataToSingleKey();
+        this._migrateBackgroundImageNullValues();
     },
 
     /**
@@ -142,7 +160,7 @@ window.Rescroller = {
                 localStorage[key] = items[key];
             }
 
-            that.migrateDataToSingleKey(); // migrate incoming data
+            that.performMigrations(); // migrate incoming data
             that.generateScrollbarCSS();
             callback();
         });
@@ -161,7 +179,7 @@ window.Rescroller = {
     },
 
     exportLocalSettings: function() {
-        this.migrateDataToSingleKey();
+        this.performMigrations();
 
         var ls = {};
         for (var key in localStorage) {
@@ -215,37 +233,37 @@ window.Rescroller = {
             }\
             ::-webkit-scrollbar-button:vertical:decrement {";
                 value =  this.getProperty("buttons-background-image-up");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-button:vertical:increment {";
                 value = this.getProperty("buttons-background-image-down");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-button:horizontal:increment {";
                 value = this.getProperty("buttons-background-image-right");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-button:horizontal:decrement {";
                 value = this.getProperty("buttons-background-image-left");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }";
             
             if (this.getProperty("buttons-use-hover") == "checked") {
                 newCSS += "::-webkit-scrollbar-button:vertical:decrement:hover {";
                     value = this.getProperty("buttons-background-image-up-hover");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:vertical:increment:hover {";
                     value = this.getProperty("buttons-background-image-down-hover");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:horizontal:increment:hover {";
                     value = this.getProperty("buttons-background-image-right-hover");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:horizontal:decrement:hover {";
                     value = this.getProperty("buttons-background-image-left-hover");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:hover {\
                     background-color: " + this.getProperty("buttons-color-hover") + " !important;\
@@ -256,19 +274,19 @@ window.Rescroller = {
             if (this.getProperty("buttons-use-active") == "checked") {
                 newCSS += "::-webkit-scrollbar-button:vertical:decrement:active {";
                     value = this.getProperty("buttons-background-image-up-active");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:vertical:increment:active {";
                     value = this.getProperty("buttons-background-image-down-active");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:horizontal:increment:active {";
                     value = this.getProperty("buttons-background-image-right-active");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:horizontal:decrement:active {";
                     value = this.getProperty("buttons-background-image-left-active");
-                    newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
                 }\
                 ::-webkit-scrollbar-button:active {\
                     background-color: " + this.getProperty("buttons-color-active") + " !important;\
@@ -292,21 +310,21 @@ window.Rescroller = {
         }\
         ::-webkit-scrollbar-track-piece:vertical {";
             value = this.getProperty("background-background-image-vertical");
-            newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
         }\
         ::-webkit-scrollbar-track-piece:horizontal {";
             value = this.getProperty("background-background-image-horizontal");
-            newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
         }";
 
         if (this.getProperty("background-use-hover") == "checked") {
             newCSS += "::-webkit-scrollbar-track-piece:vertical:hover {";
                 value = this.getProperty("background-background-image-vertical-hover");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-track-piece:horizontal:hover {";
                 value = this.getProperty("background-background-image-horizontal-hover");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-track-piece:hover {\
                 background-color: " + this.getProperty("background-color-hover") + " !important;\
@@ -317,11 +335,11 @@ window.Rescroller = {
         if (this.getProperty("background-use-active") == "checked") {
             newCSS += "::-webkit-scrollbar-track-piece:vertical:active {";
                 value = this.getProperty("background-background-image-vertical-active");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-track-piece:horizontal:active {";
                 value = this.getProperty("background-background-image-horizontal-active");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-track-piece:active {\
                 background-color: " + this.getProperty("background-color-active") + " !important;\
@@ -337,11 +355,11 @@ window.Rescroller = {
         }\
         ::-webkit-scrollbar-thumb:vertical {";
             value = this.getProperty("slider-background-image-vertical");
-            newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
         }\
         ::-webkit-scrollbar-thumb:horizontal {";
             value = this.getProperty("slider-background-image-horizontal");
-            newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
         }";
         
         if (this.getProperty("slider-use-hover") == "checked") {
@@ -351,11 +369,11 @@ window.Rescroller = {
             }\
             ::-webkit-scrollbar-thumb:vertical:hover {";
                 value = this.getProperty("slider-background-image-vertical-hover");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             ::-webkit-scrollbar-thumb:horizontal:hover {";
                 value = this.getProperty("slider-background-image-horizontal-hover");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }";
         }
         
@@ -366,12 +384,12 @@ window.Rescroller = {
             }\
             ::-webkit-scrollbar-thumb:vertical:active {";
                 value = this.getProperty("slider-background-image-vertical-active");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }\
             \
             ::-webkit-scrollbar-thumb:horizontal:active {";
                 value = this.getProperty("slider-background-image-horizontal-active");
-                newCSS += "background-image: url('" + (value && value != "0" ? value : "") + "') !important;\
+                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
             }";
         }
         
@@ -382,7 +400,7 @@ window.Rescroller = {
         ::-webkit-resizer {\
             background-color: " + this.getProperty("resizer-background") + " !important;\
         }"; */
-                
+
         return newCSS;  
     }
 

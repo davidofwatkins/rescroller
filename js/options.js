@@ -106,14 +106,14 @@ function restoreDefaults() {
 
     Rescroller.saveProperties({
         
-        //General
+        // General
         "size" : 15,
         "subbackground-color" : "#000000",
         "corner-background" : "#D9D9D9",
-        //"sb-excludedsites" : "", - stored by itself in localStorage
-        //"resizer-background" : "#FFC31F",
+        // "sb-excludedsites" : "", - stored by itself in localStorage
+        // "resizer-background" : "#FFC31F",
         
-        //Background
+        // Background
         "background-color" : "#C9C9C9",
         "background-shadow-color" : "#000000",
         "background-shadow-size" : 20,
@@ -121,16 +121,16 @@ function restoreDefaults() {
         "background-border-color" : "#000000",
         "background-border-style" : "solid",
         "background-radius" : 0,
-        //hovering
+        // hovering
         "background-color-hover" : "#D9D9D9",
         "background-shadow-color-hover" : "#000000",
         "background-shadow-size-hover" : 0,
-        //active
+        // active
         "background-color-active" : "#D9D9D9",
         "background-shadow-color-active" : "#000000",
         "background-shadow-size-active" : 0,
         
-        //Scrollbar piece/slider
+        // Scrollbar piece/slider
         "slider-color" : "#666666",
         "slider-shadow-color" : "#000000",
         "slider-shadow-size" : 35,
@@ -138,16 +138,16 @@ function restoreDefaults() {
         "slider-border-size" : 0,
         "slider-border-color" : "#000000",
         "slider-border-style" : "solid",
-        //hovering
+        // hovering
         "slider-color-hover" : "#666",
         "slider-shadow-color-hover" : "#000000",
         "slider-shadow-size-hover" : 0,
-        //active
+        // active
         "slider-color-active" : "#666",
         "slider-shadow-color-active" : "#000000",
         "slider-shadow-size-active" : 0,
         
-        //Buttons
+        // Buttons
         "showbuttons" : "off",
         "buttons-size" : 20,
         "buttons-color" : "#666666",
@@ -161,7 +161,7 @@ function restoreDefaults() {
         "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
         "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
         "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
-        //hovering
+        // hovering
         "buttons-color-hover" : "#666666",
         "buttons-shadow-color-hover" : "#000000",
         "buttons-shadow-size-hover" : 0,
@@ -169,7 +169,7 @@ function restoreDefaults() {
         "buttons-background-image-down-hover" : chrome.extension.getURL("images/defaults/down.png"),
         "buttons-background-image-left-hover" : chrome.extension.getURL("images/defaults/left.png"),
         "buttons-background-image-right-hover" : chrome.extension.getURL("images/defaults/right.png"),
-        //active
+        // active
         "buttons-color-active" : "#666666",
         "buttons-shadow-color-active" : "#000000",
         "buttons-shadow-size-active" : 0,
@@ -178,20 +178,20 @@ function restoreDefaults() {
         "buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
         "buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
         
-        //Reset all non-button images to 0
-        "slider-background-image-vertical" : 0,
-        "slider-background-image-horizontal" : 0,
-        "slider-background-image-vertical-hover" : 0,
-        "slider-background-image-horizontal-hover" : 0,
-        "slider-background-image-vertical-active" : 0,
-        "slider-background-image-horizontal-active" : 0,
+        // Reset all non-button images to 0
+        "slider-background-image-vertical" : '',
+        "slider-background-image-horizontal" : '',
+        "slider-background-image-vertical-hover" : '',
+        "slider-background-image-horizontal-hover" : '',
+        "slider-background-image-vertical-active" : '',
+        "slider-background-image-horizontal-active" : '',
         
-        "background-background-image-vertical" : 0,
-        "background-background-image-horizontal" : 0,
-        "background-background-image-vertical-hover" : 0,
-        "background-background-image-horizontal-hover" : 0,
-        "background-background-image-vertical-active" : 0,
-        "background-background-image-horizontal-active" : 0,
+        "background-background-image-vertical" : '',
+        "background-background-image-horizontal" : '',
+        "background-background-image-vertical-hover" : '',
+        "background-background-image-horizontal-hover" : '',
+        "background-background-image-vertical-active" : '',
+        "background-background-image-horizontal-active" : '',
 
         //Custom CSS
         "customcss" : "::-webkit-scrollbar {\
@@ -330,7 +330,7 @@ $(document).ready(function() {
     //Clear picture buttons
     $(".clearimage").click(function() {
         var key = $(this).parent().parent().attr("id");
-        Rescroller.saveProperty(key, 0);
+        Rescroller.saveProperty(key, '');
         $(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
         $(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
         
@@ -425,19 +425,19 @@ $(document).ready(function() {
             }
         });
         
-        //Set default color to whatever it's been saved to
+        // Set default color to whatever it's been saved to
         $(this).miniColors("value", Rescroller.getProperty($(this).parent().attr("id")));
 
-        //Add "apply" button
+        // Add "apply" button
         $(".miniColors-selector").append('<p><a href="#">Apply</a></p>');
     });
 
-    //save the last-clicked color picker
+    // save the last-clicked color picker
     $("a.miniColors-trigger").click(function() {
         lastClickedColorPickerPropertyID = $(this).parent().attr("id");
     });
 
-    //Set functionality of "apply" button
+    // Set functionality of "apply" button
     $("body").on("click", ".miniColors-apply a", function() { //applies listener to the <a> that hasn't been created yet
         var colorSelectorInput = $("#" + lastClickedColorPickerPropertyID).children("input.colorselection");
         colorSelectorInput.miniColors("hide");
@@ -445,7 +445,7 @@ $(document).ready(function() {
         return false;
     });
     
-    //Loop through all image frames and fill them:
+    // Loop through all image frames and fill them:
     var keys = [
         "slider-background-image-vertical",
         "slider-background-image-horizontal",
@@ -539,7 +539,7 @@ $(document).ready(function() {
     //When checkbox is changed:
     showButtons.change(function() {
 
-        //Expand/collapse wrapper & save value to local storage
+        // Expand/collapse wrapper & save value to local storage
         if ($(this).is(":checked")) {
             Rescroller.saveProperty($(this).attr("id"), "checked");
             $("#buttons-toggleable").slideDown("fast", function() { refreshScrollbars(); });
