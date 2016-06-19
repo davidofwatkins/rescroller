@@ -5,25 +5,27 @@ Author: David Watkins (@dwat91)
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
 */
 
-var startingLoadTimestamp = Date.now();
+var LOAD_START = new Date().getTime(); // keep track of when the page loads so we know to show the save settings dialog
 var showSaveConfirmation;
-if (localStorage["showSaveConfirmation"] != 0 && localStorage["showSaveConfirmation"] != 1) {
-    localStorage["showSaveConfirmation"] = 1;
-}
 var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
 
-// Show "saved" confirmation box
-function showSaveConfirmationBox() {
-    clearTimeout(saveconfirmationTimeout);
-    if (localStorage["showSaveConfirmation"] == 1) {
+if (typeof localStorage['showSaveConfirmation'] === 'undefined') {
+    localStorage['showSaveConfirmation'] = 1;
+}
+
+Rescroller.onSettingsUpdated = function() {
+    
+    // Show "saved" confirmation box
+    if (parseInt(localStorage["showSaveConfirmation"]) === 1 && (new Date().getTime() - 500) > LOAD_START) {
+        clearTimeout(saveconfirmationTimeout);
         $("#save-confirm").fadeIn("slow");
         saveconfirmationTimeout = setTimeout(function() {
             $("#save-confirm").fadeOut("slow");
         }, showSaveConfirmTime)
     }
-}
+};
 
 //Enable functionality of Confirm Box "Never Show Again" button
 $(document).ready(function() {
@@ -105,94 +107,94 @@ function restoreDefaults() {
     Rescroller.saveProperties({
         
         //General
-        "sb-size" : 15,
-        "sb-subbackground-color" : "#000000",
-        "sb-corner-background" : "#D9D9D9",
-        //"sb-excludedsites" : "",
-        //"sb-resizer-background" : "#FFC31F",
+        "size" : 15,
+        "subbackground-color" : "#000000",
+        "corner-background" : "#D9D9D9",
+        //"sb-excludedsites" : "", - stored by itself in localStorage
+        //"resizer-background" : "#FFC31F",
         
         //Background
-        "sb-background-color" : "#C9C9C9",
-        "sb-background-shadow-color" : "#000000",
-        "sb-background-shadow-size" : 20,
-        "sb-background-border-size" : 0,
-        "sb-background-border-color" : "#000000",
-        "sb-background-border-style" : "solid",
-        "sb-background-radius" : 0,
+        "background-color" : "#C9C9C9",
+        "background-shadow-color" : "#000000",
+        "background-shadow-size" : 20,
+        "background-border-size" : 0,
+        "background-border-color" : "#000000",
+        "background-border-style" : "solid",
+        "background-radius" : 0,
         //hovering
-        "sb-background-color-hover" : "#D9D9D9",
-        "sb-background-shadow-color-hover" : "#000000",
-        "sb-background-shadow-size-hover" : 0,
+        "background-color-hover" : "#D9D9D9",
+        "background-shadow-color-hover" : "#000000",
+        "background-shadow-size-hover" : 0,
         //active
-        "sb-background-color-active" : "#D9D9D9",
-        "sb-background-shadow-color-active" : "#000000",
-        "sb-background-shadow-size-active" : 0,
+        "background-color-active" : "#D9D9D9",
+        "background-shadow-color-active" : "#000000",
+        "background-shadow-size-active" : 0,
         
         //Scrollbar piece/slider
-        "sb-slider-color" : "#666666",
-        "sb-slider-shadow-color" : "#000000",
-        "sb-slider-shadow-size" : 35,
-        "sb-slider-radius" : 0,
-        "sb-slider-border-size" : 0,
-        "sb-slider-border-color" : "#000000",
-        "sb-slider-border-style" : "solid",
+        "slider-color" : "#666666",
+        "slider-shadow-color" : "#000000",
+        "slider-shadow-size" : 35,
+        "slider-radius" : 0,
+        "slider-border-size" : 0,
+        "slider-border-color" : "#000000",
+        "slider-border-style" : "solid",
         //hovering
-        "sb-slider-color-hover" : "#666",
-        "sb-slider-shadow-color-hover" : "#000000",
-        "sb-slider-shadow-size-hover" : 0,
+        "slider-color-hover" : "#666",
+        "slider-shadow-color-hover" : "#000000",
+        "slider-shadow-size-hover" : 0,
         //active
-        "sb-slider-color-active" : "#666",
-        "sb-slider-shadow-color-active" : "#000000",
-        "sb-slider-shadow-size-active" : 0,
+        "slider-color-active" : "#666",
+        "slider-shadow-color-active" : "#000000",
+        "slider-shadow-size-active" : 0,
         
         //Buttons
-        "sb-showbuttons" : "off",
-        "sb-buttons-size" : 20,
-        "sb-buttons-color" : "#666666",
-        "sb-buttons-shadow-color" : "#000000",
-        "sb-buttons-shadow-size" : 0,
-        "sb-buttons-radius" : 0,
-        "sb-buttons-border-size" : 0,
-        "sb-buttons-border-color" : "#666",
-        "sb-buttons-border-style" : "solid",
-        "sb-buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
-        "sb-buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
-        "sb-buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
-        "sb-buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
+        "showbuttons" : "off",
+        "buttons-size" : 20,
+        "buttons-color" : "#666666",
+        "buttons-shadow-color" : "#000000",
+        "buttons-shadow-size" : 0,
+        "buttons-radius" : 0,
+        "buttons-border-size" : 0,
+        "buttons-border-color" : "#666",
+        "buttons-border-style" : "solid",
+        "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
+        "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
+        "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
+        "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
         //hovering
-        "sb-buttons-color-hover" : "#666666",
-        "sb-buttons-shadow-color-hover" : "#000000",
-        "sb-buttons-shadow-size-hover" : 0,
-        "sb-buttons-background-image-up-hover" : chrome.extension.getURL("images/defaults/up.png"),
-        "sb-buttons-background-image-down-hover" : chrome.extension.getURL("images/defaults/down.png"),
-        "sb-buttons-background-image-left-hover" : chrome.extension.getURL("images/defaults/left.png"),
-        "sb-buttons-background-image-right-hover" : chrome.extension.getURL("images/defaults/right.png"),
+        "buttons-color-hover" : "#666666",
+        "buttons-shadow-color-hover" : "#000000",
+        "buttons-shadow-size-hover" : 0,
+        "buttons-background-image-up-hover" : chrome.extension.getURL("images/defaults/up.png"),
+        "buttons-background-image-down-hover" : chrome.extension.getURL("images/defaults/down.png"),
+        "buttons-background-image-left-hover" : chrome.extension.getURL("images/defaults/left.png"),
+        "buttons-background-image-right-hover" : chrome.extension.getURL("images/defaults/right.png"),
         //active
-        "sb-buttons-color-active" : "#666666",
-        "sb-buttons-shadow-color-active" : "#000000",
-        "sb-buttons-shadow-size-active" : 0,
-        "sb-buttons-background-image-up-active" : chrome.extension.getURL("images/defaults/up.png"),
-        "sb-buttons-background-image-down-active" : chrome.extension.getURL("images/defaults/down.png"),
-        "sb-buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
-        "sb-buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
+        "buttons-color-active" : "#666666",
+        "buttons-shadow-color-active" : "#000000",
+        "buttons-shadow-size-active" : 0,
+        "buttons-background-image-up-active" : chrome.extension.getURL("images/defaults/up.png"),
+        "buttons-background-image-down-active" : chrome.extension.getURL("images/defaults/down.png"),
+        "buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
+        "buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
         
         //Reset all non-button images to 0
-        "sb-slider-background-image-vertical" : 0,
-        "sb-slider-background-image-horizontal" : 0,
-        "sb-slider-background-image-vertical-hover" : 0,
-        "sb-slider-background-image-horizontal-hover" : 0,
-        "sb-slider-background-image-vertical-active" : 0,
-        "sb-slider-background-image-horizontal-active" : 0,
+        "slider-background-image-vertical" : 0,
+        "slider-background-image-horizontal" : 0,
+        "slider-background-image-vertical-hover" : 0,
+        "slider-background-image-horizontal-hover" : 0,
+        "slider-background-image-vertical-active" : 0,
+        "slider-background-image-horizontal-active" : 0,
         
-        "sb-background-background-image-vertical" : 0,
-        "sb-background-background-image-horizontal" : 0,
-        "sb-background-background-image-vertical-hover" : 0,
-        "sb-background-background-image-horizontal-hover" : 0,
-        "sb-background-background-image-vertical-active" : 0,
-        "sb-background-background-image-horizontal-active" : 0,
+        "background-background-image-vertical" : 0,
+        "background-background-image-horizontal" : 0,
+        "background-background-image-vertical-hover" : 0,
+        "background-background-image-horizontal-hover" : 0,
+        "background-background-image-vertical-active" : 0,
+        "background-background-image-horizontal-active" : 0,
 
         //Custom CSS
-        "sb-customcss" : "::-webkit-scrollbar {\
+        "customcss" : "::-webkit-scrollbar {\
 \n\n\
 }\n\
 ::-webkit-scrollbar-button {\
@@ -225,11 +227,11 @@ var newCSS = Rescroller.getCSSString();
 document.write('<style id="rescroller">' + newCSS + "</style>");
 
 //If there is no previously-saved scrollbar CSS in local storage, save it!
-if (!Rescroller.getProperty("sb-size") || Rescroller.getProperty("sb-size") == "") {
+if (!Rescroller.getProperty("size") || Rescroller.getProperty("size") == "") {
     restoreDefaults();
 }
 
-if (!Rescroller.getProperty("sb-excludedsites")) { Rescroller.saveProperty("sb-excludedsites", ""); }
+if (!localStorage['sb-excludedsites']) { localStorage['sb-excludedsites'] = ''; }
 
 
 //When the page has loaded:
@@ -241,15 +243,15 @@ $(document).ready(function() {
     $("#generatedcss").html(newCSS);
     
     //Fill the excludedsites textarea with the list of excluded sites:
-    $("#excludedsites").val(Rescroller.getProperty("sb-excludedsites"));
+    $("#excludedsites").val(localStorage['sb-excludedsites']);
     $("#excludedsites").change(function() {
-        Rescroller.saveProperty("sb-excludedsites", $(this).val());
+        localStorage['sb-excludedsites'] = $(this).val();
     });
     
     //Fill the custom CSS form with the custom CSS
-    $("#customcss").val(Rescroller.getProperty("sb-customcss"));
+    $("#customcss").val(Rescroller.getProperty("customcss"));
     $("#customcss").change(function() {
-        Rescroller.saveProperty("sb-customcss", $(this).val());
+        Rescroller.saveProperty("customcss", $(this).val());
         refreshScrollbars();
     });
     
@@ -309,12 +311,12 @@ $(document).ready(function() {
     });
     
     //Expand/collapse all non-custom css areas when that checkbox is checked    
-    if (Rescroller.getProperty("sb-usecustomcss") == "checked") {
+    if (Rescroller.getProperty("usecustomcss") == "checked") {
         $(".section").not("#misc").not($("#general")).hide();
         $(".customcss-collapsible").hide();
     }
     
-    $("#sb-usecustomcss").change(function() {
+    $("#usecustomcss").change(function() {
         if ($(this).is(":checked")) {
             $(".section").not("#misc").not($("#general")).slideUp("slow");
             $(".customcss-collapsible").slideUp("slow");
@@ -362,14 +364,14 @@ $(document).ready(function() {
     /***********Set up Sliders************/
     
     //Main slider (scrollbar size)
-    $("#sb-size .slider").slider({
+    $("#size .slider").slider({
         animate: true,
         min: 0,
         max: 30
     });
     
     //All sliders
-    $(".slider").not("#sb-size .slider").slider({
+    $(".slider").not("#size .slider").slider({
         animate: true,
         min: 0,
         max: 100
@@ -385,7 +387,7 @@ $(document).ready(function() {
         
         //If this is one of the few scrollbars that uses px instead of %, set the "units" to px
         var units;
-        if (propertyName == "sb-size" || propertyName == "sb-buttons-size") { units = "px"; }
+        if (propertyName == "size" || propertyName == "buttons-size") { units = "px"; }
         else { units = "%"; }
         
         //Fill slider value with value from local storage
@@ -445,32 +447,32 @@ $(document).ready(function() {
     
     //Loop through all image frames and fill them:
     var keys = [
-        "sb-slider-background-image-vertical",
-        "sb-slider-background-image-horizontal",
-        "sb-slider-background-image-vertical-hover",
-        "sb-slider-background-image-horizontal-hover",
-        "sb-slider-background-image-vertical-active",
-        "sb-slider-background-image-horizontal-active",
+        "slider-background-image-vertical",
+        "slider-background-image-horizontal",
+        "slider-background-image-vertical-hover",
+        "slider-background-image-horizontal-hover",
+        "slider-background-image-vertical-active",
+        "slider-background-image-horizontal-active",
         
-        "sb-background-background-image-vertical",
-        "sb-background-background-image-horizontal",
-        "sb-background-background-image-vertical-hover",
-        "sb-background-background-image-horizontal-hover",
-        "sb-background-background-image-vertical-active",
-        "sb-background-background-image-horizontal-active",
+        "background-background-image-vertical",
+        "background-background-image-horizontal",
+        "background-background-image-vertical-hover",
+        "background-background-image-horizontal-hover",
+        "background-background-image-vertical-active",
+        "background-background-image-horizontal-active",
         
-        "sb-buttons-background-image-up",
-        "sb-buttons-background-image-down",
-        "sb-buttons-background-image-left",
-        "sb-buttons-background-image-right",
-        "sb-buttons-background-image-up-hover",
-        "sb-buttons-background-image-down-hover",
-        "sb-buttons-background-image-left-hover",
-        "sb-buttons-background-image-right-hover",
-        "sb-buttons-background-image-up-active",
-        "sb-buttons-background-image-down-active",
-        "sb-buttons-background-image-left-active",
-        "sb-buttons-background-image-right-active"
+        "buttons-background-image-up",
+        "buttons-background-image-down",
+        "buttons-background-image-left",
+        "buttons-background-image-right",
+        "buttons-background-image-up-hover",
+        "buttons-background-image-down-hover",
+        "buttons-background-image-left-hover",
+        "buttons-background-image-right-hover",
+        "buttons-background-image-up-active",
+        "buttons-background-image-down-active",
+        "buttons-background-image-left-active",
+        "buttons-background-image-right-active"
     ]
     
     for (var i = 0; i < keys.length; i++) {
@@ -528,7 +530,7 @@ $(document).ready(function() {
  /********** Collapsable Checkboxes *********************/
      
     //Scroll buttons
-    var showButtons = $("#sb-showbuttons");
+    var showButtons = $("#showbuttons");
      
     //Make sure wrapper is correctly expanded on load
     if (showButtons.is(":checked")) { $("#buttons-toggleable").show(); }
@@ -578,9 +580,9 @@ $(document).ready(function() {
     });
 
     /** Set functionality of "restore default buttons" link (for scrollbar buttons) **/
-    setRestoreArrowsDefaultImages("restore-arrow-defaults", "sb-buttons-background-image-", "");
-    setRestoreArrowsDefaultImages("restore-arrow-defaults-hover", "sb-buttons-background-image-", "-hover");
-    setRestoreArrowsDefaultImages("restore-arrow-defaults-active", "sb-buttons-background-image-", "-active");
+    setRestoreArrowsDefaultImages("restore-arrow-defaults", "buttons-background-image-", "");
+    setRestoreArrowsDefaultImages("restore-arrow-defaults-hover", "buttons-background-image-", "-hover");
+    setRestoreArrowsDefaultImages("restore-arrow-defaults-active", "buttons-background-image-", "-active");
 
     function setRestoreArrowsDefaultImages(triggerID, propertyPrefix, propertySuffix) {
         $("#" + triggerID).click(function() {
@@ -659,6 +661,8 @@ $(document).ready(function() {
     
     //Whenever selectors (hidden <input type="file">s) are changed, save their valuese to local storage
     $(".selector").change(function() {
+        // @todo:david we should limit the image size the user selects. If too big, won't be able to sync with chrome.storage, and
+        // it might impact page performance. See https://developer.chrome.com/extensions/storage#property-sync
         handleFiles(this.files, $(this).siblings(".thumbframe").children("div.thumbcontainer").get()[0], $(this).parent().attr("id"))
     });
     
