@@ -1,3 +1,17 @@
+if (!String.prototype.fmt) {
+    String.prototype.fmt = function() {
+        var args = arguments;
+        var i = 0;
+        return this.replace(/%((%)|s)/g, function(match) {
+            return_val = typeof args[i] != 'undefined' ? args[i] : match;
+            i++;
+            return return_val;
+        });
+    };
+}
+
+
+
 /**
  * The Rescroller API
  */
@@ -191,6 +205,125 @@ window.Rescroller = {
     },
 
     /**
+     * Restore the default settings for the scrollbars.
+     */
+    restoreDefaults: function() {
+
+        this.saveProperties({
+            
+            // General
+            "size" : 15,
+            "subbackground-color" : "#000000",
+            "corner-background" : "#D9D9D9",
+            // "sb-excludedsites" : "", - stored by itself in localStorage
+            // "resizer-background" : "#FFC31F",
+            
+            // Background
+            "background-color" : "#C9C9C9",
+            "background-shadow-color" : "#000000",
+            "background-shadow-size" : 20,
+            "background-border-size" : 0,
+            "background-border-color" : "#000000",
+            "background-border-style" : "solid",
+            "background-radius" : 0,
+            // hovering
+            "background-color-hover" : "#D9D9D9",
+            "background-shadow-color-hover" : "#000000",
+            "background-shadow-size-hover" : 0,
+            // active
+            "background-color-active" : "#D9D9D9",
+            "background-shadow-color-active" : "#000000",
+            "background-shadow-size-active" : 0,
+            
+            // Scrollbar piece/slider
+            "slider-color" : "#666666",
+            "slider-shadow-color" : "#000000",
+            "slider-shadow-size" : 35,
+            "slider-radius" : 0,
+            "slider-border-size" : 0,
+            "slider-border-color" : "#000000",
+            "slider-border-style" : "solid",
+            // hovering
+            "slider-color-hover" : "#666",
+            "slider-shadow-color-hover" : "#000000",
+            "slider-shadow-size-hover" : 0,
+            // active
+            "slider-color-active" : "#666",
+            "slider-shadow-color-active" : "#000000",
+            "slider-shadow-size-active" : 0,
+            
+            // Buttons
+            "showbuttons" : "off",
+            "buttons-size" : 20,
+            "buttons-color" : "#666666",
+            "buttons-shadow-color" : "#000000",
+            "buttons-shadow-size" : 0,
+            "buttons-radius" : 0,
+            "buttons-border-size" : 0,
+            "buttons-border-color" : "#666",
+            "buttons-border-style" : "solid",
+            "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
+            "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
+            "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
+            "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
+            // hovering
+            "buttons-color-hover" : "#666666",
+            "buttons-shadow-color-hover" : "#000000",
+            "buttons-shadow-size-hover" : 0,
+            "buttons-background-image-up-hover" : chrome.extension.getURL("images/defaults/up.png"),
+            "buttons-background-image-down-hover" : chrome.extension.getURL("images/defaults/down.png"),
+            "buttons-background-image-left-hover" : chrome.extension.getURL("images/defaults/left.png"),
+            "buttons-background-image-right-hover" : chrome.extension.getURL("images/defaults/right.png"),
+            // active
+            "buttons-color-active" : "#666666",
+            "buttons-shadow-color-active" : "#000000",
+            "buttons-shadow-size-active" : 0,
+            "buttons-background-image-up-active" : chrome.extension.getURL("images/defaults/up.png"),
+            "buttons-background-image-down-active" : chrome.extension.getURL("images/defaults/down.png"),
+            "buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
+            "buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
+            
+            // Reset all non-button images to 0
+            "slider-background-image-vertical" : '',
+            "slider-background-image-horizontal" : '',
+            "slider-background-image-vertical-hover" : '',
+            "slider-background-image-horizontal-hover" : '',
+            "slider-background-image-vertical-active" : '',
+            "slider-background-image-horizontal-active" : '',
+            
+            "background-background-image-vertical" : '',
+            "background-background-image-horizontal" : '',
+            "background-background-image-vertical-hover" : '',
+            "background-background-image-horizontal-hover" : '',
+            "background-background-image-vertical-active" : '',
+            "background-background-image-horizontal-active" : '',
+
+            //Custom CSS
+            "customcss" : "::-webkit-scrollbar {\
+    \n\n\
+    }\n\
+    ::-webkit-scrollbar-button {\
+    \n\n\
+    }\n\
+    ::-webkit-scrollbar-track {\
+    \n\n\
+    }\n\
+    ::-webkit-scrollbar-track-piece {\
+    \n\n\
+    }\n\
+    ::-webkit-scrollbar-thumb {\
+    \n\n\
+    }\n\
+    ::-webkit-scrollbar-corner {\
+    \n\n\
+    }\n\
+    ::-webkit-resizer {\
+    \n\n\
+    }"
+        });
+    },
+
+    /**
      * Gnerate a CSS string from our scrollbar settings and save it to local storage for browser tabs to use.
      */
     generateScrollbarCSS: function() {
@@ -201,207 +334,299 @@ window.Rescroller = {
      * Grab data from local storage and convert it into a CSS string
      */
     getCSSString: function() {
-        
-        var value = null;
+        if (typeof jQuery === 'undefined') {
+            console.error('jQuery is required for getCSSString()');
+            return
+        }
 
         // If user has chosen to specify his own CSS, just return that
         if (this.getProperty("usecustomcss") == "checked") { return this.getProperty("customcss"); }
-              
-        // Because Javascript has no "heredoc" function, the "\"s escape the newlines
-        var newCSS = "\
-        \
-        ::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical {\
-            width: " + this.getProperty("size") + "px !important;\
-            height: " + this.getProperty("size") + "px !important;\
-            background-color: " + this.getProperty("subbackground-color") + " !important;\
-        }";
-            
-        if (this.getProperty("showbuttons") == "checked") {
-            newCSS += "\
-            ::-webkit-scrollbar-button {\
-                background-color: " + this.getProperty("buttons-color") + " !important;\
-                border-radius: " + this._precentageToPixels(this.getProperty("buttons-radius")) + "px !important;\
-                box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("buttons-shadow-size"), true) + "px " + this.getProperty("buttons-shadow-color") + "; !important\
-                border: " + this._precentageToPixels(this.getProperty("buttons-border-size")) + "px " + this.getProperty("buttons-border-style") + " " + this.getProperty("buttons-border-color") + " !important;\
-                display: block !important;\
-            }\
-            ::-webkit-scrollbar-button:vertical {\
-                height: " + this.getProperty("buttons-size") + "px !important;\
-            }\
-            ::-webkit-scrollbar-button:horizontal {\
-                width: " + this.getProperty("buttons-size") + "px !important;\
-            }\
-            ::-webkit-scrollbar-button:vertical:decrement {";
-                value =  this.getProperty("buttons-background-image-up");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-button:vertical:increment {";
-                value = this.getProperty("buttons-background-image-down");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-button:horizontal:increment {";
-                value = this.getProperty("buttons-background-image-right");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-button:horizontal:decrement {";
-                value = this.getProperty("buttons-background-image-left");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }";
-            
-            if (this.getProperty("buttons-use-hover") == "checked") {
-                newCSS += "::-webkit-scrollbar-button:vertical:decrement:hover {";
-                    value = this.getProperty("buttons-background-image-up-hover");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:vertical:increment:hover {";
-                    value = this.getProperty("buttons-background-image-down-hover");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:horizontal:increment:hover {";
-                    value = this.getProperty("buttons-background-image-right-hover");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:horizontal:decrement:hover {";
-                    value = this.getProperty("buttons-background-image-left-hover");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:hover {\
-                    background-color: " + this.getProperty("buttons-color-hover") + " !important;\
-                    box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("buttons-shadow-size-hover"), true) + "px " + this.getProperty("buttons-shadow-color-hover") + "; !important\
-                }";
+       
+       // Build our CSS structure as JSON for readability and maintainability. Then, we'll convert it to CSS!
+        var json = {
+            children: {
+
+                // Base
+                "::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical": {
+                    "attributes": {
+                        "width": "%spx".fmt(this.getProperty('size')),
+                        "height": "%spx".fmt(this.getProperty('size')),
+                        "background-color": "%s".fmt(this.getProperty('subbackground-color'))
+                    }
+                },
+
+                "::-webkit-scrollbar-track-piece": {
+                    "attributes": {
+                        "background-color": this.getProperty('background-color'),
+                        "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.getProperty('background-shadow-size'), true), this.getProperty('background-shadow-color')),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('background-border-size')), this.getProperty('background-border-style'), this.getProperty('background-border-color')),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('background-radius')))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:vertical": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical'))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:horizontal": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal'))
+                    }
+                },
+
+                "::-webkit-scrollbar-thumb": {
+                    "attributes": {
+                        "background-color": this.getProperty('slider-color'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size'), true), this.getProperty('slider-shadow-color')),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('slider-radius'))),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('slider-border-size')), this.getProperty('slider-border-style'), this.getProperty('slider-border-color'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:vertical": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:horizontal": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal'))
+                    }
+                },
+
+
+                "::-webkit-scrollbar-corner": {
+                    "attributes": {
+                        "background-color": this.getProperty('corner-background')
+                    }
+                }
+                // "::-webkit-resizer": {
+                //     "attributes": {
+                //         "background-color": this.getProperty('resizer-background')
+                //     }
+                // }
             }
-            
-            if (this.getProperty("buttons-use-active") == "checked") {
-                newCSS += "::-webkit-scrollbar-button:vertical:decrement:active {";
-                    value = this.getProperty("buttons-background-image-up-active");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:vertical:increment:active {";
-                    value = this.getProperty("buttons-background-image-down-active");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:horizontal:increment:active {";
-                    value = this.getProperty("buttons-background-image-right-active");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:horizontal:decrement:active {";
-                    value = this.getProperty("buttons-background-image-left-active");
-                    newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-                }\
-                ::-webkit-scrollbar-button:active {\
-                    background-color: " + this.getProperty("buttons-color-active") + " !important;\
-                    box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("buttons-shadow-size-active"), true) + "px " + this.getProperty("buttons-shadow-color-active") + "; !important\
-                }";
+        };
+
+        // Conditionals:
+
+        if (this.getProperty('showbuttons') == 'checked') {
+            $.extend(json.children, {
+                "::-webkit-scrollbar-button {": {
+                    "attributes": {
+                        "background-color": this.getProperty('buttons-color'),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('buttons-radius'))),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size'), true), this.getProperty('buttons-shadow-color')),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('buttons-border-size')), this.getProperty('buttons-border-style'), this.getProperty('buttons-border-color')),
+                        "display": "block"
+                    }
+                },
+                "::-webkit-scrollbar-button:vertical": {
+                    "attributes": {
+                        "height": "%spx".fmt(this.getProperty('buttons-size'))
+                    }
+                },
+                "::-webkit-scrollbar-button:horizontal": {
+                    "attributes": {
+                        "width": "%spx".fmt(this.getProperty('buttons-size'))
+                    }
+                },
+                "::-webkit-scrollbar-button:vertical:decrement": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up'))
+                    }
+                },
+                "::-webkit-scrollbar-button:vertical:increment": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down'))
+                    }
+                },
+                "::-webkit-scrollbar-button:horizontal:increment": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right'))
+                    }
+                },
+                "::-webkit-scrollbar-button:horizontal:decrement": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left'))
+                    }
+                },
+            });
+
+            if (this.getProperty('buttons-use-hover') == 'checked') {
+                $.extend(json.children, {
+                    "::-webkit-scrollbar-button:vertical:decrement:hover": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up-hover'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:vertical:increment:hover": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down-hover'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:horizontal:increment:hover": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right-hover'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:horizontal:decrement:hover": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left-hover'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:hover": {
+                        "attributes": {
+                            "background-color": this.getProperty('buttons-color-hover'),
+                            "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size-hover'), true), this.getProperty('buttons-shadow-color-hover'))
+                        }
+                    }
+                });
             }
-            
-            //Use single buttons (hide the doubles):
-            newCSS += "\
-            ::-webkit-scrollbar-button:vertical:start:increment, ::-webkit-scrollbar-button:vertical:end:decrement, ::-webkit-scrollbar-button:horizontal:start:increment, ::-webkit-scrollbar-button:horizontal:end:decrement {\
-                display: none !important;\
-            }";
+
+            if (this.getProperty('buttons-use-active') == 'checked') {
+                $.extend(json.children, {
+                    "::-webkit-scrollbar-button:vertical:decrement:active": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up-active'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:vertical:increment:active": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down-active'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:horizontal:increment:active": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right-active'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:horizontal:decrement:active": {
+                        "attributes": {
+                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left-active'))
+                        }
+                    },
+                    "::-webkit-scrollbar-button:active": {
+                        "attributes": {
+                            "background-color": this.getProperty('buttons-color-active'),
+                            "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size-active'), true), this.getProperty('buttons-shadow-color-active'))
+                        }
+                    }
+                });
+            }
+
+            // Use single buttons (hide the doubles):
+            $.extend(json.children, {
+                "::-webkit-scrollbar-button:vertical:start:increment, ::-webkit-scrollbar-button:vertical:end:decrement, ::-webkit-scrollbar-button:horizontal:start:increment, ::-webkit-scrollbar-button:horizontal:end:decrement": {
+                    "attributes": {
+                        "display": "none"
+                    }
+                }
+            });
         }
-        
-        newCSS += "\
-        ::-webkit-scrollbar-track-piece {\
-            background-color: " + this.getProperty("background-color") + " !important;\
-            box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("background-shadow-size"), true) + "px " + this.getProperty("background-shadow-color") + " !important;\
-            border: " + this._precentageToPixels(this.getProperty("background-border-size")) + "px " + this.getProperty("background-border-style") + " " + this.getProperty("background-border-color") + " !important;\
-            border-radius: " + this._precentageToPixels(this.getProperty("background-radius")) + "px !important;\
-        }\
-        ::-webkit-scrollbar-track-piece:vertical {";
-            value = this.getProperty("background-background-image-vertical");
-            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-        }\
-        ::-webkit-scrollbar-track-piece:horizontal {";
-            value = this.getProperty("background-background-image-horizontal");
-            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-        }";
 
         if (this.getProperty("background-use-hover") == "checked") {
-            newCSS += "::-webkit-scrollbar-track-piece:vertical:hover {";
-                value = this.getProperty("background-background-image-vertical-hover");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-track-piece:horizontal:hover {";
-                value = this.getProperty("background-background-image-horizontal-hover");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-track-piece:hover {\
-                background-color: " + this.getProperty("background-color-hover") + " !important;\
-                box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("background-shadow-size-hover"), true) + "px " + this.getProperty("background-shadow-color-hover") + " !important;\
-            }";
+            $.extend(json.children, {
+                "::-webkit-scrollbar-track-piece:vertical:hover": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical-hover'))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:horizontal:hover": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal-hover'))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:hover ": {
+                    "attributes": {
+                        "background-color": this.getProperty('background-color-hover'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('background-shadow-size-hover'), true), this.getProperty('background-shadow-color-hover'))
+                    }
+                }
+            });
         }
-        
-        if (this.getProperty("background-use-active") == "checked") {
-            newCSS += "::-webkit-scrollbar-track-piece:vertical:active {";
-                value = this.getProperty("background-background-image-vertical-active");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-track-piece:horizontal:active {";
-                value = this.getProperty("background-background-image-horizontal-active");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-track-piece:active {\
-                background-color: " + this.getProperty("background-color-active") + " !important;\
-                box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("background-shadow-size-active"), true) + "px " + this.getProperty("background-shadow-color-active") + " !important;\
-            }";
-        }
-        
-        newCSS += "::-webkit-scrollbar-thumb {\
-            background-color: " + this.getProperty("slider-color") + " !important;\
-            box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("slider-shadow-size"), true) + "px " + this.getProperty("slider-shadow-color") + " !important;\
-            border-radius: " + this._precentageToPixels(this.getProperty("slider-radius")) + "px !important;\
-            border: " + this._precentageToPixels(this.getProperty("slider-border-size")) + "px " + this.getProperty("slider-border-style") + " " + this.getProperty("slider-border-color") + " !important;\
-        }\
-        ::-webkit-scrollbar-thumb:vertical {";
-            value = this.getProperty("slider-background-image-vertical");
-            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-        }\
-        ::-webkit-scrollbar-thumb:horizontal {";
-            value = this.getProperty("slider-background-image-horizontal");
-            newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-        }";
-        
-        if (this.getProperty("slider-use-hover") == "checked") {
-            newCSS += "::-webkit-scrollbar-thumb:hover {\
-                background-color: " + this.getProperty("slider-color-hover") + " !important;\
-                box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("slider-shadow-size-hover"), true) + "px " + this.getProperty("slider-shadow-color-hover") + " !important;\
-            }\
-            ::-webkit-scrollbar-thumb:vertical:hover {";
-                value = this.getProperty("slider-background-image-vertical-hover");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            ::-webkit-scrollbar-thumb:horizontal:hover {";
-                value = this.getProperty("slider-background-image-horizontal-hover");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }";
-        }
-        
-        if (this.getProperty("slider-use-active") == "checked") {
-            newCSS += "::-webkit-scrollbar-thumb:active {\
-                background-color: " + this.getProperty("slider-color-active") + " !important;\
-                box-shadow: inset 0 0 " + this._precentageToPixels(this.getProperty("slider-shadow-size-active"), true) +  "px " + this.getProperty("slider-shadow-color-active") + " !important;\
-            }\
-            ::-webkit-scrollbar-thumb:vertical:active {";
-                value = this.getProperty("slider-background-image-vertical-active");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }\
-            \
-            ::-webkit-scrollbar-thumb:horizontal:active {";
-                value = this.getProperty("slider-background-image-horizontal-active");
-                newCSS += !value ? "" : "background-image: url('" + value + "') !important;\
-            }";
-        }
-        
-        
-        newCSS += "::-webkit-scrollbar-corner {\
-            background-color: " + this.getProperty("corner-background") + " !important;\
-        }"; /*
-        ::-webkit-resizer {\
-            background-color: " + this.getProperty("resizer-background") + " !important;\
-        }"; */
 
-        return newCSS;  
+        if (this.getProperty("background-use-active") == "checked") {
+            $.extend(json.children, {
+                "::-webkit-scrollbar-track-piece:vertical:active": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical-active'))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:horizontal:active": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal-active'))
+                    }
+                },
+                "::-webkit-scrollbar-track-piece:active": {
+                    "attributes": {
+                        "background-color": this.getProperty('background-color-active'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('background-shadow-size-active'), true), this.getProperty('background-shadow-color-active'))
+                    }
+                }
+            });
+        }
+
+        if (this.getProperty("slider-use-hover") == "checked") {
+            $.extend(json.children, {
+                "::-webkit-scrollbar-thumb:hover": {
+                    "attributes": {
+                        "background-color": this.getProperty('slider-color-hover'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size-hover'), true), this.getProperty('slider-shadow-color-hover'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:vertical:hover": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical-hover'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:horizontal:hover": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal-hover'))
+                    }
+                }
+            });
+        }
+
+        if (this.getProperty("slider-use-active") == "checked") {
+            $.extend(json.children, {
+                "::-webkit-scrollbar-thumb:active": {
+                    "attributes": {
+                        "background-color": this.getProperty('slider-color-active'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size-active'), true), this.getProperty('slider-shadow-color-active'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:vertical:active": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical-active'))
+                    }
+                },
+                "::-webkit-scrollbar-thumb:horizontal:active": {
+                    "attributes": {
+                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal-active'))
+                    }
+                }
+            });
+        }
+
+        // Some cleanup before we send it off!
+        $.each(json.children, function(selector, children) {
+            var attrs = children.attributes
+            $.each(attrs, function(attr_name, attr_val) { // assume we never go deeper than one level
+
+                if (!attr_val) { return true; } // continue
+
+                // Clear out any empty image values to avoid erronius server calls
+                if (attr_val == "url('')") {
+                    attrs[attr_name] = '""';
+                    return true; // continue
+                }
+
+                // Make sure every attribute is marked '!important'
+                attrs[attr_name] = attr_val + ' !important';
+            });
+        });
+
+        return CSSJSON.toCSS(json);
     }
 
 }

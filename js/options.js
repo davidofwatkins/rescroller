@@ -102,124 +102,6 @@ function hideErrorMessage() {
     $("#errorbox").slideUp("fast");
 }
 
-function restoreDefaults() {
-
-    Rescroller.saveProperties({
-        
-        // General
-        "size" : 15,
-        "subbackground-color" : "#000000",
-        "corner-background" : "#D9D9D9",
-        // "sb-excludedsites" : "", - stored by itself in localStorage
-        // "resizer-background" : "#FFC31F",
-        
-        // Background
-        "background-color" : "#C9C9C9",
-        "background-shadow-color" : "#000000",
-        "background-shadow-size" : 20,
-        "background-border-size" : 0,
-        "background-border-color" : "#000000",
-        "background-border-style" : "solid",
-        "background-radius" : 0,
-        // hovering
-        "background-color-hover" : "#D9D9D9",
-        "background-shadow-color-hover" : "#000000",
-        "background-shadow-size-hover" : 0,
-        // active
-        "background-color-active" : "#D9D9D9",
-        "background-shadow-color-active" : "#000000",
-        "background-shadow-size-active" : 0,
-        
-        // Scrollbar piece/slider
-        "slider-color" : "#666666",
-        "slider-shadow-color" : "#000000",
-        "slider-shadow-size" : 35,
-        "slider-radius" : 0,
-        "slider-border-size" : 0,
-        "slider-border-color" : "#000000",
-        "slider-border-style" : "solid",
-        // hovering
-        "slider-color-hover" : "#666",
-        "slider-shadow-color-hover" : "#000000",
-        "slider-shadow-size-hover" : 0,
-        // active
-        "slider-color-active" : "#666",
-        "slider-shadow-color-active" : "#000000",
-        "slider-shadow-size-active" : 0,
-        
-        // Buttons
-        "showbuttons" : "off",
-        "buttons-size" : 20,
-        "buttons-color" : "#666666",
-        "buttons-shadow-color" : "#000000",
-        "buttons-shadow-size" : 0,
-        "buttons-radius" : 0,
-        "buttons-border-size" : 0,
-        "buttons-border-color" : "#666",
-        "buttons-border-style" : "solid",
-        "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
-        "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
-        "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
-        "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
-        // hovering
-        "buttons-color-hover" : "#666666",
-        "buttons-shadow-color-hover" : "#000000",
-        "buttons-shadow-size-hover" : 0,
-        "buttons-background-image-up-hover" : chrome.extension.getURL("images/defaults/up.png"),
-        "buttons-background-image-down-hover" : chrome.extension.getURL("images/defaults/down.png"),
-        "buttons-background-image-left-hover" : chrome.extension.getURL("images/defaults/left.png"),
-        "buttons-background-image-right-hover" : chrome.extension.getURL("images/defaults/right.png"),
-        // active
-        "buttons-color-active" : "#666666",
-        "buttons-shadow-color-active" : "#000000",
-        "buttons-shadow-size-active" : 0,
-        "buttons-background-image-up-active" : chrome.extension.getURL("images/defaults/up.png"),
-        "buttons-background-image-down-active" : chrome.extension.getURL("images/defaults/down.png"),
-        "buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
-        "buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
-        
-        // Reset all non-button images to 0
-        "slider-background-image-vertical" : '',
-        "slider-background-image-horizontal" : '',
-        "slider-background-image-vertical-hover" : '',
-        "slider-background-image-horizontal-hover" : '',
-        "slider-background-image-vertical-active" : '',
-        "slider-background-image-horizontal-active" : '',
-        
-        "background-background-image-vertical" : '',
-        "background-background-image-horizontal" : '',
-        "background-background-image-vertical-hover" : '',
-        "background-background-image-horizontal-hover" : '',
-        "background-background-image-vertical-active" : '',
-        "background-background-image-horizontal-active" : '',
-
-        //Custom CSS
-        "customcss" : "::-webkit-scrollbar {\
-\n\n\
-}\n\
-::-webkit-scrollbar-button {\
-\n\n\
-}\n\
-::-webkit-scrollbar-track {\
-\n\n\
-}\n\
-::-webkit-scrollbar-track-piece {\
-\n\n\
-}\n\
-::-webkit-scrollbar-thumb {\
-\n\n\
-}\n\
-::-webkit-scrollbar-corner {\
-\n\n\
-}\n\
-::-webkit-resizer {\
-\n\n\
-}"
-    });
-    
-    
-}
-
 //Convert the styling stored in local storage into CSS:
 var newCSS = Rescroller.getCSSString();
 
@@ -228,7 +110,7 @@ document.write('<style id="rescroller">' + newCSS + "</style>");
 
 //If there is no previously-saved scrollbar CSS in local storage, save it!
 if (!Rescroller.getProperty("size") || Rescroller.getProperty("size") == "") {
-    restoreDefaults();
+    Rescroller.restoreDefaults();
 }
 
 if (!localStorage['sb-excludedsites']) { localStorage['sb-excludedsites'] = ''; }
@@ -306,7 +188,7 @@ $(document).ready(function() {
     //Reset formatting button
     $("#resetformatting").click(function() {
         if (!confirm("Are you sure you would like to reset your scrollbars to default? This cannot be undone.")) { return false; }
-        restoreDefaults();
+        Rescroller.restoreDefaults();
         location.reload(true);
     });
     
