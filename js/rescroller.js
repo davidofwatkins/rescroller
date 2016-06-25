@@ -124,6 +124,8 @@ window.Rescroller = {
             this._settings = JSON.parse(localStorage.getItem('rescroller_settings'));
         }
 
+        if (!this._settings) { this._settings = {}; }
+
         return this._settings;
     },
 
@@ -298,7 +300,7 @@ window.Rescroller = {
             "background-background-image-vertical-active" : '',
             "background-background-image-horizontal-active" : '',
 
-            //Custom CSS
+            // Custom CSS
             "customcss" : "::-webkit-scrollbar {\
     \n\n\
     }\n\
