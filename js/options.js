@@ -11,14 +11,14 @@ var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
 
-if (typeof localStorage['showSaveConfirmation'] === 'undefined') {
-    localStorage['showSaveConfirmation'] = 1;
+if (!Rescroller.settings.get('showSaveConfirmation')) {
+    Rescroller.settings.set('showSaveConfirmation', 1);
 }
 
 Rescroller.onSettingsUpdated = function() {
     
     // Show "saved" confirmation box
-    if (parseInt(localStorage["showSaveConfirmation"]) === 1 && (new Date().getTime() - 500) > LOAD_START) {
+    if (parseInt(Rescroller.settings.get('showSaveConfirmation')) === 1 && (new Date().getTime() - 500) > LOAD_START) {
         clearTimeout(saveconfirmationTimeout);
         $("#save-confirm").fadeIn("slow");
         saveconfirmationTimeout = setTimeout(function() {
@@ -30,7 +30,7 @@ Rescroller.onSettingsUpdated = function() {
 //Enable functionality of Confirm Box "Never Show Again" button
 $(document).ready(function() {
     $("#save-confirm #hide-saved-confirm").click(function() {
-        localStorage["showSaveConfirmation"] = 0;
+        Rescroller.settings.set('showSaveConfirmation', 0);
         $("#save-confirm").fadeOut("slow");
         return false;
     });
@@ -109,11 +109,11 @@ var newCSS = Rescroller.getCSSString();
 document.write('<style id="rescroller">' + newCSS + "</style>");
 
 //If there is no previously-saved scrollbar CSS in local storage, save it!
-if (!Rescroller.getProperty("size") || Rescroller.getProperty("size") == "") {
+if (!Rescroller.properties.get("size") || Rescroller.properties.get("size") == "") {
     Rescroller.restoreDefaults();
 }
 
-if (!localStorage['sb-excludedsites']) { localStorage['sb-excludedsites'] = ''; }
+if (!Rescroller.settings.get('excludedsites')) { Rescroller.settings.set('excludedsites', ''); }
 
 
 //When the page has loaded:
@@ -125,15 +125,15 @@ $(document).ready(function() {
     $("#generatedcss").html(newCSS);
     
     //Fill the excludedsites textarea with the list of excluded sites:
-    $("#excludedsites").val(localStorage['sb-excludedsites']);
+    $("#excludedsites").val(Rescroller.settings.get('excludedsites'));
     $("#excludedsites").change(function() {
-        localStorage['sb-excludedsites'] = $(this).val();
+        Rescroller.settings.set('excludedsites', $(this).val());
     });
     
     //Fill the custom CSS form with the custom CSS
-    $("#customcss").val(Rescroller.getProperty("customcss"));
+    $("#customcss").val(Rescroller.properties.get("customcss"));
     $("#customcss").change(function() {
-        Rescroller.saveProperty("customcss", $(this).val());
+        Rescroller.properties.set("customcss", $(this).val());
         refreshScrollbars();
     });
     
@@ -145,13 +145,13 @@ $(document).ready(function() {
             if ($(this).attr("type") == "checkbox") { //If it's a check box...
                 
                 //If local storage says this option should be checked, check it
-                if (Rescroller.getProperty($(this).attr("id")) == "checked") {
-                    $(this).attr("checked", Rescroller.getProperty($(this).attr("id")));
+                if (Rescroller.properties.get($(this).attr("id")) == "checked") {
+                    $(this).attr("checked", Rescroller.properties.get($(this).attr("id")));
                 }
             }
             //If it's an ordinary input, just fill the input with the corresponding value from local storage
             else {
-                $(this).val(Rescroller.getProperty($(this).attr("id")));
+                $(this).val(Rescroller.properties.get($(this).attr("id")));
             }
         }
     });
@@ -193,7 +193,7 @@ $(document).ready(function() {
     });
     
     //Expand/collapse all non-custom css areas when that checkbox is checked    
-    if (Rescroller.getProperty("usecustomcss") == "checked") {
+    if (Rescroller.properties.get("usecustomcss") == "checked") {
         $(".section").not("#misc").not($("#general")).hide();
         $(".customcss-collapsible").hide();
     }
@@ -212,7 +212,7 @@ $(document).ready(function() {
     //Clear picture buttons
     $(".clearimage").click(function() {
         var key = $(this).parent().parent().attr("id");
-        Rescroller.saveProperty(key, '');
+        Rescroller.properties.set(key, '');
         $(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
         $(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
         
@@ -227,7 +227,7 @@ $(document).ready(function() {
     //Set correct value for <select>s
     $("select").each(function() {
         var thisProperty = $(this).attr('id');
-        var thisPropertyValue = Rescroller.getProperty(thisProperty);
+        var thisPropertyValue = Rescroller.properties.get(thisProperty);
         $(this).children().each(function() {
             if($(this).val() == thisPropertyValue) {
                 $(this).attr("selected", "selected");
@@ -239,7 +239,7 @@ $(document).ready(function() {
     $("select").change(function() {
         var thisProperty = $(this).attr('id');
         var currentValue = $(this).val();
-        Rescroller.saveProperty(thisProperty, currentValue);
+        Rescroller.properties.set(thisProperty, currentValue);
         refreshScrollbars();
     });
     
@@ -273,18 +273,18 @@ $(document).ready(function() {
         else { units = "%"; }
         
         //Fill slider value with value from local storage
-        $("#" + propertyName + " .slider-value").html(Rescroller.getProperty(propertyName) + units);
+        $("#" + propertyName + " .slider-value").html(Rescroller.properties.get(propertyName) + units);
         
         //Set up slider for this property
         $("#" + propertyName + " .slider").slider({
-            value: Rescroller.getProperty(propertyName),
+            value: Rescroller.properties.get(propertyName),
             orientation: theOrientation,
             slide: function(event, ui) {
                 $(this).siblings(".slider-value").html(ui.value + units);
             },
             change: function(event, ui) {
                 //Update value in local storage
-                Rescroller.saveProperty(propertyName, ui.value);
+                Rescroller.properties.set(propertyName, ui.value);
                 refreshScrollbars();
             }
         });
@@ -302,13 +302,14 @@ $(document).ready(function() {
             change: function(hex, rgb) {
                 self.siblings(".colorvalue").val(hex);
             },
-            "close": function(hex, rgb) {
-                Rescroller.saveProperty(localStorageKey, hex, function() { refreshScrollbars(); });
+            close: function(hex, rgb) {
+                Rescroller.properties.set(localStorageKey, hex);
+                refreshScrollbars();
             }
         });
         
         // Set default color to whatever it's been saved to
-        $(this).miniColors("value", Rescroller.getProperty($(this).parent().attr("id")));
+        $(this).miniColors("value", Rescroller.properties.get($(this).parent().attr("id")));
 
         // Add "apply" button
         $(".miniColors-selector").append('<p><a href="#">Apply</a></p>');
@@ -359,8 +360,8 @@ $(document).ready(function() {
     
     for (var i = 0; i < keys.length; i++) {
         
-        if (Rescroller.getProperty(keys[i]) && Rescroller.getProperty(keys[i]) != 0) {
-            $("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + Rescroller.getProperty(keys[i]) + '" />');
+        if (Rescroller.properties.get(keys[i]) && Rescroller.properties.get(keys[i]) != 0) {
+            $("#" + keys[i] + " .thumbframe div.thumbcontainer").html('<img src="' + Rescroller.properties.get(keys[i]) + '" />');
             $("#" + keys[i] + " .thumbframe").css("display", "inline-block"); //show the image frame for this image
         }
         else {
@@ -374,7 +375,7 @@ $(document).ready(function() {
     
     //Fill "colorvalue" inputs with color values
     $(".colorvalue").each(function() {
-        $(this).val(Rescroller.getProperty($(this).parent().attr("id")));
+        $(this).val(Rescroller.properties.get($(this).parent().attr("id")));
     });
     
     //Automatically select text when clicking a color value
@@ -392,19 +393,19 @@ $(document).ready(function() {
         //If the value is a hex value, save it
         if (val.indexOf("#") == 0 && (val.length == 4 || val.length == 7)) {
             $(this).siblings(".colorselection").miniColors("value", val);
-            //refreshScrollbars();
-            Rescroller.saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
+            Rescroller.properties.set($(this).parent().attr("id"), val);
+            refreshScrollbars();
         }
         //If the user just forgot the #, add it automatically and save
         else if (val.indexOf("#") != 0 && (val.length == 3 || val.length == 6)) {
             $(this).siblings(".colorselection").miniColors("value", "#" + val);
             $(this).val("#" + val);
-            //refreshScrollbars();
-            Rescroller.saveProperty($(this).parent().attr("id"), val, function() { refreshScrollbars(); });
+            Rescroller.properties.set($(this).parent().attr("id"), val);
+            refreshScrollbars();
         }
         //If it's just a bad value, restore original
         else {
-            $(this).val(Rescroller.getProperty($(this).parent().attr("id")));
+            $(this).val(Rescroller.properties.get($(this).parent().attr("id")));
         }
         
     });
@@ -423,11 +424,11 @@ $(document).ready(function() {
 
         // Expand/collapse wrapper & save value to local storage
         if ($(this).is(":checked")) {
-            Rescroller.saveProperty($(this).attr("id"), "checked");
+            Rescroller.properties.set($(this).attr("id"), "checked");
             $("#buttons-toggleable").slideDown("fast", function() { refreshScrollbars(); });
         }
         else {
-            Rescroller.saveProperty($(this).attr("id"), "unchecked");
+            Rescroller.properties.set($(this).attr("id"), "unchecked");
             $("#buttons-toggleable").slideUp("fast", function() { refreshScrollbars(); });
         }
     });
@@ -448,12 +449,12 @@ $(document).ready(function() {
         
         if ($(this).is(":checked")) {
             //alert("Checked!");
-            Rescroller.saveProperty($(this).attr("id"), "checked");
+            Rescroller.properties.set($(this).attr("id"), "checked");
             $("#" + $(this).attr("data-wrapperid")).slideDown("slow", function() { refreshScrollbars(); });
         }
         else {
             //alert("Unchecked!");
-            Rescroller.saveProperty($(this).attr("id"), "unchecked");
+            Rescroller.properties.set($(this).attr("id"), "unchecked");
             $("#" + $(this).attr("data-wrapperid")).slideUp("slow", function() { refreshScrollbars(); });
         }
         
@@ -474,14 +475,14 @@ $(document).ready(function() {
             var left = propertyPrefix + "left" + propertySuffix;
             var right = propertyPrefix + "right" + propertySuffix;
 
-            Rescroller.saveProperty(down, chrome.extension.getURL("images/defaults/down.png"));
-            Rescroller.saveProperty(up, chrome.extension.getURL("images/defaults/up.png"));
-            Rescroller.saveProperty(left, chrome.extension.getURL("images/defaults/left.png"));
-            Rescroller.saveProperty(right, chrome.extension.getURL("images/defaults/right.png"));
+            Rescroller.properties.set(down, chrome.extension.getURL("images/defaults/down.png"));
+            Rescroller.properties.set(up, chrome.extension.getURL("images/defaults/up.png"));
+            Rescroller.properties.set(left, chrome.extension.getURL("images/defaults/left.png"));
+            Rescroller.properties.set(right, chrome.extension.getURL("images/defaults/right.png"));
 
             $("#" + down + ", #" + up + ", #" + left + ", #" + right).each(function() {
 
-                $(this).children(".thumbframe").children(".thumbcontainer").html('<img src="' + Rescroller.getProperty($(this).attr("id")) + '" />');
+                $(this).children(".thumbframe").children(".thumbcontainer").html('<img src="' + Rescroller.properties.get($(this).attr("id")) + '" />');
                 $(this).children(".selector-button").hide();
                 $(this).children(".thumbframe").show();
             });
@@ -522,7 +523,7 @@ function handleFiles(files, frame, key) {
                 aImg.src = e.target.result;
                 
                 //Save to local storage
-                Rescroller.saveProperty(key, aImg.src);
+                Rescroller.properties.set(key, aImg.src);
                 
                 //Change the "Select Image" button to an image frame
                 var container = $(frame).parents(".imagepicker-container");

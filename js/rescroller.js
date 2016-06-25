@@ -22,7 +22,80 @@ window.Rescroller = {
 
     version: chrome.app.getDetails().version,
     _exportBuffer: null,                        // used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
-    _settings: null,                            // a cached JSON version of our settings from localStorage. 
+
+    settings: {
+        _settings: null,                        // a cached JSON version of our settings from localStorage. 
+
+        /**
+         * Get our settings object.
+         * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
+         */
+        getAll: function(force) {
+            if (force === true || !this._settings) {
+                this._settings = JSON.parse(localStorage.getItem('rescroller_settings'));
+            }
+
+            if (!this._settings) { this._settings = {}; }
+
+            return this._settings;
+        },
+
+        /**
+         * Get a single setting value.
+         * @param  {string}     key     The setting to get
+         * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
+         */
+        get: function(key, force) {
+            try { return this.getAll(force)[key]; }
+            catch(e) { return null; }
+        },
+
+        set: function(key, value) { // @todo:david update to accept multiple
+            var settings = this.getAll();
+            settings[key] = value;
+            localStorage['rescroller_settings'] = JSON.stringify(settings);
+
+            Rescroller.queueExportLocalSettings();
+            Rescroller.onSettingsUpdated();
+        }
+    },
+
+    properties: {
+        getAll: function(force) {
+            var props = null;
+            try { props = Rescroller.settings.get('scrollbarStyle', force); }
+            catch(e) { }
+
+            if (!props) { props = {}; }
+
+            return props;
+        },
+
+        get: function(key, force) {
+            try { return this.getAll(force)[key]; }
+            catch(e) { return null; }
+        },
+
+        set: function(key, value) { // @todo:david update to accept multiple
+            
+            var props = this.getAll();
+            props[key] = value;
+            Rescroller.settings.set('scrollbarStyle', props);
+
+            Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
+        },
+
+        setMultiple: function(new_props) {
+            var props = this.getAll();
+
+            for (key in new_props) {
+                props[key] = new_props[key];
+            }
+
+            Rescroller.settings.set('scrollbarStyle', props);
+            Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
+        }
+    },
 
     /**
      * Migration from 1.2 --> 1.3. Migrate all our "sb-*" keys in localStorage to a single key.
@@ -36,14 +109,20 @@ window.Rescroller = {
         // @todo:david we should also store images in their own localStorage keys to prevent issues with
         // Chrome sync data limits.
 
-        var json = {};
+        var json = {
+            scrollbarStyle: {}
+        };
 
         Object.keys(localStorage).forEach(function(key) {
-            if (key == 'sb-excludedsites') { return true; } // continue - we'll keep this out of our settings to keep our background page lightweight
-            if (key.indexOf('sb-') !== 0) { return true; } // continue
 
-            // set new key as old without the 'sb-' prefix
-            json[key.substr(3, key.length -1)] = parseInt(localStorage[key]) === NaN ? localStorage[key] : parseInt(localStorage[key]) ;
+            if (key == 'sb-excludedsites') {
+                json['excludedsites'] = localStorage['excludedsites']
+            } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings 
+                // set new key as old without the 'sb-' prefix
+                json.scrollbarStyle[key.substr(3, key.length -1)] = parseInt(localStorage[key]) === NaN ? localStorage[key] : parseInt(localStorage[key]) ;
+            }
+
+            // Remove the old key/val
             localStorage.removeItem(key);
         });
 
@@ -54,13 +133,13 @@ window.Rescroller = {
     _migrateBackgroundImageNullValues: function() {
         
         // For whatever reason, we were setting default values for images as 0. They should be empty string
-        var settings = Rescroller.getSettings();
-        for (key in settings) {
+        var props = this.properties.getAll();
+        for (key in props) {
             if (key.indexOf('background-image') <= -1) { continue; }
-            if (parseInt(settings[key]) === 0) { settings[key] = '' }
+            if (parseInt(props[key]) === 0) { props[key] = '' }
         }
 
-        localStorage['rescroller_settings'] = JSON.stringify(settings)
+        this.properties.setMultiple(props)
     },
 
     performMigrations: function() {
@@ -73,64 +152,8 @@ window.Rescroller = {
      */
     onSettingsUpdated: function() {},
 
-    /**
-     * Saves to local storage via localStorage[] and chrome.storage
-     */
-    saveProperty: function(key, value, callback) {
-        callback || (callback = function() {});
-        
-        var settings = this.getSettings();
-        settings[key] = value;
-        localStorage['rescroller_settings'] = JSON.stringify(settings);
-
-        this.generateScrollbarCSS(); // update our generated CSS for browser tabs
-        this.queueExportLocalSettings();
-        this.onSettingsUpdated();
-
-        callback();
-    },
-
-    saveProperties: function(props) {
-        
-        var settings = this.getSettings();
-
-        for (var key in props) {
-            settings[key] = props[key];
-        }
-
-        localStorage['rescroller_settings'] = JSON.stringify(settings);
-        
-        this.generateScrollbarCSS(); // update our generated CSS for browser tabs
-        this.queueExportLocalSettings(); // Export to Chrome.storage
-        this.onSettingsUpdated();
-    },
-
-    /**
-     * Get a single property.
-     * @param  {string}     key     The property to get
-     * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
-     */
-    getProperty: function(key, force) {
-        try { return this.getSettings(force)[key]; }
-        catch(e) { return null; }
-    },
-
-    /**
-     * Get our settings object.
-     * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
-     */
-    getSettings: function(force) {
-        if (force === true || !this._settings) {
-            this._settings = JSON.parse(localStorage.getItem('rescroller_settings'));
-        }
-
-        if (!this._settings) { this._settings = {}; }
-
-        return this._settings;
-    },
-
     getListOfDisabledSites: function() {
-        var rawString = localStorage['sb-excludedsites'];
+        var rawString = this.settings.get('excludedsites');
         
         //Remove all spaces from the string, etc.
         rawString = this._replaceAll(rawString, " ", "");
@@ -158,10 +181,10 @@ window.Rescroller = {
      */
     _precentageToPixels: function(percentage, doNotReduceByHalf) {
         if (!doNotReduceByHalf) {
-            return ((percentage / 100) * this.getProperty("size")) / 2;
+            return ((percentage / 100) * this.properties.get("size")) / 2;
         }
 
-        return (percentage / 100) * this.getProperty("size");
+        return (percentage / 100) * this.properties.get("size");
     },
 
     /**
@@ -211,13 +234,12 @@ window.Rescroller = {
      */
     restoreDefaults: function() {
 
-        this.saveProperties({
+        this.properties.setMultiple({
             
             // General
             "size" : 15,
             "subbackground-color" : "#000000",
             "corner-background" : "#D9D9D9",
-            // "sb-excludedsites" : "", - stored by itself in localStorage
             // "resizer-background" : "#FFC31F",
             
             // Background
@@ -342,7 +364,7 @@ window.Rescroller = {
         }
 
         // If user has chosen to specify his own CSS, just return that
-        if (this.getProperty("usecustomcss") == "checked") { return this.getProperty("customcss"); }
+        if (this.properties.get("usecustomcss") == "checked") { return this.properties.get("customcss"); }
        
        // Build our CSS structure as JSON for readability and maintainability. Then, we'll convert it to CSS!
         var json = {
@@ -351,59 +373,59 @@ window.Rescroller = {
                 // Base
                 "::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical": {
                     "attributes": {
-                        "width": "%spx".fmt(this.getProperty('size')),
-                        "height": "%spx".fmt(this.getProperty('size')),
-                        "background-color": "%s".fmt(this.getProperty('subbackground-color'))
+                        "width": "%spx".fmt(this.properties.get('size')),
+                        "height": "%spx".fmt(this.properties.get('size')),
+                        "background-color": "%s".fmt(this.properties.get('subbackground-color'))
                     }
                 },
 
                 "::-webkit-scrollbar-track-piece": {
                     "attributes": {
-                        "background-color": this.getProperty('background-color'),
-                        "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.getProperty('background-shadow-size'), true), this.getProperty('background-shadow-color')),
-                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('background-border-size')), this.getProperty('background-border-style'), this.getProperty('background-border-color')),
-                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('background-radius')))
+                        "background-color": this.properties.get('background-color'),
+                        "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.properties.get('background-shadow-size'), true), this.properties.get('background-shadow-color')),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.properties.get('background-border-size')), this.properties.get('background-border-style'), this.properties.get('background-border-color')),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.properties.get('background-radius')))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:vertical": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-vertical'))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:horizontal": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-horizontal'))
                     }
                 },
 
                 "::-webkit-scrollbar-thumb": {
                     "attributes": {
-                        "background-color": this.getProperty('slider-color'),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size'), true), this.getProperty('slider-shadow-color')),
-                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('slider-radius'))),
-                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('slider-border-size')), this.getProperty('slider-border-style'), this.getProperty('slider-border-color'))
+                        "background-color": this.properties.get('slider-color'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('slider-shadow-size'), true), this.properties.get('slider-shadow-color')),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.properties.get('slider-radius'))),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.properties.get('slider-border-size')), this.properties.get('slider-border-style'), this.properties.get('slider-border-color'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:vertical": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-vertical'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:horizontal": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-horizontal'))
                     }
                 },
 
 
                 "::-webkit-scrollbar-corner": {
                     "attributes": {
-                        "background-color": this.getProperty('corner-background')
+                        "background-color": this.properties.get('corner-background')
                     }
                 }
                 // "::-webkit-resizer": {
                 //     "attributes": {
-                //         "background-color": this.getProperty('resizer-background')
+                //         "background-color": this.properties.get('resizer-background')
                 //     }
                 // }
             }
@@ -411,106 +433,106 @@ window.Rescroller = {
 
         // Conditionals:
 
-        if (this.getProperty('showbuttons') == 'checked') {
+        if (this.properties.get('showbuttons') == 'checked') {
             $.extend(json.children, {
                 "::-webkit-scrollbar-button {": {
                     "attributes": {
-                        "background-color": this.getProperty('buttons-color'),
-                        "border-radius": "%spx".fmt(this._precentageToPixels(this.getProperty('buttons-radius'))),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size'), true), this.getProperty('buttons-shadow-color')),
-                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.getProperty('buttons-border-size')), this.getProperty('buttons-border-style'), this.getProperty('buttons-border-color')),
+                        "background-color": this.properties.get('buttons-color'),
+                        "border-radius": "%spx".fmt(this._precentageToPixels(this.properties.get('buttons-radius'))),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('buttons-shadow-size'), true), this.properties.get('buttons-shadow-color')),
+                        "border": "%spx %s %s".fmt(this._precentageToPixels(this.properties.get('buttons-border-size')), this.properties.get('buttons-border-style'), this.properties.get('buttons-border-color')),
                         "display": "block"
                     }
                 },
                 "::-webkit-scrollbar-button:vertical": {
                     "attributes": {
-                        "height": "%spx".fmt(this.getProperty('buttons-size'))
+                        "height": "%spx".fmt(this.properties.get('buttons-size'))
                     }
                 },
                 "::-webkit-scrollbar-button:horizontal": {
                     "attributes": {
-                        "width": "%spx".fmt(this.getProperty('buttons-size'))
+                        "width": "%spx".fmt(this.properties.get('buttons-size'))
                     }
                 },
                 "::-webkit-scrollbar-button:vertical:decrement": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up'))
+                        "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-up'))
                     }
                 },
                 "::-webkit-scrollbar-button:vertical:increment": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down'))
+                        "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-down'))
                     }
                 },
                 "::-webkit-scrollbar-button:horizontal:increment": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right'))
+                        "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-right'))
                     }
                 },
                 "::-webkit-scrollbar-button:horizontal:decrement": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left'))
+                        "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-left'))
                     }
                 },
             });
 
-            if (this.getProperty('buttons-use-hover') == 'checked') {
+            if (this.properties.get('buttons-use-hover') == 'checked') {
                 $.extend(json.children, {
                     "::-webkit-scrollbar-button:vertical:decrement:hover": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up-hover'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-up-hover'))
                         }
                     },
                     "::-webkit-scrollbar-button:vertical:increment:hover": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down-hover'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-down-hover'))
                         }
                     },
                     "::-webkit-scrollbar-button:horizontal:increment:hover": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right-hover'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-right-hover'))
                         }
                     },
                     "::-webkit-scrollbar-button:horizontal:decrement:hover": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left-hover'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-left-hover'))
                         }
                     },
                     "::-webkit-scrollbar-button:hover": {
                         "attributes": {
-                            "background-color": this.getProperty('buttons-color-hover'),
-                            "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size-hover'), true), this.getProperty('buttons-shadow-color-hover'))
+                            "background-color": this.properties.get('buttons-color-hover'),
+                            "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('buttons-shadow-size-hover'), true), this.properties.get('buttons-shadow-color-hover'))
                         }
                     }
                 });
             }
 
-            if (this.getProperty('buttons-use-active') == 'checked') {
+            if (this.properties.get('buttons-use-active') == 'checked') {
                 $.extend(json.children, {
                     "::-webkit-scrollbar-button:vertical:decrement:active": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-up-active'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-up-active'))
                         }
                     },
                     "::-webkit-scrollbar-button:vertical:increment:active": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-down-active'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-down-active'))
                         }
                     },
                     "::-webkit-scrollbar-button:horizontal:increment:active": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-right-active'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-right-active'))
                         }
                     },
                     "::-webkit-scrollbar-button:horizontal:decrement:active": {
                         "attributes": {
-                            "background-image": "url('%s')".fmt(this.getProperty('buttons-background-image-left-active'))
+                            "background-image": "url('%s')".fmt(this.properties.get('buttons-background-image-left-active'))
                         }
                     },
                     "::-webkit-scrollbar-button:active": {
                         "attributes": {
-                            "background-color": this.getProperty('buttons-color-active'),
-                            "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.getProperty('buttons-shadow-size-active'), true), this.getProperty('buttons-shadow-color-active'))
+                            "background-color": this.properties.get('buttons-color-active'),
+                            "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.properties.get('buttons-shadow-size-active'), true), this.properties.get('buttons-shadow-color-active'))
                         }
                     }
                 });
@@ -526,85 +548,85 @@ window.Rescroller = {
             });
         }
 
-        if (this.getProperty("background-use-hover") == "checked") {
+        if (this.properties.get("background-use-hover") == "checked") {
             $.extend(json.children, {
                 "::-webkit-scrollbar-track-piece:vertical:hover": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical-hover'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-vertical-hover'))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:horizontal:hover": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal-hover'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-horizontal-hover'))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:hover ": {
                     "attributes": {
-                        "background-color": this.getProperty('background-color-hover'),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('background-shadow-size-hover'), true), this.getProperty('background-shadow-color-hover'))
+                        "background-color": this.properties.get('background-color-hover'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('background-shadow-size-hover'), true), this.properties.get('background-shadow-color-hover'))
                     }
                 }
             });
         }
 
-        if (this.getProperty("background-use-active") == "checked") {
+        if (this.properties.get("background-use-active") == "checked") {
             $.extend(json.children, {
                 "::-webkit-scrollbar-track-piece:vertical:active": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-vertical-active'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-vertical-active'))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:horizontal:active": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('background-background-image-horizontal-active'))
+                        "background-image": "url('%s')".fmt(this.properties.get('background-background-image-horizontal-active'))
                     }
                 },
                 "::-webkit-scrollbar-track-piece:active": {
                     "attributes": {
-                        "background-color": this.getProperty('background-color-active'),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('background-shadow-size-active'), true), this.getProperty('background-shadow-color-active'))
+                        "background-color": this.properties.get('background-color-active'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('background-shadow-size-active'), true), this.properties.get('background-shadow-color-active'))
                     }
                 }
             });
         }
 
-        if (this.getProperty("slider-use-hover") == "checked") {
+        if (this.properties.get("slider-use-hover") == "checked") {
             $.extend(json.children, {
                 "::-webkit-scrollbar-thumb:hover": {
                     "attributes": {
-                        "background-color": this.getProperty('slider-color-hover'),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size-hover'), true), this.getProperty('slider-shadow-color-hover'))
+                        "background-color": this.properties.get('slider-color-hover'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('slider-shadow-size-hover'), true), this.properties.get('slider-shadow-color-hover'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:vertical:hover": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical-hover'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-vertical-hover'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:horizontal:hover": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal-hover'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-horizontal-hover'))
                     }
                 }
             });
         }
 
-        if (this.getProperty("slider-use-active") == "checked") {
+        if (this.properties.get("slider-use-active") == "checked") {
             $.extend(json.children, {
                 "::-webkit-scrollbar-thumb:active": {
                     "attributes": {
-                        "background-color": this.getProperty('slider-color-active'),
-                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.getProperty('slider-shadow-size-active'), true), this.getProperty('slider-shadow-color-active'))
+                        "background-color": this.properties.get('slider-color-active'),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('slider-shadow-size-active'), true), this.properties.get('slider-shadow-color-active'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:vertical:active": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-vertical-active'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-vertical-active'))
                     }
                 },
                 "::-webkit-scrollbar-thumb:horizontal:active": {
                     "attributes": {
-                        "background-image": "url('%s')".fmt(this.getProperty('slider-background-image-horizontal-active'))
+                        "background-image": "url('%s')".fmt(this.properties.get('slider-background-image-horizontal-active'))
                     }
                 }
             });
