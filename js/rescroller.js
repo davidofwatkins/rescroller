@@ -50,13 +50,14 @@ window.Rescroller = {
             catch(e) { return null; }
         },
 
-        set: function(key, value) { // @todo:david update to accept multiple
+        set: function(key, value, noSync) { // @todo:david update to accept multiple
             var settings = this.getAll();
             settings[key] = value;
             localStorage['rescroller_settings'] = JSON.stringify(settings);
-
-            Rescroller.queueExportLocalSettings();
             Rescroller.onSettingsUpdated();
+
+            if (noSync) { return; }
+            Rescroller.queueExportLocalSettings();
         }
     },
 
@@ -72,27 +73,31 @@ window.Rescroller = {
         },
 
         get: function(key, force) {
-            try { return this.getAll(force)[key]; }
-            catch(e) { return null; }
+            try {
+                var val = this.getAll(force)[key];
+                return val ? val : ''; // return empty string so we don't have 'null's in our CSS
+            } catch(e) {
+                return '';
+            }
         },
 
-        set: function(key, value) { // @todo:david update to accept multiple
+        set: function(key, value, noSync) { // @todo:david update to accept multiple
             
             var props = this.getAll();
             props[key] = value;
-            Rescroller.settings.set('scrollbarStyle', props);
+            Rescroller.settings.set('scrollbarStyle', props, noSync);
 
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
         },
 
-        setMultiple: function(new_props) {
+        setMultiple: function(newProps, noSync) {
             var props = this.getAll();
 
-            for (key in new_props) {
-                props[key] = new_props[key];
+            for (key in newProps) {
+                props[key] = newProps[key];
             }
 
-            Rescroller.settings.set('scrollbarStyle', props);
+            Rescroller.settings.set('scrollbarStyle', props, noSync);
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
         }
     },
@@ -102,9 +107,6 @@ window.Rescroller = {
      */
     _migrateDataToSingleKey: function() {
         if (!localStorage['sb-size']) { return; } // already migrated
-
-        // @todo:david we should probably store the fake-CSS values of the scrollbars themselves in a sub-settings
-        // object, so it's separate from other app settings.
         
         // @todo:david we should also store images in their own localStorage keys to prevent issues with
         // Chrome sync data limits.
@@ -114,12 +116,13 @@ window.Rescroller = {
         };
 
         Object.keys(localStorage).forEach(function(key) {
+            if (key == 'install_time') { return true; } // continue
 
             if (key == 'sb-excludedsites') {
                 json['excludedsites'] = localStorage['excludedsites']
             } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings 
                 // set new key as old without the 'sb-' prefix
-                json.scrollbarStyle[key.substr(3, key.length -1)] = parseInt(localStorage[key]) === NaN ? localStorage[key] : parseInt(localStorage[key]) ;
+                json.scrollbarStyle[key.substr(3, key.length -1)] = (isNaN(parseInt(localStorage[key]))) ? localStorage[key] : parseInt(localStorage[key]) ;
             }
 
             // Remove the old key/val
@@ -128,18 +131,27 @@ window.Rescroller = {
 
         this._settings = json;
         localStorage['rescroller_settings'] = JSON.stringify(json)
+
+        // @todo:david after switching to the new version, the new settings should be synced up.
     },
 
     _migrateBackgroundImageNullValues: function() {
         
         // For whatever reason, we were setting default values for images as 0. They should be empty string
+        var i = 0;
         var props = this.properties.getAll();
         for (key in props) {
             if (key.indexOf('background-image') <= -1) { continue; }
-            if (parseInt(props[key]) === 0) { props[key] = '' }
+            if (parseInt(props[key]) !== 0) { continue; }
+            props[key] = '';
+            i++;
         }
 
-        this.properties.setMultiple(props)
+        // don't set anything if no changes were made; this prevents a recursive loop with
+        // chrome.sync since this is run every every sync down
+        if (i == 0) { return; }
+
+        this.properties.setMultiple(props, true)
     },
 
     performMigrations: function() {
@@ -154,7 +166,8 @@ window.Rescroller = {
 
     getListOfDisabledSites: function() {
         var rawString = this.settings.get('excludedsites');
-        
+        if (!rawString) { return []; }
+            
         //Remove all spaces from the string, etc.
         rawString = this._replaceAll(rawString, " ", "");
         rawString = this._replaceAll(rawString, "https://", "");
@@ -196,7 +209,10 @@ window.Rescroller = {
 
         chrome.storage.sync.get(function(items) {
             for (var key in items) {
-                localStorage[key] = items[key];
+                var val = items[key];
+                if (!val) { continue; }
+
+                localStorage[key] = val;
             }
 
             that.performMigrations(); // migrate incoming data
@@ -217,12 +233,13 @@ window.Rescroller = {
         }, this.EXPORT_BUFFER_TIME);
     },
 
-    exportLocalSettings: function() {
+    exportLocalSettings: function() { // @todo:david this may be occurring twice? Double check.
         this.performMigrations();
 
         var ls = {};
         for (var key in localStorage) {
             if (key == 'generated_css') { continue; } // waste of time to sync this
+            if (!localStorage[key]) { continue; }
             ls[key] = localStorage[key];
         }
 

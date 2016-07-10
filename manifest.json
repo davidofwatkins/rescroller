@@ -24,7 +24,9 @@
     }
   ],
   "background": {
-    "scripts" : ["js/rescroller.js", "js/background.js"]
+    // @todo:david unfortunately we need all these in the background page in order to generate new CSS when a sync happens.
+    // I wonder if it would be better to use requirejs and require them only when we need them?
+    "scripts" : ["js/jquery.js", "js/cssjson.js", "js/rescroller.js", "js/background.js"]
   },
   "permissions": [
     "<all_urls>",

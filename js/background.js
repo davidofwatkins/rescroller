@@ -3,7 +3,10 @@ Rescroller Chrome Extension
 Author: David Watkins (@dwat91)
 
 Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
+@todo:david remove these
 */
+
+// @todo:david consider using event page instead of background page? https://developer.chrome.com/extensions/event_pages
 
 /**
  * If this is the first time running the extension (if it's just been installed), open options page
@@ -12,8 +15,8 @@ Redistribution or reuse of this code is permitted for non-profit purposes, as lo
 Rescroller.refreshLocalStorage(function() {
     if (localStorage['install_time']) { return; }
     
-    localStorage["install_time"] = new Date().getTime();
-    chrome.tabs.create({ url: "options.html" });
+    localStorage['install_time'] = new Date().getTime();
+    chrome.tabs.create({ url: 'options.html' });
 });
 
 /**
