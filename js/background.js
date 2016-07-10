@@ -1,10 +1,11 @@
-/*
-Rescroller Chrome Extension
-Author: David Watkins (@dwat91)
-
-Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
-@todo:david remove these
-*/
+/**
+ * Background page: this persists the extension between pages and performst he following:
+ * 
+ * - Handles browser action button click (opening of options.html)
+ * - Handles first-time install by setting install_time in local storage and opening options.html
+ * - Hanldes changes to chrome.sync and syncs down CSS updated remotely
+ * - Hands generated CSS over to tabs when requested
+ */
 
 // @todo:david consider using event page instead of background page? https://developer.chrome.com/extensions/event_pages
 

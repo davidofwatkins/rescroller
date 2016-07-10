@@ -1,3 +1,7 @@
+/**
+ * The Rescroller API and other utility methods.
+ */
+
 if (!String.prototype.fmt) {
     String.prototype.fmt = function() {
         var args = arguments;
@@ -9,12 +13,6 @@ if (!String.prototype.fmt) {
         });
     };
 }
-
-
-
-/**
- * The Rescroller API
- */
 
 window.Rescroller = {
 

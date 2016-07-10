@@ -1,9 +1,6 @@
-/*
-Rescroller Chrome Extension
-Author: David Watkins (@dwat91)
-
-Redistribution or reuse of this code is permitted for non-profit purposes, as long as the original author is credited.
-*/
+/**
+ * Javascript used to control the settings page, options.html
+ */
 
 var LOAD_START = new Date().getTime(); // keep track of when the page loads so we know to show the save settings dialog
 var showSaveConfirmation;
