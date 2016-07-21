@@ -8,20 +8,20 @@ var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
 
-if (!Rescroller.settings.get('showSaveConfirmation')) {
-    Rescroller.settings.set('showSaveConfirmation', 1);
+// @todo:david this doesn't stick when migrating from old version to current...
+if (typeof Rescroller.settings.get('showSaveConfirmation') == 'undefined') {
+    Rescroller.settings.set('showSaveConfirmation', 1); // @todo:david let's use true/false instead!
 }
 
 Rescroller.onSettingsUpdated = function() {
+    if (parseInt(Rescroller.settings.get('showSaveConfirmation')) !== 1 || (new Date().getTime() - 500) <= LOAD_START) { return; }
     
     // Show "saved" confirmation box
-    if (parseInt(Rescroller.settings.get('showSaveConfirmation')) === 1 && (new Date().getTime() - 500) > LOAD_START) {
-        clearTimeout(saveconfirmationTimeout);
-        $("#save-confirm").fadeIn("slow");
-        saveconfirmationTimeout = setTimeout(function() {
-            $("#save-confirm").fadeOut("slow");
-        }, showSaveConfirmTime)
-    }
+    clearTimeout(saveconfirmationTimeout);
+    $("#save-confirm").fadeIn("slow");
+    saveconfirmationTimeout = setTimeout(function() {
+        $("#save-confirm").fadeOut("slow");
+    }, showSaveConfirmTime)
 };
 
 //Enable functionality of Confirm Box "Never Show Again" button
@@ -209,7 +209,7 @@ $(document).ready(function() {
     //Clear picture buttons
     $(".clearimage").click(function() {
         var key = $(this).parent().parent().attr("id");
-        Rescroller.properties.set(key, '');
+        Rescroller.properties.remove(key);
         $(this).siblings(".thumbframe .thumbcontainer").html("No Image Loaded");
         $(this).parents(".imagepicker-container").children("input[type=file].selector").val("");
         
@@ -500,49 +500,49 @@ function handleFiles(files, frame, key) {
     
     if (!file.type.match(imageType)) {
         showErrorMessage("Sorry, you must select an image file. Please try again.")
+        return;
+    }
+
+    // chrome.storage.sync.QUOTA_BYTES_PER_ITEM
+    if (file.size >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+        showErrorMessage('Sorry, only very small images are allowed. Please choose one under 8 KB.')
+        return;
     }
         
-    else {
-        
-        //hide any error messages
-        hideErrorMessage();
-        
-        var img = document.createElement("img");
-        img.classList.add("obj");
-        img.file = file;
-        
-        frame.innerHTML = ""; //clear frame before putting new image in
-        frame.appendChild(img);
-        
-        var reader = new FileReader();  
-        reader.onload = (function(aImg) {
-            return function(e) {
-                aImg.src = e.target.result;
-                
-                //Save to local storage
-                Rescroller.properties.set(key, aImg.src);
-                
-                //Change the "Select Image" button to an image frame
-                var container = $(frame).parents(".imagepicker-container");
-                container.children(".selector-button").hide();
-                container.children(".thumbframe").show();
-                
-                //Redraw scrollbars
-                refreshScrollbars();
-            };
-        })(img);
-        reader.readAsDataURL(file);
-        
-        
-    }
+    //hide any error messages
+    hideErrorMessage();
+    
+    var img = document.createElement("img");
+    img.classList.add("obj");
+    img.file = file;
+    
+    frame.innerHTML = ""; //clear frame before putting new image in
+    frame.appendChild(img);
+    
+    var reader = new FileReader();  
+    reader.onload = (function(aImg) {
+        return function(e) {
+            aImg.src = e.target.result;
+            
+            //Save to local storage
+            Rescroller.properties.set(key, aImg.src);
+            
+            //Change the "Select Image" button to an image frame
+            var container = $(frame).parents(".imagepicker-container");
+            container.children(".selector-button").hide();
+            container.children(".thumbframe").show();
+            
+            //Redraw scrollbars
+            refreshScrollbars();
+        };
+    })(img);
+    reader.readAsDataURL(file);
 }
 
 $(document).ready(function() {
     
     //Whenever selectors (hidden <input type="file">s) are changed, save their valuese to local storage
     $(".selector").change(function() {
-        // @todo:david we should limit the image size the user selects. If too big, won't be able to sync with chrome.storage, and
-        // it might impact page performance. See https://developer.chrome.com/extensions/storage#property-sync
         handleFiles(this.files, $(this).siblings(".thumbframe").children("div.thumbcontainer").get()[0], $(this).parent().attr("id"))
     });
     

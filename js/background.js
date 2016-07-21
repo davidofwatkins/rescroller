@@ -23,7 +23,7 @@ Rescroller.refreshLocalStorage(function() {
 /**
  * Listen for commands from our content script (sbformatter.js)
  */
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) { // @todo:david not sure we want to do this on EVERY request - just every page load...
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
     /**
      * Inject our customized CSS into the webpage.
@@ -51,13 +51,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     }
 });
 
-
 // Handle action button in Chrome toolbar
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.create({ url: "options.html" });
 })
 
 // Detect changes to Chrome Storage, and import them into Local Storage
+// @todo:david ummm how is this different from Rescroller.refreshLocalStorage()? I think this listens, while that checks.
+// These two should probably share code if possible, and this should not overwrite newer data locally
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   for (key in changes) {
     // Debugging:

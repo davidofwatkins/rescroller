@@ -14,6 +14,19 @@ if (!String.prototype.fmt) {
     };
 }
 
+/**
+ * Superficial class creator. It may be better to use something like Backbone in the future.
+ */
+var createClass = function(proto) {
+    proto || (proto = {});
+    proto.constructor || (proto.constructor = function() {});
+    var obj = function() {
+        proto.constructor.apply(this, arguments)
+    };
+    obj.prototype = proto;
+    return obj;
+};
+
 window.Rescroller = {
 
     EXPORT_BUFFER_TIME: 7000,                   // 7 seconds
@@ -21,16 +34,74 @@ window.Rescroller = {
     version: chrome.app.getDetails().version,
     _exportBuffer: null,                        // used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
 
+    /**
+     * An object that understands our image {} format and can handle image data values to and from localStorage
+     */
+    Image: createClass({
+        data: {
+            localStorageKey: null
+        },
+
+        constructor: function(data) {
+            if (!data) { return; }
+
+            this.data = data;
+        },
+
+        getDataValue: function() {
+            var dataValue = localStorage[this.data.localStorageKey];
+            if (!dataValue) { return ''; }
+            return dataValue;
+        },
+
+        setImageData: function(imageData) {
+            var imageKey = 'image-' + new Date().getTime() + Math.random().toString().split('.')[1];
+
+            this.data.localStorageKey = imageKey;
+            localStorage[imageKey] = imageData;
+
+            return this;
+        },
+
+        removeImage: function() {
+            localStorage.removeItem(this.data.localStorageKey);
+        },
+
+        /**
+         * When we are converted to string, let's show our value string instead of [object Object]. This way,
+         * we don't need to handle this class vs other string values in getCSSString()
+         */
+        toString: function() {
+            return this.getDataValue();
+        },
+
+        /**
+         * This is needed for JSON.stringify() and localStorage's stringify
+         */
+        toJSON: function() {
+            return this.data;
+        }
+    }),
+
     settings: {
-        _settings: null,                        // a cached JSON version of our settings from localStorage. 
+        _settings: null,                        // a cached JSON version of our settings from localStorage.
 
         /**
          * Get our settings object.
          * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
          */
         getAll: function(force) {
+            var that = this;
+
             if (force === true || !this._settings) {
-                this._settings = JSON.parse(localStorage.getItem('rescroller_settings'));
+                this._settings = JSON.parse(localStorage.getItem('rescroller-settings'));
+
+                // Convert all image {}'s into proper Image classes
+                Object.keys(this._settings.scrollbarStyle).forEach(function(key) {
+                    var val = that._settings.scrollbarStyle[key];
+                    if (!(val instanceof Object) && !val.localStorageKey) { return true; }
+                    that._settings.scrollbarStyle[key] = new Rescroller.Image(val);
+                });
             }
 
             if (!this._settings) { this._settings = {}; }
@@ -48,10 +119,11 @@ window.Rescroller = {
             catch(e) { return null; }
         },
 
-        set: function(key, value, noSync) { // @todo:david update to accept multiple
+        set: function(key, value, noSync) {
             var settings = this.getAll();
             settings[key] = value;
-            localStorage['rescroller_settings'] = JSON.stringify(settings);
+            localStorage['rescroller-settings'] = JSON.stringify(settings);
+            localStorage['date-settings-last-updated'] = new Date().getTime();
             Rescroller.onSettingsUpdated();
 
             if (noSync) { return; }
@@ -60,6 +132,7 @@ window.Rescroller = {
     },
 
     properties: {
+
         getAll: function(force) {
             var props = null;
             try { props = Rescroller.settings.get('scrollbarStyle', force); }
@@ -79,12 +152,21 @@ window.Rescroller = {
             }
         },
 
-        set: function(key, value, noSync) { // @todo:david update to accept multiple
-            
+        set: function(key, value, noSync) {
             var props = this.getAll();
-            props[key] = value;
-            Rescroller.settings.set('scrollbarStyle', props, noSync);
 
+            // if previous value was image, we need to remove the old image before overwriting it
+            if (this.get(key) instanceof Rescroller.Image) {
+                this.get(key).removeImage();
+            }
+
+            if (typeof value == 'string' && value.indexOf('data') == 0) { // save images in separate localStorage key to avoid chrome.sync item size limits
+                props[key] = new Rescroller.Image().setImageData(value);
+            } else {
+                props[key] = value;
+            }
+
+            Rescroller.settings.set('scrollbarStyle', props, noSync);
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
         },
 
@@ -92,12 +174,31 @@ window.Rescroller = {
             var props = this.getAll();
 
             for (key in newProps) {
-                props[key] = newProps[key];
+                var newVal = newProps[key];
+                
+                if (typeof newVal == 'string' && newVal.indexOf('data') == 0) {
+                    newVal = new Rescroller.Image().setImageData(newVal);
+                }
+
+                props[key] = newVal;
             }
 
             Rescroller.settings.set('scrollbarStyle', props, noSync);
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
+        },
+
+        remove: function(key) {
+            if (this.get(key) instanceof Rescroller.Image) {
+                this.get(key).removeImage();
+            }
+
+            this.set(key, '');
         }
+    },
+
+    performMigrations: function() {
+        this._migrateDataToSingleKey();
+        this._migrateImageNullValues();
     },
 
     /**
@@ -105,9 +206,6 @@ window.Rescroller = {
      */
     _migrateDataToSingleKey: function() {
         if (!localStorage['sb-size']) { return; } // already migrated
-        
-        // @todo:david we should also store images in their own localStorage keys to prevent issues with
-        // Chrome sync data limits.
 
         var json = {
             scrollbarStyle: {}
@@ -128,18 +226,25 @@ window.Rescroller = {
         });
 
         this._settings = json;
-        localStorage['rescroller_settings'] = JSON.stringify(json)
+        localStorage['rescroller-settings'] = JSON.stringify(json)
 
         // @todo:david after switching to the new version, the new settings should be synced up.
     },
 
-    _migrateBackgroundImageNullValues: function() {
+    _migrateImageNullValues: function() {
         
         // For whatever reason, we were setting default values for images as 0. They should be empty string
         var i = 0;
         var props = this.properties.getAll();
         for (key in props) {
             if (key.indexOf('background-image') <= -1) { continue; }
+
+            // Convert any data strings to Image classes
+            if (typeof key == 'string' && key.indexOf('data') === 0) {
+                props[key] = new Rescroller.Image().setImageData(props[key]);
+                continue;
+            }
+
             if (parseInt(props[key]) !== 0) { continue; }
             props[key] = '';
             i++;
@@ -150,11 +255,6 @@ window.Rescroller = {
         if (i == 0) { return; }
 
         this.properties.setMultiple(props, true)
-    },
-
-    performMigrations: function() {
-        this._migrateDataToSingleKey();
-        this._migrateBackgroundImageNullValues();
     },
 
     /**
@@ -206,6 +306,16 @@ window.Rescroller = {
         var that = this;
 
         chrome.storage.sync.get(function(items) {
+            var lastUpdatedRemote = items['date-settings-last-updated'];
+            var lastUpdatedLocal = localStorage['date-settings-last-updated'];
+
+            // Do not proceed if remote data is older than local data
+            if (lastUpdatedRemote && lastUpdatedLocal && lastUpdatedLocal >= lastUpdatedRemote) {
+                console.warn('[Rescroller] Warning: ignoring sync down; remote data is out of date.');
+                callback();
+                return;
+            }
+
             for (var key in items) {
                 var val = items[key];
                 if (!val) { continue; }
@@ -223,7 +333,6 @@ window.Rescroller = {
      * Save the local settings to chrome.storage in 30 seconds.
      */
     queueExportLocalSettings: function() {
-
         var that = this;
         clearTimeout(this._exportBuffer);
         this._exportBuffer = setTimeout(function() {
@@ -238,6 +347,9 @@ window.Rescroller = {
         for (var key in localStorage) {
             if (key == 'generated_css') { continue; } // waste of time to sync this
             if (!localStorage[key]) { continue; }
+
+            // @todo:david for legacy, ignore any images that are > 8kb, maybe show a warning message about not syncing the image
+
             ls[key] = localStorage[key];
         }
 
@@ -301,7 +413,7 @@ window.Rescroller = {
             "buttons-border-size" : 0,
             "buttons-border-color" : "#666",
             "buttons-border-style" : "solid",
-            "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
+            "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"), // @todo:david use SVG(s)?
             "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
             "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
             "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
@@ -338,6 +450,8 @@ window.Rescroller = {
             "background-background-image-horizontal-active" : '',
 
             // Custom CSS
+            // @todo:david hmmm, maybe, if the the user enters this, it should be used in addition to the generated CSS?
+            // This way people can override just some parts of the styling, or everything.
             "customcss" : "::-webkit-scrollbar {\
     \n\n\
     }\n\
