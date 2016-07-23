@@ -105,11 +105,6 @@ var newCSS = Rescroller.getCSSString();
 //Write the newly formatted CSS (from local storage) to the (beginning of the) page:
 document.write('<style id="rescroller">' + newCSS + "</style>");
 
-//If there is no previously-saved scrollbar CSS in local storage, save it!
-if (!Rescroller.properties.get("size") || Rescroller.properties.get("size") == "") {
-    Rescroller.restoreDefaults();
-}
-
 if (!Rescroller.settings.get('excludedsites')) { Rescroller.settings.set('excludedsites', ''); }
 
 

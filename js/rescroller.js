@@ -93,6 +93,14 @@ window.Rescroller = {
         getAll: function(force) {
             var that = this;
 
+            if (!localStorage['rescroller-settings']) { // no matter what, we need a default for this
+                localStorage['rescroller-settings'] = JSON.stringify({
+                    scrollbarStyle: {}
+                });
+                
+                Rescroller.restoreDefaults();
+            }
+
             if (force === true || !this._settings) {
                 this._settings = JSON.parse(localStorage.getItem('rescroller-settings'));
 

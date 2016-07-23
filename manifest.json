@@ -15,18 +15,11 @@
     "default_title": "Rescroller Settings",
     "default_icon": "appicons/icon19.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["js/sbformatter.js"],
-    "run_at": "document_start",
-    "all_frames" : true
-    }
-  ],
   "background": {
     // @todo:david unfortunately we need all these in the background page in order to generate new CSS when a sync happens.
     // I wonder if it would be better to use requirejs and require them only when we need them?
-    "scripts" : ["js/jquery.js", "js/cssjson.js", "js/rescroller.js", "js/background.js"]
+    "scripts": ["js/jquery.js", "js/cssjson.js", "js/rescroller.js", "js/background.js"],
+    "persistant": false // make this an event page - do not stay in memory when not in use
   },
   "permissions": [
     "<all_urls>",
