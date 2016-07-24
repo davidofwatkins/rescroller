@@ -519,7 +519,7 @@ window.Rescroller = {
                 "::-webkit-scrollbar-track-piece": {
                     "attributes": {
                         "background-color": this.properties.get('background-color'),
-                        "box-shadow": "inset 0 0 %spx %s')".fmt(this._precentageToPixels(this.properties.get('background-shadow-size'), true), this.properties.get('background-shadow-color')),
+                        "box-shadow": "inset 0 0 %spx %s".fmt(this._precentageToPixels(this.properties.get('background-shadow-size'), true), this.properties.get('background-shadow-color')),
                         "border": "%spx %s %s".fmt(this._precentageToPixels(this.properties.get('background-border-size')), this.properties.get('background-border-style'), this.properties.get('background-border-color')),
                         "border-radius": "%spx".fmt(this._precentageToPixels(this.properties.get('background-radius')))
                     }
