@@ -572,7 +572,7 @@ window.Rescroller = {
 
         if (this.properties.get('showbuttons') == 'checked') {
             $.extend(json.children, {
-                "::-webkit-scrollbar-button {": {
+                "::-webkit-scrollbar-button": {
                     "attributes": {
                         "background-color": this.properties.get('buttons-color'),
                         "border-radius": "%spx".fmt(this._precentageToPixels(this.properties.get('buttons-radius'))),
