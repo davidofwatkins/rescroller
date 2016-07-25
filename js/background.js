@@ -40,9 +40,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         if (tab.url.indexOf(restricted) >= 0) { return; }
     }
 
-    /**
-     * Aaaand, inject our customized CSS into the webpage!
-     */
+    // Aaaand, inject our customized CSS into the webpage!
     chrome.tabs.insertCSS(tabId, { // unfortunately, this requires the <all_urls> permission :/
         code: localStorage['generated_css'],
         allFrames: true,
@@ -50,21 +48,23 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     });
 });
 
-// Handle action button in Chrome toolbar
+/**
+ * Handle action button in Chrome toolbar
+ */
 chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.create({ url: "options.html" });
 })
 
-// Detect changes to Chrome Storage, and import them into Local Storage
-// @todo:david ummm how is this different from Rescroller.refreshLocalStorage()? I think this listens, while that checks.
-// These two should probably share code if possible, and this should not overwrite newer data locally
+/**
+ * Detect changes to Chrome Storage, and import them into Local Storage
+ */
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-  for (key in changes) {
-    // Debugging:
-    // var change = changes[key];
-    // console.log('(Chrome Storage ' + namespace + ') "' + key + '": \t "' + change.oldValue + '" \t --> \t "' + change.newValue + '".');
+        
+    // Convert these 'changes' into a key-val object, parallel to how localStorage is formatted (no need for change[].oldValue)
+    var changesCleaned = {};
+    for (var key in changes) {
+        changesCleaned[key] = changes[key].newValue
+    }
 
-    // Import these to localStorage
-    localStorage[key] = changes[key].newValue;
-  }
+    Rescroller.mergeSyncWithLocalStorage(changesCleaned);
 });

@@ -314,27 +314,39 @@ window.Rescroller = {
         var that = this;
 
         chrome.storage.sync.get(function(items) {
-            var lastUpdatedRemote = items['date-settings-last-updated'];
-            var lastUpdatedLocal = localStorage['date-settings-last-updated'];
-
-            // Do not proceed if remote data is older than local data
-            if (lastUpdatedRemote && lastUpdatedLocal && lastUpdatedLocal >= lastUpdatedRemote) {
-                console.warn('[Rescroller] Warning: ignoring sync down; remote data is out of date.');
-                callback();
-                return;
-            }
-
-            for (var key in items) {
-                var val = items[key];
-                if (!val) { continue; }
-
-                localStorage[key] = val;
-            }
-
-            that.performMigrations(); // migrate incoming data
-            that.generateScrollbarCSS();
+            that.mergeSyncWithLocalStorage(items);
             callback();
         });
+    },
+
+    /**
+     * Merge items from Chrome Sync into LocalStorage.
+     * Note: if a 'date-settings-last-updated' item exists in the synced items and localStorage, 
+     * the update will only occur if a remote timestamp is newer than local.
+     * 
+     * @param  {object} items An object of key-value items to set in local storage.
+     * @return {[type]}       [description]
+     */
+    mergeSyncWithLocalStorage: function(items) {
+        var lastUpdatedRemote = items['date-settings-last-updated'];
+        var lastUpdatedLocal = localStorage['date-settings-last-updated'];
+
+        // Do not proceed if remote data is older than local data
+        if (lastUpdatedRemote && lastUpdatedLocal && parseInt(lastUpdatedLocal) >= parseInt(lastUpdatedRemote)) {
+            console.warn('[Rescroller] Warning: ignoring sync down; remote data is out of date.');
+            return;
+        }
+
+        for (var key in items) {
+            var val = items[key];
+            if (!val) { continue; }
+
+            localStorage[key] = val;
+        }
+
+        // migrate incoming data
+        this.performMigrations();
+        this.generateScrollbarCSS();
     },
 
     /**
