@@ -8,13 +8,8 @@ var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
 
-// @todo:david this doesn't stick when migrating from old version to current...
-if (typeof Rescroller.settings.get('showSaveConfirmation') == 'undefined') {
-    Rescroller.settings.set('showSaveConfirmation', 1); // @todo:david let's use true/false instead!
-}
-
 Rescroller.onSettingsUpdated = function() {
-    if (parseInt(Rescroller.settings.get('showSaveConfirmation')) !== 1 || (new Date().getTime() - 500) <= LOAD_START) { return; }
+    if (!Rescroller.settings.get('showSaveConfirmation') || (new Date().getTime() - 500) <= LOAD_START) { return; }
     
     // Show "saved" confirmation box
     clearTimeout(saveconfirmationTimeout);
@@ -27,7 +22,7 @@ Rescroller.onSettingsUpdated = function() {
 //Enable functionality of Confirm Box "Never Show Again" button
 $(document).ready(function() {
     $("#save-confirm #hide-saved-confirm").click(function() {
-        Rescroller.settings.set('showSaveConfirmation', 0);
+        Rescroller.settings.set('showSaveConfirmation', false);
         $("#save-confirm").fadeOut("slow");
         return false;
     });

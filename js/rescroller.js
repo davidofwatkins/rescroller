@@ -87,6 +87,18 @@ window.Rescroller = {
         _settings: null,                        // a cached JSON version of our settings from localStorage.
 
         /**
+         * Perform setup of our settins struture for a new installation.
+         */
+        _initializeFirstTimeSettings: function() {
+            localStorage['rescroller-settings'] = JSON.stringify({
+                showSaveConfirmation: true,
+                scrollbarStyle: {}
+            });
+            
+            Rescroller.restoreDefaults();
+        },
+
+        /**
          * Get our settings object.
          * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
          */
@@ -94,11 +106,7 @@ window.Rescroller = {
             var that = this;
 
             if (!localStorage['rescroller-settings']) { // no matter what, we need a default for this
-                localStorage['rescroller-settings'] = JSON.stringify({
-                    scrollbarStyle: {}
-                });
-                
-                Rescroller.restoreDefaults();
+                this._initializeFirstTimeSettings();
             }
 
             if (force === true || !this._settings) {
@@ -224,8 +232,9 @@ window.Rescroller = {
 
             if (key == 'sb-excludedsites') {
                 json['excludedsites'] = localStorage['excludedsites']
-            } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings 
-                // set new key as old without the 'sb-' prefix
+            } else if (key == 'showSaveConfirmation') { // change showSaveConfirmation form a '1'/'0' to true/false
+                json[key] = localStorage[key] !== '0';
+            } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings, without the 'sb-' prefix
                 json.scrollbarStyle[key.substr(3, key.length -1)] = (isNaN(parseInt(localStorage[key]))) ? localStorage[key] : parseInt(localStorage[key]) ;
             }
 
