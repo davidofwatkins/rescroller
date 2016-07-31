@@ -29,7 +29,7 @@ var createClass = function(proto) {
 
 window.Rescroller = {
 
-    EXPORT_BUFFER_TIME: 7000,                   // 7 seconds
+    EXPORT_BUFFER_TIME: 5000,                   // 5 seconds
 
     version: chrome.app.getDetails().version,
     _exportBuffer: null,                        // used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
@@ -92,10 +92,22 @@ window.Rescroller = {
         _initializeFirstTimeSettings: function() {
             localStorage['rescroller-settings'] = JSON.stringify({
                 showSaveConfirmation: true,
-                scrollbarStyle: {}
+                excludedsites: '',
+                scrollbarStyle: {
+                    metadata: {}, // unused now, but will use it in the future if/when we allow saving/sharing/exporting of styles
+                    data: {}
+                }
             });
             
             Rescroller.restoreDefaults();
+        },
+
+        /**
+         * Sometimes after localStorage has changed, we need to wipe our JS cache 
+         * so the next time get()/getAll() is called, we return accurate results.
+         */
+        resetJSCache: function() {
+            this._settings = null;
         },
 
         /**
@@ -113,14 +125,12 @@ window.Rescroller = {
                 this._settings = JSON.parse(localStorage.getItem('rescroller-settings'));
 
                 // Convert all image {}'s into proper Image classes
-                Object.keys(this._settings.scrollbarStyle).forEach(function(key) {
-                    var val = that._settings.scrollbarStyle[key];
+                Object.keys(this._settings.scrollbarStyle.data).forEach(function(key) {
+                    var val = that._settings.scrollbarStyle.data[key];
                     if (!(val instanceof Object) && !val.localStorageKey) { return true; }
-                    that._settings.scrollbarStyle[key] = new Rescroller.Image(val);
+                    that._settings.scrollbarStyle.data[key] = new Rescroller.Image(val);
                 });
             }
-
-            if (!this._settings) { this._settings = {}; }
 
             return this._settings;
         },
@@ -140,10 +150,11 @@ window.Rescroller = {
             settings[key] = value;
             localStorage['rescroller-settings'] = JSON.stringify(settings);
             localStorage['date-settings-last-updated'] = new Date().getTime();
+            console.log('rescroller-settings localStorage UPDATED!', settings === this._settings);
             Rescroller.onSettingsUpdated();
 
             if (noSync) { return; }
-            Rescroller.queueExportLocalSettings();
+            Rescroller.queueSyncUp();
         }
     },
 
@@ -154,9 +165,11 @@ window.Rescroller = {
             try { props = Rescroller.settings.get('scrollbarStyle', force); }
             catch(e) { }
 
-            if (!props) { props = {}; }
+            if (!props || !props.data) {
+                return {};
+            }
 
-            return props;
+            return props.data;
         },
 
         get: function(key, force) {
@@ -182,7 +195,7 @@ window.Rescroller = {
                 props[key] = value;
             }
 
-            Rescroller.settings.set('scrollbarStyle', props, noSync);
+            this.setMultiple(props, noSync);
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
         },
 
@@ -199,7 +212,11 @@ window.Rescroller = {
                 props[key] = newVal;
             }
 
-            Rescroller.settings.set('scrollbarStyle', props, noSync);
+            Rescroller.settings.set('scrollbarStyle', {
+                metadata: Rescroller.settings.get('scrollbarStyle').metadata,
+                data: props
+            }, noSync);
+
             Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
         },
 
@@ -213,29 +230,45 @@ window.Rescroller = {
     },
 
     performMigrations: function() {
-        this._migrateDataToSingleKey();
-        this._migrateImageNullValues();
+
+        if (!this._migrateDataToSingleKey() && !this._migrateImageNullValues()) {
+            return; // none of the migrations needed to run; we're done!
+        }
+
+        console.log('performed migration(s)! Now updating chrome.sync...');
+        
+        // Since localStorage has change, we need to invalide our JS cache so we get accurate results
+        this.settings.resetJSCache();
+
+        // After switching to the new version, the new settings should be synced up.
+        localStorage['date-settings-last-updated'] = new Date().getTime(); // copied from set()
+        this.syncUp();
     },
 
     /**
      * Migration from 1.2 --> 1.3. Migrate all our "sb-*" keys in localStorage to a single key.
+     *
+     * @returns {boolean} true if migration ran, false if it didn't (need to)
      */
     _migrateDataToSingleKey: function() {
-        if (!localStorage['sb-size']) { return; } // already migrated
+        if (!localStorage['sb-size']) { return false; } // already migrated
 
         var json = {
-            scrollbarStyle: {}
+            scrollbarStyle: {
+                metadata: {},
+                data: {}
+            }
         };
 
         Object.keys(localStorage).forEach(function(key) {
             if (key == 'install_time') { return true; } // continue
 
             if (key == 'sb-excludedsites') {
-                json['excludedsites'] = localStorage['excludedsites']
+                json['excludedsites'] = localStorage['sb-excludedsites']
             } else if (key == 'showSaveConfirmation') { // change showSaveConfirmation form a '1'/'0' to true/false
                 json[key] = localStorage[key] !== '0';
             } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings, without the 'sb-' prefix
-                json.scrollbarStyle[key.substr(3, key.length -1)] = (isNaN(parseInt(localStorage[key]))) ? localStorage[key] : parseInt(localStorage[key]) ;
+                json.scrollbarStyle.data[key.substr(3, key.length -1)] = (isNaN(parseInt(localStorage[key]))) ? localStorage[key] : parseInt(localStorage[key]) ;
             }
 
             // Remove the old key/val
@@ -244,13 +277,18 @@ window.Rescroller = {
 
         this._settings = json;
         localStorage['rescroller-settings'] = JSON.stringify(json)
-
-        // @todo:david after switching to the new version, the new settings should be synced up.
+        return true;
     },
 
+    /**
+     * For whatever reason, we were setting default values for images as 0. They should be empty strings.
+     * Also, this migrates datea values (data-url strings) to their own key in local storage so that
+     * chrome.sync will handle them separately.
+     * 
+     * @return {boolean} true if migration ran, false if it didn't (need to)
+     */
     _migrateImageNullValues: function() {
-        
-        // For whatever reason, we were setting default values for images as 0. They should be empty string
+
         var i = 0;
         var props = this.properties.getAll();
         for (key in props) {
@@ -269,9 +307,10 @@ window.Rescroller = {
 
         // don't set anything if no changes were made; this prevents a recursive loop with
         // chrome.sync since this is run every every sync down
-        if (i == 0) { return; }
+        if (i == 0) { return false; }
 
         this.properties.setMultiple(props, true)
+        return true;
     },
 
     /**
@@ -318,12 +357,12 @@ window.Rescroller = {
     /**
      * Used for first-time install refresh from Chrome Storage -> Local Storage (or old localStorage -> Chrome Storage)
      */
-    refreshLocalStorage: function(callback) {
+    syncDown: function(callback, force) {
         callback || (callback = function() {});
         var that = this;
 
         chrome.storage.sync.get(function(items) {
-            that.mergeSyncWithLocalStorage(items);
+            that.mergeSyncWithLocalStorage(items, force);
             callback();
         });
     },
@@ -334,17 +373,20 @@ window.Rescroller = {
      * the update will only occur if a remote timestamp is newer than local.
      * 
      * @param  {object} items An object of key-value items to set in local storage.
+     * @param {boolean} force If true, we will force the merge - otherwise we will only sync if 'date-settings-last-updated' comparisons match
      * @return {[type]}       [description]
      */
-    mergeSyncWithLocalStorage: function(items) {
+    mergeSyncWithLocalStorage: function(items, force) {
         var lastUpdatedRemote = items['date-settings-last-updated'];
         var lastUpdatedLocal = localStorage['date-settings-last-updated'];
 
         // Do not proceed if remote data is older than local data
-        if (lastUpdatedRemote && lastUpdatedLocal && parseInt(lastUpdatedLocal) >= parseInt(lastUpdatedRemote)) {
+        if (!force && lastUpdatedRemote && lastUpdatedLocal && parseInt(lastUpdatedLocal) >= parseInt(lastUpdatedRemote)) {
             console.warn('[Rescroller] Warning: ignoring sync down; remote data is out of date.');
             return;
         }
+
+        console.log('syncing down');
 
         for (var key in items) {
             var val = items[key];
@@ -352,6 +394,9 @@ window.Rescroller = {
 
             localStorage[key] = val;
         }
+
+        // force refresh of this.settings._settings
+        this.settings.resetJSCache();
 
         // migrate incoming data
         this.performMigrations();
@@ -361,23 +406,30 @@ window.Rescroller = {
     /**
      * Save the local settings to chrome.storage in 30 seconds.
      */
-    queueExportLocalSettings: function() {
+    queueSyncUp: function() { // @todo:david not sure if this queueing is necessary... Chrome storage seems to be throttling itself...
+        console.log('queuing sync...');
         var that = this;
         clearTimeout(this._exportBuffer);
         this._exportBuffer = setTimeout(function() {
-            that.exportLocalSettings();
+            that.syncUp();
         }, this.EXPORT_BUFFER_TIME);
     },
 
-    exportLocalSettings: function() { // @todo:david this may be occurring twice? Double check.
-        this.performMigrations();
+    syncUp: function() {
+
+        // @todo:david remove console.logs after testing
+        console.log('uploading sync');
 
         var ls = {};
         for (var key in localStorage) {
-            if (key == 'generated_css') { continue; } // waste of time to sync this
+            if (key == 'generated_css') { continue; } // waste of time to sync this // @todo:david rename to generated-css?
             if (!localStorage[key]) { continue; }
 
-            // @todo:david for legacy, ignore any images that are > 8kb, maybe show a warning message about not syncing the image
+            // For legacy, ignore any images that are too big to sync
+            if ((encodeURI(localStorage[key]).split(/%..|./).length - 1) > chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+                console.warn('[Rescroller] Ignoring sync up of image > 8 KB.')
+                continue;
+            }
 
             ls[key] = localStorage[key];
         }
@@ -442,7 +494,7 @@ window.Rescroller = {
             "buttons-border-size" : 0,
             "buttons-border-color" : "#666",
             "buttons-border-style" : "solid",
-            "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"), // @todo:david use SVG(s)?
+            "buttons-background-image-up" : chrome.extension.getURL("images/defaults/up.png"),
             "buttons-background-image-down" : chrome.extension.getURL("images/defaults/down.png"),
             "buttons-background-image-left" : chrome.extension.getURL("images/defaults/left.png"),
             "buttons-background-image-right" : chrome.extension.getURL("images/defaults/right.png"),
@@ -479,7 +531,7 @@ window.Rescroller = {
             "background-background-image-horizontal-active" : '',
 
             // Custom CSS
-            // @todo:david hmmm, maybe, if the the user enters this, it should be used in addition to the generated CSS?
+            // @note potential improvement: maybe, if the the user enters this, it should be used in addition to the generated CSS?
             // This way people can override just some parts of the styling, or everything.
             "customcss" : "::-webkit-scrollbar {\
     \n\n\

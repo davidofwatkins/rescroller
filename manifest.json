@@ -16,10 +16,10 @@
     "default_icon": "appicons/icon19.png"
   },
   "background": {
-    // @todo:david unfortunately we need all these in the background page in order to generate new CSS when a sync happens.
-    // I wonder if it would be better to use requirejs and require them only when we need them?
+    // @note unfortunately we need all these in the background page in order to generate new CSS when a sync happens.
+    // Maybe requirejs or something would let us selectively load these as we need them?
     "scripts": ["js/jquery.js", "js/cssjson.js", "js/rescroller.js", "js/background.js"],
-    "persistant": false // make this an event page - do not stay in memory when not in use
+    "persistant": false // event page - will not stay in memory when not in use
   },
   "permissions": [
     "<all_urls>",

@@ -10,14 +10,22 @@
  * event callbacks. Do not put any code outside of listeners!
  */
 
-chrome.runtime.onInstalled.addListener(function() { // when extension installed/updated and chrome updated
+chrome.runtime.onInstalled.addListener(function(details) { // when extension installed/updated and chrome updated
 
     /**
      * If this is the first time running the extension, open options page
      * and Download latest Chrome Storage to Local Storage.
      */
-    Rescroller.refreshLocalStorage(function() {
-        if (localStorage['install_time']) { return; }
+    
+     console.log('onInstalled! reason = ', details.reason);
+
+     if (details.reason != 'install') { // no need to sync down if updating.
+        Rescroller.performMigrations();
+        return;
+     }
+
+    Rescroller.syncDown(function() {
+        if (localStorage['install_time']) { return; } // only open options.html if this is the first install on any of the users' Chromes
         
         localStorage['install_time'] = new Date().getTime();
         chrome.tabs.create({ url: 'options.html' });

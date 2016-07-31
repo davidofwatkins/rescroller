@@ -32,7 +32,7 @@ function refreshScrollbars() {
     $("#rescroller").html(Rescroller.getCSSString());
     var originalOverflow = $("body").css("overflow");
     $("body").css("overflow", "hidden");
-    setTimeout(function() { $("body").css("overflow", originalOverflow) }, 10);
+    setTimeout(function() { $("body").css("overflow", originalOverflow) }, 0);
 }
 
 //Following "plugin" function found here: http://stackoverflow.com/a/10310815/477632
@@ -99,9 +99,6 @@ var newCSS = Rescroller.getCSSString();
 
 //Write the newly formatted CSS (from local storage) to the (beginning of the) page:
 document.write('<style id="rescroller">' + newCSS + "</style>");
-
-if (!Rescroller.settings.get('excludedsites')) { Rescroller.settings.set('excludedsites', ''); }
-
 
 //When the page has loaded:
 $(document).ready(function() {
@@ -176,6 +173,9 @@ $(document).ready(function() {
     $("#resetformatting").click(function() {
         if (!confirm("Are you sure you would like to reset your scrollbars to default? This cannot be undone.")) { return false; }
         Rescroller.restoreDefaults();
+
+        // full refresh instead of refreshScrollbars() so all our settings bars are reset as well.
+        // An actual JS view framework will fix this later on.
         location.reload(true);
     });
     
@@ -493,7 +493,9 @@ function handleFiles(files, frame, key) {
         return;
     }
 
-    // chrome.storage.sync.QUOTA_BYTES_PER_ITEM
+    // For now, restrict the user from using large images that won't sync. In the future, we could allow it,
+    // but we'll have to warn the user that it will not be synced and make sure our raw value (the reference to
+    // the actual data image localStorage item) doesn't overwrite any remote ones.
     if (file.size >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
         showErrorMessage('Sorry, only very small images are allowed. Please choose one under 8 KB.')
         return;
