@@ -28,11 +28,7 @@ var createClass = function(proto) {
 };
 
 window.Rescroller = {
-
-    EXPORT_BUFFER_TIME: 5000,                   // 5 seconds
-
     version: chrome.app.getDetails().version,
-    _exportBuffer: null,                        // used to set/cancel setTimeouts for exporting localStorage to Chrome Storage
 
     /**
      * An object that understands our image {} format and can handle image data values to and from localStorage
@@ -154,7 +150,7 @@ window.Rescroller = {
             Rescroller.onSettingsUpdated();
 
             if (noSync) { return; }
-            Rescroller.queueSyncUp();
+            Rescroller.syncUp();
         }
     },
 
@@ -240,9 +236,12 @@ window.Rescroller = {
         // Since localStorage has change, we need to invalide our JS cache so we get accurate results
         this.settings.resetJSCache();
 
+        // we need to regenerate our CSS so it's in localStorage['generated-css'] for our background page to find it
+        this.generateScrollbarCSS();
+
         // After switching to the new version, the new settings should be synced up.
         localStorage['date-settings-last-updated'] = new Date().getTime(); // copied from set()
-        this.syncUp();
+        this.syncUp(); // sync migrated structures up
     },
 
     /**
@@ -401,18 +400,6 @@ window.Rescroller = {
         // migrate incoming data
         this.performMigrations();
         this.generateScrollbarCSS();
-    },
-
-    /**
-     * Save the local settings to chrome.storage in 30 seconds.
-     */
-    queueSyncUp: function() { // @todo:david not sure if this queueing is necessary... Chrome storage seems to be throttling itself...
-        console.log('queuing sync...');
-        var that = this;
-        clearTimeout(this._exportBuffer);
-        this._exportBuffer = setTimeout(function() {
-            that.syncUp();
-        }, this.EXPORT_BUFFER_TIME);
     },
 
     syncUp: function() {
