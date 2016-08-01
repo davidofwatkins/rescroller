@@ -422,7 +422,7 @@ window.Rescroller = {
 
         var ls = {};
         for (var key in localStorage) {
-            if (key == 'generated_css') { continue; } // waste of time to sync this // @todo:david rename to generated-css?
+            if (key == 'generated-css') { continue; } // waste of time to sync this
             if (!localStorage[key]) { continue; }
 
             // For legacy, ignore any images that are too big to sync
@@ -561,7 +561,7 @@ window.Rescroller = {
      * Gnerate a CSS string from our scrollbar settings and save it to local storage for browser tabs to use.
      */
     generateScrollbarCSS: function() {
-        localStorage['generated_css'] = this.getCSSString();
+        localStorage['generated-css'] = this.getCSSString();
     },
 
     /**

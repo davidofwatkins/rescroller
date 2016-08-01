@@ -50,7 +50,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
     // Aaaand, inject our customized CSS into the webpage!
     chrome.tabs.insertCSS(tabId, { // unfortunately, this requires the <all_urls> permission :/
-        code: localStorage['generated_css'],
+        code: localStorage['generated-css'],
         allFrames: true,
         runAt: 'document_start'
     });
