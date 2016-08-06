@@ -95,7 +95,7 @@ window.Rescroller = {
                 }
             });
             
-            Rescroller.restoreDefaults();
+            Rescroller.restoreDefaults(true);
         },
 
         /**
@@ -402,6 +402,12 @@ window.Rescroller = {
         this.generateScrollbarCSS();
     },
 
+    /**
+     * Sync our settings up to Chrome Storage.
+     *
+     * @note we used to throttle this ourselves with a queueSyncUp() method, but it seemed like overkill since the limit was upped from 10/min to 120/min:
+     * https://bugs.chromium.org/p/chromium/issues/detail?id=270665#c19 (@see MAX_WRITE_OPERATIONS_PER_MINUTE)
+     */
     syncUp: function() {
 
         // @todo:david remove console.logs after testing
@@ -427,7 +433,9 @@ window.Rescroller = {
     /**
      * Restore the default settings for the scrollbars.
      */
-    restoreDefaults: function() {
+    restoreDefaults: function(noSync) {
+
+        console.log('restoring defaults');
 
         this.properties.setMultiple({
             
@@ -541,7 +549,7 @@ window.Rescroller = {
     ::-webkit-resizer {\
     \n\n\
     }"
-        });
+        }, noSync);
     },
 
     /**
@@ -555,10 +563,6 @@ window.Rescroller = {
      * Grab data from local storage and convert it into a CSS string
      */
     getCSSString: function() {
-        if (typeof jQuery === 'undefined') {
-            console.error('jQuery is required for getCSSString()');
-            return
-        }
 
         // If user has chosen to specify his own CSS, just return that
         if (this.properties.get("usecustomcss") == "checked") { return this.properties.get("customcss"); }
