@@ -146,7 +146,6 @@ window.Rescroller = {
             settings[key] = value;
             localStorage['rescroller-settings'] = JSON.stringify(settings);
             localStorage['date-settings-last-updated'] = new Date().getTime();
-            console.log('rescroller-settings localStorage UPDATED!', settings === this._settings);
             Rescroller.onSettingsUpdated();
 
             if (noSync) { return; }
@@ -230,8 +229,6 @@ window.Rescroller = {
         if (!this._migrateDataToSingleKey() && !this._migrateImageNullValues()) {
             return; // none of the migrations needed to run; we're done!
         }
-
-        console.log('performed migration(s)! Now updating chrome.sync...');
         
         // Since localStorage has change, we need to invalide our JS cache so we get accurate results
         this.settings.resetJSCache();
@@ -385,8 +382,6 @@ window.Rescroller = {
             return;
         }
 
-        console.log('syncing down');
-
         for (var key in items) {
             var val = items[key];
             if (!val) { continue; }
@@ -409,9 +404,6 @@ window.Rescroller = {
      * https://bugs.chromium.org/p/chromium/issues/detail?id=270665#c19 (@see MAX_WRITE_OPERATIONS_PER_MINUTE)
      */
     syncUp: function() {
-
-        // @todo:david remove console.logs after testing
-        console.log('uploading sync');
 
         var ls = {};
         for (var key in localStorage) {
@@ -437,8 +429,6 @@ window.Rescroller = {
      * https://material.google.com/style/color.html#color-color-palette
      */
     restoreDefaults: function(noSync) {
-
-        console.log('restoring defaults');
 
         this.properties.setMultiple({
             

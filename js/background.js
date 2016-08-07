@@ -16,8 +16,6 @@ chrome.runtime.onInstalled.addListener(function(details) { // when extension ins
      * If this is the first time running the extension, open options page
      * and Download latest Chrome Storage to Local Storage.
      */
-    
-     console.log('onInstalled! reason = ', details.reason);
 
      if (details.reason != 'install') { // no need to sync down if updating.
         Rescroller.performMigrations();
