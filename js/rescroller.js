@@ -432,6 +432,9 @@ window.Rescroller = {
 
     /**
      * Restore the default settings for the scrollbars.
+     *
+     * Slider/background theme are shades of Material's Blue Grey colors:
+     * https://material.google.com/style/color.html#color-color-palette
      */
     restoreDefaults: function(noSync) {
 
@@ -440,15 +443,15 @@ window.Rescroller = {
         this.properties.setMultiple({
             
             // General
-            "size" : 15,
+            "size" : 6,
             "subbackground-color" : "#000000",
-            "corner-background" : "#D9D9D9",
+            "corner-background" : "#B0BEC5",
             // "resizer-background" : "#FFC31F",
             
             // Background
-            "background-color" : "#C9C9C9",
+            "background-color" : "#B0BEC5",
             "background-shadow-color" : "#000000",
-            "background-shadow-size" : 20,
+            "background-shadow-size" : 0,
             "background-border-size" : 0,
             "background-border-color" : "#000000",
             "background-border-style" : "solid",
@@ -463,9 +466,9 @@ window.Rescroller = {
             "background-shadow-size-active" : 0,
             
             // Scrollbar piece/slider
-            "slider-color" : "#666666",
+            "slider-color" : "#455A64",
             "slider-shadow-color" : "#000000",
-            "slider-shadow-size" : 35,
+            "slider-shadow-size" : 0,
             "slider-radius" : 0,
             "slider-border-size" : 0,
             "slider-border-color" : "#000000",
@@ -510,7 +513,7 @@ window.Rescroller = {
             "buttons-background-image-left-active" : chrome.extension.getURL("images/defaults/left.png"),
             "buttons-background-image-right-active" : chrome.extension.getURL("images/defaults/right.png"),
             
-            // Reset all non-button images to 0
+            // Reset all non-button images
             "slider-background-image-vertical" : '',
             "slider-background-image-horizontal" : '',
             "slider-background-image-vertical-hover" : '',
