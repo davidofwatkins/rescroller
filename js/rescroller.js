@@ -433,7 +433,7 @@ window.Rescroller = {
         this.properties.setMultiple({
             
             // General
-            "size" : 6,
+            "size" : 8,
             "subbackground-color" : "#000000",
             "corner-background" : "#B0BEC5",
             // "resizer-background" : "#FFC31F",
