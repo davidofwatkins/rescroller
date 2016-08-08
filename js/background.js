@@ -8,6 +8,9 @@
  *
  * Note: because this is a non-persistent ('event') background page, this script will only load to run
  * event callbacks. Do not put any code outside of listeners!
+ *
+ * Note: Unfortunately, we need to load jquery.js and cssjson.js here, since they are needed when the CSS
+ * hasn't been precomputed or needs to be regenerated.
  */
 
 chrome.runtime.onInstalled.addListener(function(details) { // when extension installed/updated and chrome updated
@@ -43,7 +46,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         var restricted = restrictedSites[restricted];
 
         if (!restricted) { continue; }
-        if (tab.url.indexOf(restricted) >= 0) { return; }
+        if (tab.url.indexOf(restricted) >= 0) { return; } // @todo this could probably be more accurate
     }
 
     // Aaaand, inject our customized CSS into the webpage!
