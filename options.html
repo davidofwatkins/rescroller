@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Rescroller</title>
     <link type="text/css" rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="js/jquery.js"></script>
@@ -8,689 +8,905 @@
     <script type="text/javascript" src="js/rescroller.js"></script>
     <script type="text/javascript" src="js/cssjson.js"></script>
     <script type="text/javascript" src="js/options.js"></script>
-    <script type="text/javascript" src="js/jquery-minicolors/jquery.miniColors.js"></script>
-    <link type="text/css" rel="stylesheet" href="js/jquery-minicolors/jquery.miniColors.css" />
+    <script
+      type="text/javascript"
+      src="js/jquery-minicolors/jquery.miniColors.js"
+    ></script>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="js/jquery-minicolors/jquery.miniColors.css"
+    />
     <!-- @todo:david put "fork on github" note in -->
-</head>
-<body>
+  </head>
+  <body>
     <div id="errorbox">Error!</div>
     <div id="save-confirm">
-        <p><b>Settings Saved</b></p>
-        <p>Your scrollbar settings are saved automatically. If you are signed into Chrome with sync, your scrollbars will follow you across computers.</p>
-        <p><a href="#" id="hide-saved-confirm">Don't show again</a></p>
+      <p><b>Settings Saved</b></p>
+      <p>
+        Your scrollbar settings are saved automatically. If you are signed into
+        Chrome with sync, your scrollbars will follow you across computers.
+      </p>
+      <p><a href="#" id="hide-saved-confirm">Don't show again</a></p>
     </div>
     <div id="settings">
-    <div id="logo-wrapper">
+      <div id="logo-wrapper">
         <img src="images/logo-hover.png" id="logo-hover" />
         <img src="images/logo.png" id="logo" />
-    </div>
-        <form id="theform">
+      </div>
+      <form id="theform">
         <div id="welcomemsg">
-            <p>Welcome to Rescroller! Using the tools below, you can customize the look and feel of scrollbars across your Chrome browser. Please take a moment to style each scrollbar element and their properties, including the sizes and colors of shadows and borders. This extension will override scrollbars on all websites, including those that have their own customized scrollbars, unless you specify them in the blacklist below.</p>
+          <p>
+            Welcome to Rescroller! Using the tools below, you can customize the
+            look and feel of scrollbars across your Chrome browser. Please take
+            a moment to style each scrollbar element and their properties,
+            including the sizes and colors of shadows and borders. This
+            extension will override scrollbars on all websites, including those
+            that have their own customized scrollbars, unless you specify them
+            in the blacklist below.
+          </p>
 
-            <p><small>(Please note that, due to general restrictions for Chrome extensions, your scrollbars will not appear on the Chrome Webstore, or URLS that begin with "<code>chrome://</code>". However, you can enable Rescroller for local webpages and incognito browsing in Chrome's extension manager.)</small></p>
+          <p>
+            <small
+              >(Please note that, due to general restrictions for Chrome
+              extensions, your scrollbars will not appear on the Chrome
+              Webstore, or URLS that begin with "<code>chrome://</code>".
+              However, you can enable Rescroller for local webpages and
+              incognito browsing in Chrome's extension manager.)</small
+            >
+          </p>
         </div>
         <div class="section" id="general">
-            <h1 class="sectionheader">General</h1>
-            <div id="size" class="slider-property customcss-collapsible" style="display: block;">
-                <div class="property-title">Scrollbar Size</div>
-                <div class="slider slider-h"></div>
-                <div class="slider-value"></div>
-                <div style="clear: both;"></div>
-            </div>
-            <div id="resetformatting" class="button">Restore Default Formatting</div>
-            <p style="margin: 20px auto 10px"><b>Blacklist:</b></p>
-            <p class="small-description">Enter any sites for which you would not like to override scrollbar styling, below (separated by commas):</p>
-            <textarea id="excludedsites" placeholder="Example: mail.google.com, facebook.com"></textarea>
+          <h1 class="sectionheader">General</h1>
+          <div
+            id="size"
+            class="slider-property customcss-collapsible"
+            style="display: block"
+          >
+            <div class="property-title">Scrollbar Size</div>
+            <div class="slider slider-h"></div>
+            <div class="slider-value"></div>
+            <div style="clear: both"></div>
+          </div>
+          <div id="resetformatting" class="button">
+            Restore Default Formatting
+          </div>
+          <p style="margin: 20px auto 10px"><b>Blacklist:</b></p>
+          <p class="small-description">
+            Enter any sites for which you would not like to override scrollbar
+            styling, below (separated by commas):
+          </p>
+          <textarea
+            id="excludedsites"
+            placeholder="Example: mail.google.com, facebook.com"
+          ></textarea>
         </div>
-        
+
         <div class="section" id="scrollbar-slider">
-            <h1 class="sectionheader">Slider Handle</h1>
-            <div id="slider-color" class="colorpicker-container" style="display: block">
-                <b>Color:</b>
-                <input type="hidden" id="colortext" class="colorselection" />
-                <input type="text" class="colorvalue" />
-            </div>
-            <table>
-                <tr>
-                    <td><p class="imagepicker-label">Vertical Image:</p></td>
-                    <td><p class="imagepicker-label">Horizontal Image:</p></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div id="slider-background-image-vertical" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                    </td>
-                    <td>
-                        <div id="slider-background-image-horizontal" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            
-            
-            
-            <div class="subsection">
-                <p class="sectionsubheader">Shadows</p>
-                <div id="slider-shadow-size" class="slider-property">
-                    <div class="slider-value"></div>
-                    <div class="slider slider-v"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                <div id="slider-shadow-color" class="colorpicker-container">
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
-                </div>
-                <div style="clear: both;"></div>
-            </div>
-            <div class="subsection">
-                <p class="sectionsubheader">Borders</p>
-                <div id="slider-border-size" class="slider-property">
-                    <div class="slider-value"></div>
-                    <div class="slider slider-v"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                <div id="slider-border-color" class="colorpicker-container">
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
-                </div>
-                <p>
-                    Style:
-                    <!--<input type="text" id="slider-border-style" />-->
-                    <select id="slider-border-style">
-                        <option value="solid">Solid</option>
-                        <option value="dashed">Dashed</option>
-                        <option value="dotted">Dotted</option>
-                        <option value="double">Double</option>
-                        <option value="groove">Groove</option>
-                        <option value="inset">Inset</option>
-                        <option value="outset">Outset</option>
-                        <option value="ridge">Ridge</option>
-                    </select>
-                </p>
-            </div>
-            <p class="sectionsubheader">Rounded Corners</p>
-            <div id="slider-radius" class="slider-property">
-                <div class="slider slider-h"></div>
-                <div class="slider-value"></div>
-                <div style="clear: both;"></div>
-            </div>
-            
-            <p class="custom-hover-active-label">Customize Style When Hovering: <input type="checkbox" id="slider-use-hover" class="toggle-hover-active" data-wrapperid="slider-hover-wrapper" /></p>
-            <div id="slider-hover-wrapper">
-                <p class="sectionsubheader">Hovering State</p>
-                <div class="subsection">
-                    <div id="slider-color-hover" class="colorpicker-container">
-                        <b>Color:</b>
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                    <p class="imagepicker-label">Vertical Image:</p>
-                    <div id="slider-background-image-vertical-hover" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                            <div class="thumbcontainer">No Image Loaded</div>
-                            <img src="images/close-button.png" class="clearimage" />
-                        </div>
-                        
-                    </div>
-                    <p class="imagepicker-label">Horizontal Image:</p>
-                    <div id="slider-background-image-horizontal-hover" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                            <div class="thumbcontainer">No Image Loaded</div>
-                            <img src="images/close-button.png" class="clearimage" />
-                        </div>
-                        
-                    </div>
-                </div>
-                <div class="subsection">
-                <p class="property-title">Shadows</p>
-                    <div id="slider-shadow-size-hover" class="slider-property">
-                        <div class="slider-value"></div>
-                        <div class="slider slider-v"></div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div id="slider-shadow-color-hover" class="colorpicker-container">
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                </div>
-            </div>
-            
-            <p class="custom-hover-active-label">Customize Style When Clicking: <input type="checkbox" id="slider-use-active" class="toggle-hover-active" data-wrapperid="slider-active-wrapper" /></p>
-            <div id="slider-active-wrapper">
-                <p class="sectionsubheader">Active State</p>
-                <div class="subsection">
-                    <div id="slider-color-active" class="colorpicker-container">
-                        <b>Color:</b>
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                    <p class="imagepicker-label">Vertical Image:</p>
-                    <div id="slider-background-image-vertical-active" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                            <div class="thumbcontainer">No Image Loaded</div>
-                            <img src="images/close-button.png" class="clearimage" />
-                        </div>
-                        
-                    </div>
-                    <p class="imagepicker-label">Horizontal Image:</p>
-                    <div id="slider-background-image-horizontal-active" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                            <div class="thumbcontainer">No Image Loaded</div>
-                            <img src="images/close-button.png" class="clearimage" />
-                        </div>
-                        
-                    </div>
-                </div>
-                <div class="subsection">
-                    <p class="property-title">Shadows</p>
-                    <div id="slider-shadow-size-active" class="slider-property">
-                        <div class="slider-value"></div>
-                        <div class="slider slider-v"></div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div id="slider-shadow-color-active" class="colorpicker-container">
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- **************** Scrollbar Background ********************** -->
-        
-        <div class="section" id="scrollbar-bg">
-        <h1 class="sectionheader">Background</h1>
-        <div id="background-color" class="colorpicker-container" style="display: block;">
+          <h1 class="sectionheader">Slider Handle</h1>
+          <div
+            id="slider-color"
+            class="colorpicker-container"
+            style="display: block"
+          >
             <b>Color:</b>
             <input type="hidden" id="colortext" class="colorselection" />
             <input type="text" class="colorvalue" />
-        </div>
-        
-        <table>
+          </div>
+          <table>
             <tr>
-                <td><p class="imagepicker-label">Vertical Image:</p></td>
-                <td><p class="imagepicker-label">Horizontal Image:</p></td>
+              <td><p class="imagepicker-label">Vertical Image:</p></td>
+              <td><p class="imagepicker-label">Horizontal Image:</p></td>
             </tr>
             <tr>
-                <td>
-                    <div id="background-background-image-vertical" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                        
-                    </div>
-                </td>
-                <td>
-                    <div id="background-background-image-horizontal" class="imagepicker-container">
-                        <input type="file" class="selector" />
-                        <a href="#" class="selector-button">Select Image</a>
-                        <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                        
-                    </div>
-                </td>
+              <td>
+                <div
+                  id="slider-background-image-vertical"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div
+                  id="slider-background-image-horizontal"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+              </td>
             </tr>
-        </table>
-        
-        <div class="subsection">
+          </table>
+
+          <div class="subsection">
             <p class="sectionsubheader">Shadows</p>
-            <div id="background-shadow-size" class="slider-property">
-                <div class="slider-value"></div>
-                <div class="slider slider-v"></div>
-                <div style="clear: both;"></div>
+            <div id="slider-shadow-size" class="slider-property">
+              <div class="slider-value"></div>
+              <div class="slider slider-v"></div>
+              <div style="clear: both"></div>
             </div>
-            <div id="background-shadow-color" class="colorpicker-container">
-                <input type="hidden" id="colortext" class="colorselection" />
-                <input type="text" class="colorvalue" />
+            <div id="slider-shadow-color" class="colorpicker-container">
+              <input type="hidden" id="colortext" class="colorselection" />
+              <input type="text" class="colorvalue" />
             </div>
-        </div>
-        
-        <div class="subsection">
+            <div style="clear: both"></div>
+          </div>
+          <div class="subsection">
             <p class="sectionsubheader">Borders</p>
-            <div id="background-border-size" class="slider-property">
-                <div class="slider-value"></div>
-                <div class="slider slider-v"></div>
-                <div style="clear: both;"></div>
+            <div id="slider-border-size" class="slider-property">
+              <div class="slider-value"></div>
+              <div class="slider slider-v"></div>
+              <div style="clear: both"></div>
             </div>
-            <div id="background-border-color" class="colorpicker-container">
-                <input type="hidden" id="colortext" class="colorselection" />
-                <input type="text" class="colorvalue" />
+            <div id="slider-border-color" class="colorpicker-container">
+              <input type="hidden" id="colortext" class="colorselection" />
+              <input type="text" class="colorvalue" />
             </div>
             <p>
-                Style:
-                <select id="background-border-style">
-                    <option value="solid">Solid</option>
-                        <option value="dashed">Dashed</option>
-                        <option value="dotted">Dotted</option>
-                        <option value="double">Double</option>
-                        <option value="groove">Groove</option>
-                        <option value="inset">Inset</option>
-                        <option value="outset">Outset</option>
-                        <option value="ridge">Ridge</option>
-                </select>
+              Style:
+              <!--<input type="text" id="slider-border-style" />-->
+              <select id="slider-border-style">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+                <option value="double">Double</option>
+                <option value="groove">Groove</option>
+                <option value="inset">Inset</option>
+                <option value="outset">Outset</option>
+                <option value="ridge">Ridge</option>
+              </select>
             </p>
-        </div>
-        
-        <p class="sectionsubheader">Rounded Corners</p>
-        <div id="background-radius" class="slider-property">
+          </div>
+          <p class="sectionsubheader">Rounded Corners</p>
+          <div id="slider-radius" class="slider-property">
             <div class="slider slider-h"></div>
             <div class="slider-value"></div>
-            <div style="clear: both;"></div>
-        </div>
-        
-        <p class="custom-hover-active-label">Customize Style When Hovering: <input type="checkbox" id="background-use-hover" class="toggle-hover-active" data-wrapperid="background-hover-wrapper" /></p>
-        <div id="background-hover-wrapper">
+            <div style="clear: both"></div>
+          </div>
+
+          <p class="custom-hover-active-label">
+            Customize Style When Hovering:
+            <input
+              type="checkbox"
+              id="slider-use-hover"
+              class="toggle-hover-active"
+              data-wrapperid="slider-hover-wrapper"
+            />
+          </p>
+          <div id="slider-hover-wrapper">
             <p class="sectionsubheader">Hovering State</p>
             <div class="subsection">
-                <div id="background-color-hover" class="colorpicker-container" style="display: block;">
-                    <b>Color:</b>
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
+              <div id="slider-color-hover" class="colorpicker-container">
+                <b>Color:</b>
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+              <p class="imagepicker-label">Vertical Image:</p>
+              <div
+                id="slider-background-image-vertical-hover"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
                 </div>
-                <p class="imagepicker-label">Vertical Image:</p>
-                <div id="background-background-image-vertical-hover" class="imagepicker-container">
-                    <input type="file" class="selector" />
-                    <a href="#" class="selector-button">Select Image</a>
-                    <div class="thumbframe">
-                        <div class="thumbcontainer">No Image Loaded</div>
-                        <img src="images/close-button.png" class="clearimage" />
-                    </div>
-                    
+              </div>
+              <p class="imagepicker-label">Horizontal Image:</p>
+              <div
+                id="slider-background-image-horizontal-hover"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
                 </div>
-                <p class="imagepicker-label">Horizontal Image:</p>
-                <div id="background-background-image-horizontal-hover" class="imagepicker-container">
-                    <input type="file" class="selector" />
-                    <a href="#" class="selector-button">Select Image</a>
-                    <div class="thumbframe">
-                        <div class="thumbcontainer">No Image Loaded</div>
-                        <img src="images/close-button.png" class="clearimage" />
-                    </div>
-                    
-                </div>
+              </div>
             </div>
-            
             <div class="subsection">
-                <p class="property-title">Shadows:</p>
-                <div id="background-shadow-size-hover" class="slider-property">
-                    <div class="slider-value"></div>
-                    <div class="slider slider-v"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                <div id="background-shadow-color-hover" class="colorpicker-container">
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
-                </div>
+              <p class="property-title">Shadows</p>
+              <div id="slider-shadow-size-hover" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div id="slider-shadow-color-hover" class="colorpicker-container">
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
             </div>
-        </div>
-        
-        <p class="custom-hover-active-label">Customize Style When Clicking: <input type="checkbox" id="background-use-active" class="toggle-hover-active" data-wrapperid="background-active-wrapper" /></p>
-        <div id="background-active-wrapper">
+          </div>
+
+          <p class="custom-hover-active-label">
+            Customize Style When Clicking:
+            <input
+              type="checkbox"
+              id="slider-use-active"
+              class="toggle-hover-active"
+              data-wrapperid="slider-active-wrapper"
+            />
+          </p>
+          <div id="slider-active-wrapper">
             <p class="sectionsubheader">Active State</p>
             <div class="subsection">
-                <div id="background-color-active" class="colorpicker-container" style="display: block;">
-                    <b>Color:</b>
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
+              <div id="slider-color-active" class="colorpicker-container">
+                <b>Color:</b>
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+              <p class="imagepicker-label">Vertical Image:</p>
+              <div
+                id="slider-background-image-vertical-active"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
                 </div>
-                <p class="imagepicker-label">Vertical Image:</p>
-                <div id="background-background-image-vertical-active" class="imagepicker-container">
-                    <input type="file" class="selector" />
-                    <a href="#" class="selector-button">Select Image</a>
-                    <div class="thumbframe">
-                        <div class="thumbcontainer">No Image Loaded</div>
-                        <img src="images/close-button.png" class="clearimage" />
-                    </div>
-                    
+              </div>
+              <p class="imagepicker-label">Horizontal Image:</p>
+              <div
+                id="slider-background-image-horizontal-active"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
                 </div>
-                <p class="imagepicker-label">Horizontal Image:</p>
-                <div id="background-background-image-horizontal-active" class="imagepicker-container">
-                    <input type="file" class="selector" />
-                    <a href="#" class="selector-button">Select Image</a>
-                    <div class="thumbframe">
-                        <div class="thumbcontainer">No Image Loaded</div>
-                        <img src="images/close-button.png" class="clearimage" />
-                    </div>
-                    
-                </div>
+              </div>
             </div>
-            
             <div class="subsection">
-                <p class="property-title">Shadows:</p>
-                <div id="background-shadow-size-active" class="slider-property">
-                    <div class="slider-value"></div>
-                    <div class="slider slider-v"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                <div id="background-shadow-color-active" class="colorpicker-container">
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
-                </div>
+              <p class="property-title">Shadows</p>
+              <div id="slider-shadow-size-active" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div
+                id="slider-shadow-color-active"
+                class="colorpicker-container"
+              >
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-        
-    <!-- ********************** Scrollbar Buttons ************************ -->
-        
+
+        <!-- **************** Scrollbar Background ********************** -->
+
+        <div class="section" id="scrollbar-bg">
+          <h1 class="sectionheader">Background</h1>
+          <div
+            id="background-color"
+            class="colorpicker-container"
+            style="display: block"
+          >
+            <b>Color:</b>
+            <input type="hidden" id="colortext" class="colorselection" />
+            <input type="text" class="colorvalue" />
+          </div>
+
+          <table>
+            <tr>
+              <td><p class="imagepicker-label">Vertical Image:</p></td>
+              <td><p class="imagepicker-label">Horizontal Image:</p></td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  id="background-background-image-vertical"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div
+                  id="background-background-image-horizontal"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <div class="subsection">
+            <p class="sectionsubheader">Shadows</p>
+            <div id="background-shadow-size" class="slider-property">
+              <div class="slider-value"></div>
+              <div class="slider slider-v"></div>
+              <div style="clear: both"></div>
+            </div>
+            <div id="background-shadow-color" class="colorpicker-container">
+              <input type="hidden" id="colortext" class="colorselection" />
+              <input type="text" class="colorvalue" />
+            </div>
+          </div>
+
+          <div class="subsection">
+            <p class="sectionsubheader">Borders</p>
+            <div id="background-border-size" class="slider-property">
+              <div class="slider-value"></div>
+              <div class="slider slider-v"></div>
+              <div style="clear: both"></div>
+            </div>
+            <div id="background-border-color" class="colorpicker-container">
+              <input type="hidden" id="colortext" class="colorselection" />
+              <input type="text" class="colorvalue" />
+            </div>
+            <p>
+              Style:
+              <select id="background-border-style">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+                <option value="double">Double</option>
+                <option value="groove">Groove</option>
+                <option value="inset">Inset</option>
+                <option value="outset">Outset</option>
+                <option value="ridge">Ridge</option>
+              </select>
+            </p>
+          </div>
+
+          <p class="sectionsubheader">Rounded Corners</p>
+          <div id="background-radius" class="slider-property">
+            <div class="slider slider-h"></div>
+            <div class="slider-value"></div>
+            <div style="clear: both"></div>
+          </div>
+
+          <p class="custom-hover-active-label">
+            Customize Style When Hovering:
+            <input
+              type="checkbox"
+              id="background-use-hover"
+              class="toggle-hover-active"
+              data-wrapperid="background-hover-wrapper"
+            />
+          </p>
+          <div id="background-hover-wrapper">
+            <p class="sectionsubheader">Hovering State</p>
+            <div class="subsection">
+              <div
+                id="background-color-hover"
+                class="colorpicker-container"
+                style="display: block"
+              >
+                <b>Color:</b>
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+              <p class="imagepicker-label">Vertical Image:</p>
+              <div
+                id="background-background-image-vertical-hover"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
+                </div>
+              </div>
+              <p class="imagepicker-label">Horizontal Image:</p>
+              <div
+                id="background-background-image-horizontal-hover"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <p class="property-title">Shadows:</p>
+              <div id="background-shadow-size-hover" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div
+                id="background-shadow-color-hover"
+                class="colorpicker-container"
+              >
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+            </div>
+          </div>
+
+          <p class="custom-hover-active-label">
+            Customize Style When Clicking:
+            <input
+              type="checkbox"
+              id="background-use-active"
+              class="toggle-hover-active"
+              data-wrapperid="background-active-wrapper"
+            />
+          </p>
+          <div id="background-active-wrapper">
+            <p class="sectionsubheader">Active State</p>
+            <div class="subsection">
+              <div
+                id="background-color-active"
+                class="colorpicker-container"
+                style="display: block"
+              >
+                <b>Color:</b>
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+              <p class="imagepicker-label">Vertical Image:</p>
+              <div
+                id="background-background-image-vertical-active"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
+                </div>
+              </div>
+              <p class="imagepicker-label">Horizontal Image:</p>
+              <div
+                id="background-background-image-horizontal-active"
+                class="imagepicker-container"
+              >
+                <input type="file" class="selector" />
+                <a href="#" class="selector-button">Select Image</a>
+                <div class="thumbframe">
+                  <div class="thumbcontainer">No Image Loaded</div>
+                  <img src="images/close-button.png" class="clearimage" />
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <p class="property-title">Shadows:</p>
+              <div id="background-shadow-size-active" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div
+                id="background-shadow-color-active"
+                class="colorpicker-container"
+              >
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ********************** Scrollbar Buttons ************************ -->
+
         <div class="section" id="scrollbar-buttons">
-            <h1 class="sectionheader">Buttons</h1>
+          <h1 class="sectionheader">Buttons</h1>
+          <table>
+            <tr>
+              <td>Show scroll buttons:</td>
+              <td><input type="checkbox" id="showbuttons" /></td>
+            </tr>
+          </table>
+
+          <div id="buttons-toggleable">
+            <div
+              id="buttons-color"
+              class="colorpicker-container"
+              style="display: block"
+            >
+              <b>Color:</b>
+              <input type="hidden" id="colortext" class="colorselection" />
+              <input type="text" class="colorvalue" />
+            </div>
+            <div
+              id="buttons-size"
+              class="slider-property"
+              style="display: block"
+            >
+              <div class="slider slider-h"></div>
+              <div class="slider-value"></div>
+              <div style="clear: both"></div>
+            </div>
+
             <table>
-                <tr>
-                    <td>Show scroll buttons:</td>
-                    <td><input type="checkbox" id="showbuttons" /></td>
-                </tr>
+              <tr>
+                <td><p class="imagepicker-label">Up</p></td>
+                <td><p class="imagepicker-label">Down</p></td>
+              </tr>
+              <tr>
+                <td>
+                  <div
+                    id="buttons-background-image-up"
+                    class="imagepicker-container"
+                  >
+                    <input type="file" class="selector" />
+                    <a href="#" class="selector-button">Select Image</a>
+                    <div class="thumbframe">
+                      <div class="thumbcontainer">No Image Loaded</div>
+                      <img src="images/close-button.png" class="clearimage" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div
+                    id="buttons-background-image-down"
+                    class="imagepicker-container"
+                  >
+                    <input type="file" class="selector" />
+                    <a href="#" class="selector-button">Select Image</a>
+                    <div class="thumbframe">
+                      <div class="thumbcontainer">No Image Loaded</div>
+                      <img src="images/close-button.png" class="clearimage" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><p class="imagepicker-label">Left</p></td>
+                <td><p class="imagepicker-label">Right</p></td>
+              </tr>
+              <tr>
+                <td>
+                  <div
+                    id="buttons-background-image-left"
+                    class="imagepicker-container"
+                  >
+                    <input type="file" class="selector" />
+                    <a href="#" class="selector-button">Select Image</a>
+                    <div class="thumbframe">
+                      <div class="thumbcontainer">No Image Loaded</div>
+                      <img src="images/close-button.png" class="clearimage" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div
+                    id="buttons-background-image-right"
+                    class="imagepicker-container"
+                  >
+                    <input type="file" class="selector" />
+                    <a href="#" class="selector-button">Select Image</a>
+                    <div class="thumbframe">
+                      <div class="thumbcontainer">No Image Loaded</div>
+                      <img src="images/close-button.png" class="clearimage" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
             </table>
-            
-            <div id="buttons-toggleable">
-                <div id="buttons-color" class="colorpicker-container" style="display: block;">
-                    <b>Color:</b>
-                    <input type="hidden" id="colortext" class="colorselection" />
-                    <input type="text" class="colorvalue" />
-                </div>
-                <div id="buttons-size" class="slider-property" style="display: block;">
-                    <div class="slider slider-h"></div>
-                    <div class="slider-value"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                
-                <table>
-                    <tr>
-                        <td><p class="imagepicker-label">Up</p></td>
-                        <td><p class="imagepicker-label">Down</p></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div id="buttons-background-image-up" class="imagepicker-container">
-                                <input type="file" class="selector" />
-                                <a href="#" class="selector-button">Select Image</a>
-                                <div class="thumbframe">
-                                    <div class="thumbcontainer">No Image Loaded</div>
-                                    <img src="images/close-button.png" class="clearimage" />
-                                </div>
-                                
-                            </div>
-                        </td>
-                        <td>
-                            <div id="buttons-background-image-down" class="imagepicker-container">
-                                <input type="file" class="selector" />
-                                <a href="#" class="selector-button">Select Image</a>
-                                <div class="thumbframe">
-                                    <div class="thumbcontainer">No Image Loaded</div>
-                                    <img src="images/close-button.png" class="clearimage" />
-                                </div>
-                                
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><p class="imagepicker-label">Left</p></td>
-                        <td><p class="imagepicker-label">Right</p></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div id="buttons-background-image-left" class="imagepicker-container">
-                                <input type="file" class="selector" />
-                                <a href="#" class="selector-button">Select Image</a>
-                                <div class="thumbframe">
-                                    <div class="thumbcontainer">No Image Loaded</div>
-                                    <img src="images/close-button.png" class="clearimage" />
-                                </div>
-                                
-                            </div>
-                        </td>
-                        <td>
-                            <div id="buttons-background-image-right" class="imagepicker-container">
-                                <input type="file" class="selector" />
-                                <a href="#" class="selector-button">Select Image</a>
-                                <div class="thumbframe">
-                                    <div class="thumbcontainer">No Image Loaded</div>
-                                    <img src="images/close-button.png" class="clearimage" />
-                                </div>
-                                
-                            </div>
-                        </td>
-                    </tr>
-                </table>
 
-                <p><a href="#" id="restore-arrow-defaults">Restore Default Arrows</a></p>
-                                
-                <div style="clear: both;"></div>
-                
-                <div class="subsection">
-                    <p class="sectionsubheader">Shadows</p>
-                    <div id="buttons-shadow-size" class="slider-property">
-                        <div class="slider-value"></div>
-                        <div class="slider slider-v"></div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div id="buttons-shadow-color" class="colorpicker-container">
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                </div>
-                
-                <div class="subsection">
-                    <p class="sectionsubheader">Borders</p>
-                    <div id="buttons-border-size" class="slider-property">
-                        <div class="slider-value"></div>
-                        <div class="slider slider-v"></div>
-                        <div style="clear: both;"></div>
-                    </div>
-                    <div id="buttons-border-color" class="colorpicker-container">
-                        <input type="hidden" id="colortext" class="colorselection" />
-                        <input type="text" class="colorvalue" />
-                    </div>
-                    <p>
-                        Style:
-                        <select id="buttons-border-style">
-                            <option value="solid">Solid</option>
-                            <option value="dashed">Dashed</option>
-                            <option value="dotted">Dotted</option>
-                            <option value="double">Double</option>
-                            <option value="groove">Groove</option>
-                            <option value="inset">Inset</option>
-                            <option value="outset">Outset</option>
-                            <option value="ridge">Ridge</option>
-                        </select>
-                    </p>
-                    
-                </div>
-                
-                <p class="sectionsubheader">Rounded Corners</p>
-                <div id="buttons-radius" class="slider-property">
-                    <div class="slider slider-h"></div>
-                    <div class="slider-value"></div>
-                    <div style="clear: both;"></div>
-                </div>
-                
-                <p class="custom-hover-active-label">Customize Style When Hovering: <input type="checkbox" id="buttons-use-hover" class="toggle-hover-active" data-wrapperid="buttons-hover-wrapper" /></p>
-                <div id="buttons-hover-wrapper">
-                    <p class="sectionsubheader">Hovering State</p>
-                    <div class="subsection">
-                        <div id="buttons-color-hover" class="colorpicker-container" style="display: block;">
-                            <b>Color:</b>
-                            <input type="hidden" id="colortext" class="colorselection" />
-                            <input type="text" class="colorvalue" />
-                        </div>
-                        <p class="imagepicker-label">Up Image:</p>
-                        <div id="buttons-background-image-up-hover" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Down Image:</p>
-                        <div id="buttons-background-image-down-hover" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Left Image:</p>
-                        <div id="buttons-background-image-left-hover" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Right Image:</p>
-                        <div id="buttons-background-image-right-hover" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
+            <p>
+              <a href="#" id="restore-arrow-defaults">Restore Default Arrows</a>
+            </p>
 
-                        <p><a href="#" id="restore-arrow-defaults-hover">Restore Default Arrows</a></p>
+            <div style="clear: both"></div>
 
-                    </div>
-                    <div class="subsection">
-                    <p class="property-title">Shadows:</p>
-                        <div id="buttons-shadow-size-hover" class="slider-property">
-                            <div class="slider-value"></div>
-                            <div class="slider slider-v"></div>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div id="buttons-shadow-color-hover" class="colorpicker-container">
-                            <input type="hidden" id="colortext" class="colorselection" />
-                            <input type="text" class="colorvalue" />
-                        </div>
-                    </div>
-                </div>
-                
-                <p class="custom-hover-active-label">Customize Style When Clicking: <input type="checkbox" id="buttons-use-active" class="toggle-hover-active" data-wrapperid="buttons-active-wrapper" /></p>
-                <div id="buttons-active-wrapper">
-                    <p class="sectionsubheader">Active State</p>
-                    <div class="subsection">
-                        <div id="buttons-color-active" class="colorpicker-container" style="display: block;">
-                            <b>Color:</b>
-                            <input type="hidden" id="colortext" class="colorselection" />
-                            <input type="text" class="colorvalue" />
-                        </div>
-                        <p class="imagepicker-label">Up Image:</p>
-                        <div id="buttons-background-image-up-active" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Down Image:</p>
-                        <div id="buttons-background-image-down-active" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Left Image:</p>
-                        <div id="buttons-background-image-left-active" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-                        <p class="imagepicker-label">Right Image:</p>
-                        <div id="buttons-background-image-right-active" class="imagepicker-container">
-                            <input type="file" class="selector" />
-                            <a href="#" class="selector-button">Select Image</a>
-                            <div class="thumbframe">
-                                <div class="thumbcontainer">No Image Loaded</div>
-                                <img src="images/close-button.png" class="clearimage" />
-                            </div>
-                            
-                        </div>
-
-                        <p><a href="#" id="restore-arrow-defaults-active">Restore Default Arrows</a></p>
-
-                    </div>
-
-                    <div class="subsection">
-                        <p class="property-title">Shadows:</p>
-                        <div id="buttons-shadow-size-active" class="slider-property">
-                            <div class="slider-value"></div>
-                            <div class="slider slider-v"></div>
-                            <div style="clear: both;"></div>
-                        </div>
-                        <div id="buttons-shadow-color-active" class="colorpicker-container">
-                            <input type="hidden" id="colortext" class="colorselection" />
-                            <input type="text" class="colorvalue" />
-                        </div>
-                    </div>
-                </div>
+            <div class="subsection">
+              <p class="sectionsubheader">Shadows</p>
+              <div id="buttons-shadow-size" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div id="buttons-shadow-color" class="colorpicker-container">
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
             </div>
-            
+
+            <div class="subsection">
+              <p class="sectionsubheader">Borders</p>
+              <div id="buttons-border-size" class="slider-property">
+                <div class="slider-value"></div>
+                <div class="slider slider-v"></div>
+                <div style="clear: both"></div>
+              </div>
+              <div id="buttons-border-color" class="colorpicker-container">
+                <input type="hidden" id="colortext" class="colorselection" />
+                <input type="text" class="colorvalue" />
+              </div>
+              <p>
+                Style:
+                <select id="buttons-border-style">
+                  <option value="solid">Solid</option>
+                  <option value="dashed">Dashed</option>
+                  <option value="dotted">Dotted</option>
+                  <option value="double">Double</option>
+                  <option value="groove">Groove</option>
+                  <option value="inset">Inset</option>
+                  <option value="outset">Outset</option>
+                  <option value="ridge">Ridge</option>
+                </select>
+              </p>
+            </div>
+
+            <p class="sectionsubheader">Rounded Corners</p>
+            <div id="buttons-radius" class="slider-property">
+              <div class="slider slider-h"></div>
+              <div class="slider-value"></div>
+              <div style="clear: both"></div>
+            </div>
+
+            <p class="custom-hover-active-label">
+              Customize Style When Hovering:
+              <input
+                type="checkbox"
+                id="buttons-use-hover"
+                class="toggle-hover-active"
+                data-wrapperid="buttons-hover-wrapper"
+              />
+            </p>
+            <div id="buttons-hover-wrapper">
+              <p class="sectionsubheader">Hovering State</p>
+              <div class="subsection">
+                <div
+                  id="buttons-color-hover"
+                  class="colorpicker-container"
+                  style="display: block"
+                >
+                  <b>Color:</b>
+                  <input type="hidden" id="colortext" class="colorselection" />
+                  <input type="text" class="colorvalue" />
+                </div>
+                <p class="imagepicker-label">Up Image:</p>
+                <div
+                  id="buttons-background-image-up-hover"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Down Image:</p>
+                <div
+                  id="buttons-background-image-down-hover"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Left Image:</p>
+                <div
+                  id="buttons-background-image-left-hover"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Right Image:</p>
+                <div
+                  id="buttons-background-image-right-hover"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+
+                <p>
+                  <a href="#" id="restore-arrow-defaults-hover"
+                    >Restore Default Arrows</a
+                  >
+                </p>
+              </div>
+              <div class="subsection">
+                <p class="property-title">Shadows:</p>
+                <div id="buttons-shadow-size-hover" class="slider-property">
+                  <div class="slider-value"></div>
+                  <div class="slider slider-v"></div>
+                  <div style="clear: both"></div>
+                </div>
+                <div
+                  id="buttons-shadow-color-hover"
+                  class="colorpicker-container"
+                >
+                  <input type="hidden" id="colortext" class="colorselection" />
+                  <input type="text" class="colorvalue" />
+                </div>
+              </div>
+            </div>
+
+            <p class="custom-hover-active-label">
+              Customize Style When Clicking:
+              <input
+                type="checkbox"
+                id="buttons-use-active"
+                class="toggle-hover-active"
+                data-wrapperid="buttons-active-wrapper"
+              />
+            </p>
+            <div id="buttons-active-wrapper">
+              <p class="sectionsubheader">Active State</p>
+              <div class="subsection">
+                <div
+                  id="buttons-color-active"
+                  class="colorpicker-container"
+                  style="display: block"
+                >
+                  <b>Color:</b>
+                  <input type="hidden" id="colortext" class="colorselection" />
+                  <input type="text" class="colorvalue" />
+                </div>
+                <p class="imagepicker-label">Up Image:</p>
+                <div
+                  id="buttons-background-image-up-active"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Down Image:</p>
+                <div
+                  id="buttons-background-image-down-active"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Left Image:</p>
+                <div
+                  id="buttons-background-image-left-active"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+                <p class="imagepicker-label">Right Image:</p>
+                <div
+                  id="buttons-background-image-right-active"
+                  class="imagepicker-container"
+                >
+                  <input type="file" class="selector" />
+                  <a href="#" class="selector-button">Select Image</a>
+                  <div class="thumbframe">
+                    <div class="thumbcontainer">No Image Loaded</div>
+                    <img src="images/close-button.png" class="clearimage" />
+                  </div>
+                </div>
+
+                <p>
+                  <a href="#" id="restore-arrow-defaults-active"
+                    >Restore Default Arrows</a
+                  >
+                </p>
+              </div>
+
+              <div class="subsection">
+                <p class="property-title">Shadows:</p>
+                <div id="buttons-shadow-size-active" class="slider-property">
+                  <div class="slider-value"></div>
+                  <div class="slider slider-v"></div>
+                  <div style="clear: both"></div>
+                </div>
+                <div
+                  id="buttons-shadow-color-active"
+                  class="colorpicker-container"
+                >
+                  <input type="hidden" id="colortext" class="colorselection" />
+                  <input type="text" class="colorvalue" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="section"  id="misc">
-            <h1 class="sectionheader">Miscellaneous</h1>
-            <div id="subbackground-color" class="colorpicker-container customcss-collapsible" style="display: block;">
-                <b>Sub-Background Color:</b>
-                <input type="hidden" id="colortext" class="colorselection" />
-                <input type="text" class="colorvalue" />
-            </div>
-            <div id="corner-background" class="colorpicker-container customcss-collapsible" style="display: block;">
-                <b>Corner Color:</b>
-                <input type="hidden" id="colortext" class="colorselection" />
-                <input type="text" class="colorvalue" />
-            </div>
-            <p>Use Custom CSS (Advanced Users Only): <input type="checkbox" id="usecustomcss" class="toggle-hover-active" data-wrapperid="customcss-wrapper" /></p>
-            <div id="customcss-wrapper">
-                <p class="small-description">While the tools above are useful in designing a unique scrollbar, they do not allow for complete customization of scrollbars within Google Chrome. If you are a web developer or are familiar with CSS styling, <a href="http://css-tricks.com/custom-scrollbars-in-webkit/" target="_blank">you may enter custom CSS</a> to override the above tools, below:</p>
-                <textarea id="customcss" placeholder="Enter CSS here"></textarea>
-            </div>
+
+        <div class="section" id="misc">
+          <h1 class="sectionheader">Miscellaneous</h1>
+          <div
+            id="subbackground-color"
+            class="colorpicker-container customcss-collapsible"
+            style="display: block"
+          >
+            <b>Sub-Background Color:</b>
+            <input type="hidden" id="colortext" class="colorselection" />
+            <input type="text" class="colorvalue" />
+          </div>
+          <div
+            id="corner-background"
+            class="colorpicker-container customcss-collapsible"
+            style="display: block"
+          >
+            <b>Corner Color:</b>
+            <input type="hidden" id="colortext" class="colorselection" />
+            <input type="text" class="colorvalue" />
+          </div>
+          <p>
+            Use Custom CSS (Advanced Users Only):
+            <input
+              type="checkbox"
+              id="usecustomcss"
+              class="toggle-hover-active"
+              data-wrapperid="customcss-wrapper"
+            />
+          </p>
+          <div id="customcss-wrapper">
+            <p class="small-description">
+              While the tools above are useful in designing a unique scrollbar,
+              they do not allow for complete customization of scrollbars within
+              Google Chrome. If you are a web developer or are familiar with CSS
+              styling,
+              <a
+                href="http://css-tricks.com/custom-scrollbars-in-webkit/"
+                target="_blank"
+                >you may enter custom CSS</a
+              >
+              to override the above tools, below:
+            </p>
+            <textarea id="customcss" placeholder="Enter CSS here"></textarea>
+          </div>
         </div>
         <br />
         <!--<input type="submit" value="Update" />-->
-        </form>
-        <p style="display: none;"><a href="#" id="expandcss" >Click here to expand/collapse generated CSS</a></p>
-        <div id="generatedcss">Error</div>
+      </form>
+      <p style="display: none">
+        <a href="#" id="expandcss"
+          >Click here to expand/collapse generated CSS</a
+        >
+      </p>
+      <div id="generatedcss">Error</div>
     </div>
-</body>
+  </body>
 </html>
