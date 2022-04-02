@@ -3,7 +3,6 @@
  */
 
 var LOAD_START = new Date().getTime(); // keep track of when the page loads so we know to show the save settings dialog
-var showSaveConfirmation;
 var showSaveConfirmTime = 4000;
 var saveconfirmationTimeout;
 var lastClickedColorPickerPropertyID;
@@ -43,7 +42,7 @@ function refreshScrollbars() {
 }
 
 //Following "plugin" function found here: http://stackoverflow.com/a/10310815/477632
-$.fn.draghover = function (options) {
+$.fn.draghover = function () {
   return this.each(function () {
     var collection = $(),
       self = $(this);
@@ -125,7 +124,7 @@ $(document).ready(function () {
   });
 
   //Fill the form elements with data from local storage:
-  $("input").each(function (index, element) {
+  $("input").each(function () {
     if ($(this).attr("type") != "submit") {
       //Make sure we're not talking about the submit button here
 
@@ -320,10 +319,10 @@ $(document).ready(function () {
     var self = $(this);
 
     $(this).miniColors({
-      change: function (hex, rgb) {
+      change: function (hex) {
         self.siblings(".colorvalue").val(hex);
       },
-      close: function (hex, rgb) {
+      close: function (hex) {
         Rescroller.properties.set(localStorageKey, hex);
         refreshScrollbars();
       },
@@ -637,7 +636,7 @@ $(document).ready(function () {
 
   //Whenever a file is dropped on a dropbox, save the file to local storage with the associated value
   $(".selector-button").bind("drop", function (eventObj) {
-    e = eventObj.originalEvent;
+    const e = eventObj.originalEvent;
     e.stopPropagation();
     e.preventDefault();
 

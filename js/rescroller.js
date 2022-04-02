@@ -7,7 +7,7 @@ if (!String.prototype.fmt) {
     var args = arguments;
     var i = 0;
     return this.replace(/%((%)|s)/g, function (match) {
-      return_val = typeof args[i] != "undefined" ? args[i] : match;
+      const return_val = typeof args[i] != "undefined" ? args[i] : match;
       i++;
       return return_val;
     });
@@ -175,7 +175,9 @@ window.Rescroller = {
       var props = null;
       try {
         props = Rescroller.settings.get("scrollbarStyle", force);
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
 
       if (!props || !props.data) {
         return {};
@@ -215,7 +217,7 @@ window.Rescroller = {
     setMultiple: function (newProps, noSync) {
       var props = this.getAll();
 
-      for (key in newProps) {
+      for (let key in newProps) {
         var newVal = newProps[key];
 
         if (typeof newVal == "string" && newVal.indexOf("data") == 0) {

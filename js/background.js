@@ -47,12 +47,12 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   // Check to make sure this url isn't blacklisted. Exit early if so
   var restrictedSites = Rescroller.getListOfDisabledSites();
   for (var restricted in restrictedSites) {
-    var restricted = restrictedSites[restricted];
+    var thisRestricted = restrictedSites[restricted];
 
-    if (!restricted) {
+    if (!thisRestricted) {
       continue;
     }
-    if (tab.url.indexOf(restricted) >= 0) {
+    if (tab.url.indexOf(thisRestricted) >= 0) {
       return;
     } // @todo this could probably be more accurate
   }
@@ -69,14 +69,14 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 /**
  * Handle action button in Chrome toolbar
  */
-chrome.browserAction.onClicked.addListener(function (tab) {
+chrome.browserAction.onClicked.addListener(function () {
   chrome.tabs.create({ url: "options.html" });
 });
 
 /**
  * Detect changes to Chrome Storage, and import them into Local Storage
  */
-chrome.storage.onChanged.addListener(function (changes, namespace) {
+chrome.storage.onChanged.addListener(function (changes) {
   // Convert these 'changes' into a key-val object, parallel to how localStorage is formatted (no need for change[].oldValue)
   var changesCleaned = {};
   for (var key in changes) {
