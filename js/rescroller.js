@@ -4,10 +4,10 @@
 
 if (!String.prototype.fmt) {
   String.prototype.fmt = function () {
-    var args = arguments;
-    var i = 0;
-    return this.replace(/%((%)|s)/g, function (match) {
-      const return_val = typeof args[i] != "undefined" ? args[i] : match;
+    const args = arguments;
+    let i = 0;
+    return this.replace(/%((%)|s)/g, (match) => {
+      const return_val = typeof args[i] !== "undefined" ? args[i] : match;
       i++;
       return return_val;
     });
@@ -17,10 +17,10 @@ if (!String.prototype.fmt) {
 /**
  * Superficial class creator. It may be better to use something like Backbone in the future.
  */
-var createClass = function (proto) {
+const createClass = function (proto) {
   proto || (proto = {});
   proto.constructor || (proto.constructor = function () {});
-  var obj = function () {
+  const obj = function () {
     proto.constructor.apply(this, arguments);
   };
   obj.prototype = proto;
@@ -38,7 +38,7 @@ window.Rescroller = {
       localStorageKey: null,
     },
 
-    constructor: function (data) {
+    constructor(data) {
       if (!data) {
         return;
       }
@@ -46,19 +46,18 @@ window.Rescroller = {
       this.data = data;
     },
 
-    getDataValue: function () {
-      var dataValue = localStorage[this.data.localStorageKey];
+    getDataValue() {
+      const dataValue = localStorage[this.data.localStorageKey];
       if (!dataValue) {
         return "";
       }
       return dataValue;
     },
 
-    setImageData: function (imageData) {
-      var imageKey =
-        "image-" +
-        new Date().getTime() +
-        Math.random().toString().split(".")[1];
+    setImageData(imageData) {
+      const imageKey = `image-${new Date().getTime()}${
+        Math.random().toString().split(".")[1]
+      }`;
 
       this.data.localStorageKey = imageKey;
       localStorage[imageKey] = imageData;
@@ -66,7 +65,7 @@ window.Rescroller = {
       return this;
     },
 
-    removeImage: function () {
+    removeImage() {
       localStorage.removeItem(this.data.localStorageKey);
     },
 
@@ -74,14 +73,14 @@ window.Rescroller = {
      * When we are converted to string, let's show our value string instead of [object Object]. This way,
      * we don't need to handle this class vs other string values in getCSSString()
      */
-    toString: function () {
+    toString() {
       return this.getDataValue();
     },
 
     /**
      * This is needed for JSON.stringify() and localStorage's stringify
      */
-    toJSON: function () {
+    toJSON() {
       return this.data;
     },
   }),
@@ -92,7 +91,7 @@ window.Rescroller = {
     /**
      * Perform setup of our settins struture for a new installation.
      */
-    _initializeFirstTimeSettings: function () {
+    _initializeFirstTimeSettings() {
       localStorage["rescroller-settings"] = JSON.stringify({
         showSaveConfirmation: true,
         excludedsites: "",
@@ -109,7 +108,7 @@ window.Rescroller = {
      * Sometimes after localStorage has changed, we need to wipe our JS cache
      * so the next time get()/getAll() is called, we return accurate results.
      */
-    resetJSCache: function () {
+    resetJSCache() {
       this._settings = null;
     },
 
@@ -117,8 +116,8 @@ window.Rescroller = {
      * Get our settings object.
      * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
      */
-    getAll: function (force) {
-      var that = this;
+    getAll(force) {
+      const that = this;
 
       if (!localStorage["rescroller-settings"]) {
         // no matter what, we need a default for this
@@ -131,8 +130,8 @@ window.Rescroller = {
         );
 
         // Convert all image {}'s into proper Image classes
-        Object.keys(this._settings.scrollbarStyle.data).forEach(function (key) {
-          var val = that._settings.scrollbarStyle.data[key];
+        Object.keys(this._settings.scrollbarStyle.data).forEach((key) => {
+          const val = that._settings.scrollbarStyle.data[key];
           if (!(val instanceof Object) && !val.localStorageKey) {
             return true;
           }
@@ -148,7 +147,7 @@ window.Rescroller = {
      * @param  {string}     key     The setting to get
      * @param  {boolean}    force   If true, will get the setting from localStorage instead of our in-memory object
      */
-    get: function (key, force) {
+    get(key, force) {
       try {
         return this.getAll(force)[key];
       } catch (e) {
@@ -156,8 +155,8 @@ window.Rescroller = {
       }
     },
 
-    set: function (key, value, noSync) {
-      var settings = this.getAll();
+    set(key, value, noSync) {
+      const settings = this.getAll();
       settings[key] = value;
       localStorage["rescroller-settings"] = JSON.stringify(settings);
       localStorage["date-settings-last-updated"] = new Date().getTime();
@@ -171,8 +170,8 @@ window.Rescroller = {
   },
 
   properties: {
-    getAll: function (force) {
-      var props = null;
+    getAll(force) {
+      let props = null;
       try {
         props = Rescroller.settings.get("scrollbarStyle", force);
       } catch (e) {
@@ -186,24 +185,24 @@ window.Rescroller = {
       return props.data;
     },
 
-    get: function (key, force) {
+    get(key, force) {
       try {
-        var val = this.getAll(force)[key];
-        return val ? val : ""; // return empty string so we don't have 'null's in our CSS
+        const val = this.getAll(force)[key];
+        return val || ""; // return empty string so we don't have 'null's in our CSS
       } catch (e) {
         return "";
       }
     },
 
-    set: function (key, value, noSync) {
-      var props = this.getAll();
+    set(key, value, noSync) {
+      const props = this.getAll();
 
       // if previous value was image, we need to remove the old image before overwriting it
       if (this.get(key) instanceof Rescroller.Image) {
         this.get(key).removeImage();
       }
 
-      if (typeof value == "string" && value.indexOf("data") == 0) {
+      if (typeof value === "string" && value.indexOf("data") == 0) {
         // save images in separate localStorage key to avoid chrome.sync item size limits
         props[key] = new Rescroller.Image().setImageData(value);
       } else {
@@ -214,13 +213,13 @@ window.Rescroller = {
       Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
     },
 
-    setMultiple: function (newProps, noSync) {
-      var props = this.getAll();
+    setMultiple(newProps, noSync) {
+      const props = this.getAll();
 
-      for (let key in newProps) {
-        var newVal = newProps[key];
+      for (const key in newProps) {
+        let newVal = newProps[key];
 
-        if (typeof newVal == "string" && newVal.indexOf("data") == 0) {
+        if (typeof newVal === "string" && newVal.indexOf("data") == 0) {
           newVal = new Rescroller.Image().setImageData(newVal);
         }
 
@@ -239,7 +238,7 @@ window.Rescroller = {
       Rescroller.generateScrollbarCSS(); // update our generated CSS for browser tabs
     },
 
-    remove: function (key) {
+    remove(key) {
       if (this.get(key) instanceof Rescroller.Image) {
         this.get(key).removeImage();
       }
@@ -251,15 +250,15 @@ window.Rescroller = {
   /**
    * Simple callback method that callers can set to act when the settings have been updated.
    */
-  onSettingsUpdated: function () {},
+  onSettingsUpdated() {},
 
-  getListOfDisabledSites: function () {
-    var rawString = this.settings.get("excludedsites");
+  getListOfDisabledSites() {
+    let rawString = this.settings.get("excludedsites");
     if (!rawString) {
       return [];
     }
 
-    //Remove all spaces from the string, etc.
+    // Remove all spaces from the string, etc.
     rawString = this._replaceAll(rawString, " ", "");
     rawString = this._replaceAll(rawString, "https://", "");
     rawString = this._replaceAll(rawString, "http://", "");
@@ -274,7 +273,7 @@ window.Rescroller = {
     return rawString.split(",");
   },
 
-  _replaceAll: function (theString, toReplace, replaceWith) {
+  _replaceAll(theString, toReplace, replaceWith) {
     while (theString.indexOf(toReplace) >= 0) {
       theString = theString.replace(toReplace, replaceWith);
     }
@@ -284,7 +283,7 @@ window.Rescroller = {
   /**
    * Get number of pixels from percentage
    */
-  _precentageToPixels: function (percentage, doNotReduceByHalf) {
+  _precentageToPixels(percentage, doNotReduceByHalf) {
     if (!doNotReduceByHalf) {
       return ((percentage / 100) * this.properties.get("size")) / 2;
     }
@@ -295,11 +294,11 @@ window.Rescroller = {
   /**
    * Used for first-time install refresh from Chrome Storage -> Local Storage (or old localStorage -> Chrome Storage)
    */
-  syncDown: function (callback, force) {
+  syncDown(callback, force) {
     callback || (callback = function () {});
-    var that = this;
+    const that = this;
 
-    chrome.storage.sync.get(function (items) {
+    chrome.storage.sync.get((items) => {
       that.mergeSyncWithLocalStorage(items, force);
       callback();
     });
@@ -314,9 +313,9 @@ window.Rescroller = {
    * @param {boolean} force If true, we will force the merge - otherwise we will only sync if 'date-settings-last-updated' comparisons match
    * @return {[type]}       [description]
    */
-  mergeSyncWithLocalStorage: function (items, force) {
-    var lastUpdatedRemote = items["date-settings-last-updated"];
-    var lastUpdatedLocal = localStorage["date-settings-last-updated"];
+  mergeSyncWithLocalStorage(items, force) {
+    const lastUpdatedRemote = items["date-settings-last-updated"];
+    const lastUpdatedLocal = localStorage["date-settings-last-updated"];
 
     // Do not proceed if remote data is older than local data
     if (
@@ -331,8 +330,8 @@ window.Rescroller = {
       return;
     }
 
-    for (var key in items) {
-      var val = items[key];
+    for (const key in items) {
+      const val = items[key];
       if (!val) {
         continue;
       }
@@ -351,9 +350,9 @@ window.Rescroller = {
    * @note we used to throttle this ourselves with a queueSyncUp() method, but it seemed like overkill since the limit was upped from 10/min to 120/min:
    * https://bugs.chromium.org/p/chromium/issues/detail?id=270665#c19 (@see MAX_WRITE_OPERATIONS_PER_MINUTE)
    */
-  syncUp: function () {
-    var ls = {};
-    for (var key in localStorage) {
+  syncUp() {
+    const ls = {};
+    for (const key in localStorage) {
       if (key == "generated-css") {
         continue;
       } // waste of time to sync this
@@ -382,7 +381,7 @@ window.Rescroller = {
    * Slider/background theme are shades of Material's Blue Grey colors:
    * https://material.google.com/style/color.html#color-color-palette
    */
-  restoreDefaults: function (noSync) {
+  restoreDefaults(noSync) {
     this.properties.setMultiple(
       {
         // General
@@ -528,21 +527,21 @@ window.Rescroller = {
   /**
    * Gnerate a CSS string from our scrollbar settings and save it to local storage for browser tabs to use.
    */
-  generateScrollbarCSS: function () {
+  generateScrollbarCSS() {
     localStorage["generated-css"] = this.getCSSString();
   },
 
   /**
    * Grab data from local storage and convert it into a CSS string
    */
-  getCSSString: function () {
+  getCSSString() {
     // If user has chosen to specify his own CSS, just return that
     if (this.properties.get("usecustomcss") == "checked") {
       return this.properties.get("customcss");
     }
 
     // Build our CSS structure as JSON for readability and maintainability. Then, we'll convert it to CSS!
-    var json = {
+    const json = {
       children: {
         // Base
         "::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical":
@@ -940,9 +939,9 @@ window.Rescroller = {
     }
 
     // Some cleanup before we send it off!
-    $.each(json.children, function (selector, children) {
-      var attrs = children.attributes;
-      $.each(attrs, function (attr_name, attr_val) {
+    $.each(json.children, (selector, children) => {
+      const attrs = children.attributes;
+      $.each(attrs, (attr_name, attr_val) => {
         // assume we never go deeper than one level
 
         if (!attr_val) {
@@ -956,7 +955,7 @@ window.Rescroller = {
         }
 
         // Make sure every attribute is marked '!important'
-        attrs[attr_name] = attr_val + " !important";
+        attrs[attr_name] = `${attr_val} !important`;
       });
     });
 

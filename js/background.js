@@ -13,7 +13,7 @@
  * hasn't been precomputed or needs to be regenerated.
  */
 
-chrome.runtime.onInstalled.addListener(function (details) {
+chrome.runtime.onInstalled.addListener((details) => {
   // when extension installed/updated and chrome updated
 
   /**
@@ -26,12 +26,12 @@ chrome.runtime.onInstalled.addListener(function (details) {
     return;
   }
 
-  Rescroller.syncDown(function () {
-    if (localStorage["install_time"]) {
+  Rescroller.syncDown(() => {
+    if (localStorage.install_time) {
       return;
     } // only open options.html if this is the first install on any of the users' Chromes
 
-    localStorage["install_time"] = new Date().getTime();
+    localStorage.install_time = new Date().getTime();
     chrome.tabs.create({ url: "options.html" });
   });
 });
@@ -39,15 +39,15 @@ chrome.runtime.onInstalled.addListener(function (details) {
 /**
  * Listen for page states to change and set our custom CSS when tabs are loading
  */
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status != "loading") {
     return;
   }
 
   // Check to make sure this url isn't blacklisted. Exit early if so
-  var restrictedSites = Rescroller.getListOfDisabledSites();
-  for (var restricted in restrictedSites) {
-    var thisRestricted = restrictedSites[restricted];
+  const restrictedSites = Rescroller.getListOfDisabledSites();
+  for (const restricted in restrictedSites) {
+    const thisRestricted = restrictedSites[restricted];
 
     if (!thisRestricted) {
       continue;
@@ -69,17 +69,17 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 /**
  * Handle action button in Chrome toolbar
  */
-chrome.browserAction.onClicked.addListener(function () {
+chrome.browserAction.onClicked.addListener(() => {
   chrome.tabs.create({ url: "options.html" });
 });
 
 /**
  * Detect changes to Chrome Storage, and import them into Local Storage
  */
-chrome.storage.onChanged.addListener(function (changes) {
+chrome.storage.onChanged.addListener((changes) => {
   // Convert these 'changes' into a key-val object, parallel to how localStorage is formatted (no need for change[].oldValue)
-  var changesCleaned = {};
-  for (var key in changes) {
+  const changesCleaned = {};
+  for (const key in changes) {
     changesCleaned[key] = changes[key].newValue;
   }
 
