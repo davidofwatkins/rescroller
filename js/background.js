@@ -45,16 +45,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 
   // Check to make sure this url isn't blacklisted. Exit early if so
-  const restrictedSites = Rescroller.getListOfDisabledSites();
-  for (const restricted in restrictedSites) {
-    const thisRestricted = restrictedSites[restricted];
+  const disabledSites = Rescroller.getListOfDisabledSites();
 
-    if (!thisRestricted) {
-      continue;
-    }
-    if (tab.url.indexOf(thisRestricted) >= 0) {
-      return;
-    } // @todo this could probably be more accurate
+  // @todo this could probably be more accurate
+  const isDisabledSite = disabledSites.some((site) => tab.url.includes(site));
+
+  if (isDisabledSite) {
+    return;
   }
 
   // Aaaand, inject our customized CSS into the webpage!
@@ -78,10 +75,13 @@ chrome.browserAction.onClicked.addListener(() => {
  */
 chrome.storage.onChanged.addListener((changes) => {
   // Convert these 'changes' into a key-val object, parallel to how localStorage is formatted (no need for change[].oldValue)
-  const changesCleaned = {};
-  for (const key in changes) {
-    changesCleaned[key] = changes[key].newValue;
-  }
+  const changesCleaned = Object.keys(changes).reduce(
+    (accumulator, key) => ({
+      ...accumulator,
+      [key]: changes[key].newValue,
+    }),
+    {}
+  );
 
   Rescroller.mergeSyncWithLocalStorage(changesCleaned);
 });

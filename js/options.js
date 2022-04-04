@@ -32,14 +32,14 @@ $(document).ready(() => {
   });
 });
 
-function refreshScrollbars() {
+const refreshScrollbars = () => {
   $("#rescroller").html(Rescroller.getCSSString());
   const originalOverflow = $("body").css("overflow");
   $("body").css("overflow", "hidden");
   setTimeout(() => {
     $("body").css("overflow", originalOverflow);
   }, 0);
-}
+};
 
 // Following "plugin" function found here: http://stackoverflow.com/a/10310815/477632
 $.fn.draghover = function () {
@@ -74,15 +74,19 @@ $.fn.draghover = function () {
         }
       }, 1);
 
-      self.on("dragover", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+      self.on("dragover", (err) => {
+        err.stopPropagation();
+        err.preventDefault();
       });
     });
   });
 };
 
-function showErrorMessage(msg) {
+const hideErrorMessage = () => {
+  $("#errorbox").slideUp("fast");
+};
+
+const showErrorMessage = (msg) => {
   const errorBox = $("#errorbox");
   errorBox.html(msg);
   errorBox.slideDown("fast", () => {
@@ -91,11 +95,7 @@ function showErrorMessage(msg) {
       hideErrorMessage();
     }, 5000);
   });
-}
-
-function hideErrorMessage() {
-  $("#errorbox").slideUp("fast");
-}
+};
 
 // Convert the styling stored in local storage into CSS:
 const newCSS = Rescroller.getCSSString();
@@ -147,7 +147,7 @@ $(document).ready(() => {
   });
 });
 
-function resetDragHoveringEventTriggering() {
+const resetDragHoveringEventTriggering = () => {
   let originalBackground;
   let originalText;
 
@@ -173,7 +173,7 @@ function resetDragHoveringEventTriggering() {
         return false;
       },
     });
-}
+};
 
 $(document).ready(() => {
   $("#expandcss").click(() => {
@@ -184,7 +184,7 @@ $(document).ready(() => {
   // Reset formatting button
   $("#resetformatting").click(() => {
     if (
-      !confirm(
+      !window.confirm(
         "Are you sure you would like to reset your scrollbars to default? This cannot be undone."
       )
     ) {
@@ -194,7 +194,8 @@ $(document).ready(() => {
 
     // full refresh instead of refreshScrollbars() so all our settings bars are reset as well.
     // An actual JS view framework will fix this later on.
-    location.reload(true);
+    window.location.reload(true);
+    return true;
   });
 
   // Expand/collapse all non-custom css areas when that checkbox is checked
@@ -380,20 +381,21 @@ $(document).ready(() => {
     "buttons-background-image-right-active",
   ];
 
-  for (let i = 0; i < keys.length; i++) {
+  // for (let i = 0; i < keys.length; i++) {
+  keys.forEach((key) => {
     if (
-      Rescroller.properties.get(keys[i]) &&
-      Rescroller.properties.get(keys[i]) !== 0
+      Rescroller.properties.get(key) &&
+      Rescroller.properties.get(key) !== 0
     ) {
-      $(`#${keys[i]} .thumbframe div.thumbcontainer`).html(
-        `<img src="${Rescroller.properties.get(keys[i])}" />`
+      $(`#${key} .thumbframe div.thumbcontainer`).html(
+        `<img src="${Rescroller.properties.get(key)}" />`
       );
-      $(`#${keys[i]} .thumbframe`).css("display", "inline-block"); // show the image frame for this image
+      $(`#${key} .thumbframe`).css("display", "inline-block"); // show the image frame for this image
     } else {
       // otherwise, show the "upload image" button (instead of the thumbframe)
-      $(`#${keys[i]} .selector-button`).css("display", "inline-block");
+      $(`#${key} .selector-button`).css("display", "inline-block");
     }
-  }
+  });
 
   // draghover() "plugin" stops working after being utilized once, so needed to be in function that can be recalled
   resetDragHoveringEventTriggering();
@@ -495,28 +497,11 @@ $(document).ready(() => {
     refreshScrollbars();
   });
 
-  /** Set functionality of "restore default buttons" link (for scrollbar buttons) * */
-  setRestoreArrowsDefaultImages(
-    "restore-arrow-defaults",
-    "buttons-background-image-",
-    ""
-  );
-  setRestoreArrowsDefaultImages(
-    "restore-arrow-defaults-hover",
-    "buttons-background-image-",
-    "-hover"
-  );
-  setRestoreArrowsDefaultImages(
-    "restore-arrow-defaults-active",
-    "buttons-background-image-",
-    "-active"
-  );
-
-  function setRestoreArrowsDefaultImages(
+  const setRestoreArrowsDefaultImages = (
     triggerID,
     propertyPrefix,
     propertySuffix
-  ) {
+  ) => {
     $(`#${triggerID}`).click(() => {
       const up = `${propertyPrefix}up${propertySuffix}`;
       const down = `${propertyPrefix}down${propertySuffix}`;
@@ -554,12 +539,29 @@ $(document).ready(() => {
       refreshScrollbars();
       return false;
     });
-  }
+  };
+
+  /** Set functionality of "restore default buttons" link (for scrollbar buttons) * */
+  setRestoreArrowsDefaultImages(
+    "restore-arrow-defaults",
+    "buttons-background-image-",
+    ""
+  );
+  setRestoreArrowsDefaultImages(
+    "restore-arrow-defaults-hover",
+    "buttons-background-image-",
+    "-hover"
+  );
+  setRestoreArrowsDefaultImages(
+    "restore-arrow-defaults-active",
+    "buttons-background-image-",
+    "-active"
+  );
 });
 
 /** *********Image selector functionality**************** */
 
-function handleFiles(files, frame, key) {
+const handleFiles = (files, frame, key) => {
   const file = files[0];
   const imageType = /image.*/;
 
@@ -585,12 +587,14 @@ function handleFiles(files, frame, key) {
   img.classList.add("obj");
   img.file = file;
 
+  // eslint-disable-next-line no-param-reassign
   frame.innerHTML = ""; // clear frame before putting new image in
   frame.appendChild(img);
 
   const reader = new FileReader();
   reader.onload = (function (aImg) {
     return function (e) {
+      // eslint-disable-next-line no-param-reassign
       aImg.src = e.target.result;
 
       // Save to local storage
@@ -606,7 +610,7 @@ function handleFiles(files, frame, key) {
     };
   })(img);
   reader.readAsDataURL(file);
-}
+};
 
 $(document).ready(() => {
   // Whenever selectors (hidden <input type="file">s) are changed, save their valuese to local storage
