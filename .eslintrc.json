@@ -1,6 +1,5 @@
 {
   "extends": ["airbnb-base", "prettier"],
-  "rules": {},
   "env": {
     "browser": true,
     "es6": true,
@@ -14,5 +13,10 @@
   "globals": {
     "Rescroller": "writable",
     "CSSJSON": "readonly"
+  },
+  "rules": {
+    "func-names": "off",
+    "no-alert": "off",
+    "no-underscore-dangle": "off"
   }
 }
