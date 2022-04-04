@@ -3,13 +3,17 @@
  */
 
 if (!String.prototype.fmt) {
+  // @todo replace with codemod to use `${template literals}`
+  // eslint-disable-next-line no-extend-native
   String.prototype.fmt = function () {
+    // eslint-disable-next-line prefer-rest-params
     const args = arguments;
     let i = 0;
     return this.replace(/%((%)|s)/g, (match) => {
-      const return_val = typeof args[i] !== "undefined" ? args[i] : match;
+      const ret = typeof args[i] !== "undefined" ? args[i] : match;
+      // eslint-disable-next-line no-plusplus
       i++;
-      return return_val;
+      return ret;
     });
   };
 }
@@ -17,11 +21,10 @@ if (!String.prototype.fmt) {
 /**
  * Superficial class creator. It may be better to use something like Backbone in the future.
  */
-const createClass = function (proto) {
-  proto || (proto = {});
-  proto.constructor || (proto.constructor = function () {});
+const createClass = function (proto = {}) {
   const obj = function () {
-    proto.constructor.apply(this, arguments);
+    // eslint-disable-next-line prefer-rest-params
+    proto?.constructor?.apply(this, arguments);
   };
   obj.prototype = proto;
   return obj;
@@ -133,7 +136,7 @@ window.Rescroller = {
         Object.keys(this._settings.scrollbarStyle.data).forEach((key) => {
           const val = that._settings.scrollbarStyle.data[key];
           if (!(val instanceof Object) && !val.localStorageKey) {
-            return true;
+            return;
           }
           that._settings.scrollbarStyle.data[key] = new Rescroller.Image(val);
         });
@@ -214,17 +217,18 @@ window.Rescroller = {
     },
 
     setMultiple(newProps, noSync) {
-      const props = this.getAll();
+      const props = Object.keys(newProps).reduce((build, key) => {
+        const val = newProps[key];
+        const newVal =
+          typeof val === "string" && val.indexOf("data") === 0
+            ? new Rescroller.Image().setImageData(val)
+            : val;
 
-      for (const key in newProps) {
-        let newVal = newProps[key];
-
-        if (typeof newVal === "string" && newVal.indexOf("data") === 0) {
-          newVal = new Rescroller.Image().setImageData(newVal);
-        }
-
-        props[key] = newVal;
-      }
+        return {
+          ...build,
+          [key]: newVal,
+        };
+      }, this.getAll());
 
       Rescroller.settings.set(
         "scrollbarStyle",
@@ -253,31 +257,27 @@ window.Rescroller = {
   onSettingsUpdated() {},
 
   getListOfDisabledSites() {
-    let rawString = this.settings.get("excludedsites");
+    const rawString = this.settings.get("excludedsites");
     if (!rawString) {
       return [];
     }
 
     // Remove all spaces from the string, etc.
-    rawString = this._replaceAll(rawString, " ", "");
-    rawString = this._replaceAll(rawString, "https://", "");
-    rawString = this._replaceAll(rawString, "http://", "");
-    rawString = this._replaceAll(rawString, "www.", "");
-    rawString = this._replaceAll(rawString, "*/", "");
-    rawString = this._replaceAll(rawString, "*.", "");
-    rawString = this._replaceAll(rawString, "*", "");
+    const cleanedString = rawString
+      .replaceAll(" ", "")
+      .replaceAll()
+      .replaceAll("https://", "")
+      .replaceAll("http://", "")
+      .replaceAll("www.", "")
+      .replaceAll("*/", "")
+      .replaceAll("*.", "")
+      .replaceAll("*", "");
 
-    if (!rawString) {
+    if (!cleanedString) {
       return [];
     }
-    return rawString.split(",");
-  },
 
-  _replaceAll(theString, toReplace, replaceWith) {
-    while (theString.indexOf(toReplace) >= 0) {
-      theString = theString.replace(toReplace, replaceWith);
-    }
-    return theString;
+    return cleanedString.split(",");
   },
 
   /**
@@ -294,12 +294,9 @@ window.Rescroller = {
   /**
    * Used for first-time install refresh from Chrome Storage -> Local Storage (or old localStorage -> Chrome Storage)
    */
-  syncDown(callback, force) {
-    callback || (callback = function () {});
-    const that = this;
-
+  syncDown(callback = () => {}, force = false) {
     chrome.storage.sync.get((items) => {
-      that.mergeSyncWithLocalStorage(items, force);
+      this.mergeSyncWithLocalStorage(items, force);
       callback();
     });
   },
@@ -322,7 +319,7 @@ window.Rescroller = {
       !force &&
       lastUpdatedRemote &&
       lastUpdatedLocal &&
-      parseInt(lastUpdatedLocal) >= parseInt(lastUpdatedRemote)
+      parseInt(lastUpdatedLocal, 10) >= parseInt(lastUpdatedRemote, 10)
     ) {
       console.warn(
         "[Rescroller] Warning: ignoring sync down; remote data is out of date."
@@ -330,9 +327,11 @@ window.Rescroller = {
       return;
     }
 
+    // eslint-disable-next-line
     for (const key in items) {
       const val = items[key];
       if (!val) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -352,11 +351,14 @@ window.Rescroller = {
    */
   syncUp() {
     const ls = {};
+    // eslint-disable-next-line no-restricted-syntax
     for (const key in localStorage) {
       if (key === "generated-css") {
+        // eslint-disable-next-line no-continue
         continue;
       } // waste of time to sync this
       if (!localStorage[key]) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -366,6 +368,7 @@ window.Rescroller = {
         chrome.storage.sync.QUOTA_BYTES_PER_ITEM
       ) {
         console.warn("[Rescroller] Ignoring sync up of image > 8 KB.");
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -497,28 +500,27 @@ window.Rescroller = {
         // Custom CSS
         // @note potential improvement: maybe, if the the user enters this, it should be used in addition to the generated CSS?
         // This way people can override just some parts of the styling, or everything.
-        customcss:
-          "::-webkit-scrollbar {\
-    \n\n\
-    }\n\
-    ::-webkit-scrollbar-button {\
-    \n\n\
-    }\n\
-    ::-webkit-scrollbar-track {\
-    \n\n\
-    }\n\
-    ::-webkit-scrollbar-track-piece {\
-    \n\n\
-    }\n\
-    ::-webkit-scrollbar-thumb {\
-    \n\n\
-    }\n\
-    ::-webkit-scrollbar-corner {\
-    \n\n\
-    }\n\
-    ::-webkit-resizer {\
-    \n\n\
-    }",
+        customcss: `::-webkit-scrollbar {\
+
+}
+::-webkit-scrollbar-button {\
+
+}
+::-webkit-scrollbar-track {\
+
+}
+::-webkit-scrollbar-track-piece {\
+
+}
+::-webkit-scrollbar-thumb {\
+
+}
+::-webkit-scrollbar-corner {\
+
+}
+::-webkit-resizer {\
+
+}`,
       },
       noSync
     );
@@ -939,23 +941,26 @@ window.Rescroller = {
     }
 
     // Some cleanup before we send it off!
-    $.each(json.children, (selector, children) => {
+    Object.keys(json.children).forEach((selector) => {
+      const children = json.children[selector];
       const attrs = children.attributes;
-      $.each(attrs, (attr_name, attr_val) => {
+
+      Object.keys(attrs).forEach((attrName) => {
+        const attrVal = attrs[attrName];
         // assume we never go deeper than one level
 
-        if (!attr_val) {
-          return true;
-        } // continue
+        if (!attrVal) {
+          return;
+        }
 
         // Clear out any empty image values to avoid erronius server calls
-        if (attr_val === "url('')") {
-          attrs[attr_name] = '""';
-          return true; // continue
+        if (attrVal === "url('')") {
+          attrs[attrName] = '""';
+          return;
         }
 
         // Make sure every attribute is marked '!important'
-        attrs[attr_name] = `${attr_val} !important`;
+        attrs[attrName] = `${attrVal} !important`;
       });
     });
 
