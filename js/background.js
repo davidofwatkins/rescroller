@@ -21,7 +21,7 @@ chrome.runtime.onInstalled.addListener((details) => {
    * and Download latest Chrome Storage to Local Storage.
    */
 
-  if (details.reason != "install") {
+  if (details.reason !== "install") {
     // no need to sync down if updating.
     return;
   }
@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener((details) => {
  * Listen for page states to change and set our custom CSS when tabs are loading
  */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status != "loading") {
+  if (changeInfo.status !== "loading") {
     return;
   }
 

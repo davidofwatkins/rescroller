@@ -125,14 +125,14 @@ $(document).ready(() => {
 
   // Fill the form elements with data from local storage:
   $("input").each(function () {
-    if ($(this).attr("type") != "submit") {
+    if ($(this).attr("type") !== "submit") {
       // Make sure we're not talking about the submit button here
 
-      if ($(this).attr("type") == "checkbox") {
+      if ($(this).attr("type") === "checkbox") {
         // If it's a check box...
 
         // If local storage says this option should be checked, check it
-        if (Rescroller.properties.get($(this).attr("id")) == "checked") {
+        if (Rescroller.properties.get($(this).attr("id")) === "checked") {
           $(this).attr(
             "checked",
             Rescroller.properties.get($(this).attr("id"))
@@ -198,7 +198,7 @@ $(document).ready(() => {
   });
 
   // Expand/collapse all non-custom css areas when that checkbox is checked
-  if (Rescroller.properties.get("usecustomcss") == "checked") {
+  if (Rescroller.properties.get("usecustomcss") === "checked") {
     $(".section").not("#misc").not($("#general")).hide();
     $(".customcss-collapsible").hide();
   }
@@ -238,7 +238,7 @@ $(document).ready(() => {
     $(this)
       .children()
       .each(function () {
-        if ($(this).val() == thisPropertyValue) {
+        if ($(this).val() === thisPropertyValue) {
           $(this).attr("selected", "selected");
         }
       });
@@ -280,7 +280,7 @@ $(document).ready(() => {
 
     // If this is one of the few scrollbars that uses px instead of %, set the "units" to px
     let units;
-    if (propertyName == "size" || propertyName == "buttons-size") {
+    if (propertyName === "size" || propertyName === "buttons-size") {
       units = "px";
     } else {
       units = "%";
@@ -383,7 +383,7 @@ $(document).ready(() => {
   for (let i = 0; i < keys.length; i++) {
     if (
       Rescroller.properties.get(keys[i]) &&
-      Rescroller.properties.get(keys[i]) != 0
+      Rescroller.properties.get(keys[i]) !== 0
     ) {
       $(`#${keys[i]} .thumbframe div.thumbcontainer`).html(
         `<img src="${Rescroller.properties.get(keys[i])}" />`
@@ -417,13 +417,13 @@ $(document).ready(() => {
   $(".colorvalue").change(function () {
     const val = $(this).val();
     // If the value is a hex value, save it
-    if (val.indexOf("#") == 0 && (val.length == 4 || val.length == 7)) {
+    if (val.indexOf("#") === 0 && (val.length === 4 || val.length === 7)) {
       $(this).siblings(".colorselection").miniColors("value", val);
       Rescroller.properties.set($(this).parent().attr("id"), val);
       refreshScrollbars();
     }
     // If the user just forgot the #, add it automatically and save
-    else if (val.indexOf("#") != 0 && (val.length == 3 || val.length == 6)) {
+    else if (val.indexOf("#") !== 0 && (val.length === 3 || val.length === 6)) {
       $(this).siblings(".colorselection").miniColors("value", `#${val}`);
       $(this).val(`#${val}`);
       Rescroller.properties.set($(this).parent().attr("id"), val);

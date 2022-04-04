@@ -202,7 +202,7 @@ window.Rescroller = {
         this.get(key).removeImage();
       }
 
-      if (typeof value === "string" && value.indexOf("data") == 0) {
+      if (typeof value === "string" && value.indexOf("data") === 0) {
         // save images in separate localStorage key to avoid chrome.sync item size limits
         props[key] = new Rescroller.Image().setImageData(value);
       } else {
@@ -219,7 +219,7 @@ window.Rescroller = {
       for (const key in newProps) {
         let newVal = newProps[key];
 
-        if (typeof newVal === "string" && newVal.indexOf("data") == 0) {
+        if (typeof newVal === "string" && newVal.indexOf("data") === 0) {
           newVal = new Rescroller.Image().setImageData(newVal);
         }
 
@@ -353,7 +353,7 @@ window.Rescroller = {
   syncUp() {
     const ls = {};
     for (const key in localStorage) {
-      if (key == "generated-css") {
+      if (key === "generated-css") {
         continue;
       } // waste of time to sync this
       if (!localStorage[key]) {
@@ -536,7 +536,7 @@ window.Rescroller = {
    */
   getCSSString() {
     // If user has chosen to specify his own CSS, just return that
-    if (this.properties.get("usecustomcss") == "checked") {
+    if (this.properties.get("usecustomcss") === "checked") {
       return this.properties.get("customcss");
     }
 
@@ -644,7 +644,7 @@ window.Rescroller = {
 
     // Conditionals:
 
-    if (this.properties.get("showbuttons") == "checked") {
+    if (this.properties.get("showbuttons") === "checked") {
       $.extend(json.children, {
         "::-webkit-scrollbar-button": {
           attributes: {
@@ -709,7 +709,7 @@ window.Rescroller = {
         },
       });
 
-      if (this.properties.get("buttons-use-hover") == "checked") {
+      if (this.properties.get("buttons-use-hover") === "checked") {
         $.extend(json.children, {
           "::-webkit-scrollbar-button:vertical:decrement:hover": {
             attributes: {
@@ -754,7 +754,7 @@ window.Rescroller = {
         });
       }
 
-      if (this.properties.get("buttons-use-active") == "checked") {
+      if (this.properties.get("buttons-use-active") === "checked") {
         $.extend(json.children, {
           "::-webkit-scrollbar-button:vertical:decrement:active": {
             attributes: {
@@ -810,7 +810,7 @@ window.Rescroller = {
       });
     }
 
-    if (this.properties.get("background-use-hover") == "checked") {
+    if (this.properties.get("background-use-hover") === "checked") {
       $.extend(json.children, {
         "::-webkit-scrollbar-track-piece:vertical:hover": {
           attributes: {
@@ -843,7 +843,7 @@ window.Rescroller = {
       });
     }
 
-    if (this.properties.get("background-use-active") == "checked") {
+    if (this.properties.get("background-use-active") === "checked") {
       $.extend(json.children, {
         "::-webkit-scrollbar-track-piece:vertical:active": {
           attributes: {
@@ -876,7 +876,7 @@ window.Rescroller = {
       });
     }
 
-    if (this.properties.get("slider-use-hover") == "checked") {
+    if (this.properties.get("slider-use-hover") === "checked") {
       $.extend(json.children, {
         "::-webkit-scrollbar-thumb:hover": {
           attributes: {
@@ -907,7 +907,7 @@ window.Rescroller = {
       });
     }
 
-    if (this.properties.get("slider-use-active") == "checked") {
+    if (this.properties.get("slider-use-active") === "checked") {
       $.extend(json.children, {
         "::-webkit-scrollbar-thumb:active": {
           attributes: {
@@ -949,7 +949,7 @@ window.Rescroller = {
         } // continue
 
         // Clear out any empty image values to avoid erronius server calls
-        if (attr_val == "url('')") {
+        if (attr_val === "url('')") {
           attrs[attr_name] = '""';
           return true; // continue
         }
