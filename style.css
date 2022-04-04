@@ -2,7 +2,7 @@ body {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
-  background: url("images/bg.png"); /* http://subtlepatterns.com/patterns/dark_wall.png */
+  background: url('images/bg.png'); /* http://subtlepatterns.com/patterns/dark_wall.png */
   color: white;
   overflow: scroll;
 }
@@ -45,7 +45,7 @@ a:hover {
 #welcomemsg {
   width: 515px;
   margin: 0 auto 20px auto;
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
   font-size: 15px;
   text-align: justify;
 }
@@ -74,13 +74,13 @@ img#logo:hover {
 }
 
 @font-face {
-  font-family: "Righteous-Regular";
-  src: url("Righteous-Regular.ttf");
+  font-family: 'Righteous-Regular';
+  src: url('Righteous-Regular.ttf');
 }
 
 .section h1 {
   font-size: 25px;
-  font-family: "Righteous-Regular";
+  font-family: 'Righteous-Regular';
 }
 
 div#errorbox {
@@ -118,7 +118,7 @@ textarea {
 }
 
 textarea#customcss {
-  font-family: "Consolas", "Courier New", Courier, monospacel;
+  font-family: 'Consolas', 'Courier New', Courier, monospacel;
   height: 400px;
 }
 
@@ -202,7 +202,7 @@ div.section table td {
 div#generatedcss {
   width: 500px;
   background: lightgray;
-  font-family: consolas, "Courier New", Courier, monospace;
+  font-family: consolas, 'Courier New', Courier, monospace;
   margin: 20px auto;
   padding: 20px;
   text-align: left;
@@ -213,7 +213,7 @@ div#generatedcss {
 }
 
 /* Checkboxes */
-input[type="checkbox"] {
+input[type='checkbox'] {
   vertical-align: top;
 }
 
@@ -343,7 +343,7 @@ input[type="checkbox"] {
 }
 
 .miniColors-selector:before {
-  content: "";
+  content: '';
   position: absolute;
   width: 0;
   height: 0;
@@ -384,7 +384,7 @@ input[type="checkbox"] {
 }
 
 #save-confirm:after {
-  content: "";
+  content: '';
   position: absolute;
   width: 0;
   height: 0;

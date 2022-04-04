@@ -21,7 +21,7 @@ chrome.runtime.onInstalled.addListener((details) => {
    * and Download latest Chrome Storage to Local Storage.
    */
 
-  if (details.reason !== "install") {
+  if (details.reason !== 'install') {
     // no need to sync down if updating.
     return;
   }
@@ -32,7 +32,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     } // only open options.html if this is the first install on any of the users' Chromes
 
     localStorage.install_time = new Date().getTime();
-    chrome.tabs.create({ url: "options.html" });
+    chrome.tabs.create({ url: 'options.html' });
   });
 });
 
@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener((details) => {
  * Listen for page states to change and set our custom CSS when tabs are loading
  */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "loading") {
+  if (changeInfo.status !== 'loading') {
     return;
   }
 
@@ -57,9 +57,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // Aaaand, inject our customized CSS into the webpage!
   chrome.tabs.insertCSS(tabId, {
     // unfortunately, this requires the <all_urls> permission :/
-    code: localStorage["generated-css"],
+    code: localStorage['generated-css'],
     allFrames: true,
-    runAt: "document_start",
+    runAt: 'document_start',
   });
 });
 
@@ -67,7 +67,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
  * Handle action button in Chrome toolbar
  */
 chrome.browserAction.onClicked.addListener(() => {
-  chrome.tabs.create({ url: "options.html" });
+  chrome.tabs.create({ url: 'options.html' });
 });
 
 /**
