@@ -17,6 +17,7 @@
   "rules": {
     "func-names": "off",
     "no-alert": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
   }
 }
