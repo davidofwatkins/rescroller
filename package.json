@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --list-different  .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "version": "scripts/bump-version.js && npx prettier --write package.json manifest.json"
   },
   "devDependencies": {
     "@types/chrome": "0.0.203",
