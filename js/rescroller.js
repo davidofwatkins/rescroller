@@ -224,91 +224,6 @@ window.Rescroller = {
         }
     },
 
-    performMigrations: function() {
-
-        if (!this._migrateDataToSingleKey() && !this._migrateImageNullValues()) {
-            return; // none of the migrations needed to run; we're done!
-        }
-        
-        // Since localStorage has change, we need to invalide our JS cache so we get accurate results
-        this.settings.resetJSCache();
-
-        // we need to regenerate our CSS so it's in localStorage['generated-css'] for our background page to find it
-        this.generateScrollbarCSS();
-
-        // After switching to the new version, the new settings should be synced up.
-        localStorage['date-settings-last-updated'] = new Date().getTime(); // copied from set()
-        this.syncUp(); // sync migrated structures up
-    },
-
-    /**
-     * Migration from 1.2 --> 1.3. Migrate all our "sb-*" keys in localStorage to a single key.
-     *
-     * @returns {boolean} true if migration ran, false if it didn't (need to)
-     */
-    _migrateDataToSingleKey: function() {
-        if (!localStorage['sb-size']) { return false; } // already migrated
-
-        var json = {
-            scrollbarStyle: {
-                metadata: {},
-                data: {}
-            }
-        };
-
-        Object.keys(localStorage).forEach(function(key) {
-            if (key == 'install_time') { return true; } // continue
-
-            if (key == 'sb-excludedsites') {
-                json['excludedsites'] = localStorage['sb-excludedsites']
-            } else if (key == 'showSaveConfirmation') { // change showSaveConfirmation form a '1'/'0' to true/false
-                json[key] = localStorage[key] !== '0';
-            } else if (key.indexOf('sb-') == 0) { // put scrollbar CSS settings in our scrollbar settings, without the 'sb-' prefix
-                json.scrollbarStyle.data[key.substr(3, key.length -1)] = (isNaN(parseInt(localStorage[key]))) ? localStorage[key] : parseInt(localStorage[key]) ;
-            }
-
-            // Remove the old key/val
-            localStorage.removeItem(key);
-        });
-
-        this._settings = json;
-        localStorage['rescroller-settings'] = JSON.stringify(json)
-        return true;
-    },
-
-    /**
-     * For whatever reason, we were setting default values for images as 0. They should be empty strings.
-     * Also, this migrates datea values (data-url strings) to their own key in local storage so that
-     * chrome.sync will handle them separately.
-     * 
-     * @return {boolean} true if migration ran, false if it didn't (need to)
-     */
-    _migrateImageNullValues: function() {
-
-        var i = 0;
-        var props = this.properties.getAll();
-        for (key in props) {
-            if (key.indexOf('background-image') <= -1) { continue; }
-
-            // Convert any data strings to Image classes
-            if (typeof key == 'string' && key.indexOf('data') === 0) {
-                props[key] = new Rescroller.Image().setImageData(props[key]);
-                continue;
-            }
-
-            if (parseInt(props[key]) !== 0) { continue; }
-            props[key] = '';
-            i++;
-        }
-
-        // don't set anything if no changes were made; this prevents a recursive loop with
-        // chrome.sync since this is run every every sync down
-        if (i == 0) { return false; }
-
-        this.properties.setMultiple(props, true)
-        return true;
-    },
-
     /**
      * Simple callback method that callers can set to act when the settings have been updated.
      */
@@ -391,9 +306,6 @@ window.Rescroller = {
 
         // force refresh of this.settings._settings
         this.settings.resetJSCache();
-
-        // migrate incoming data
-        this.performMigrations();
         this.generateScrollbarCSS();
     },
 
