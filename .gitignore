@@ -4,3 +4,5 @@ nohup.out
 Thumbs.db
 
 node_modules
+build/*
+!build/.gitkeep
