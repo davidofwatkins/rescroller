@@ -19,5 +19,21 @@
     "no-alert": "off",
     "no-underscore-dangle": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["scripts/*"],
+      "rules": {
+        "no-console": "off",
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "devDependencies": true,
+            "optionalDependencies": false,
+            "peerDependencies": false
+          }
+        ]
+      }
+    }
+  ]
 }
