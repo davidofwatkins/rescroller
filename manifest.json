@@ -28,9 +28,14 @@
   "permissions": ["storage", "tabs"],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
-    "images/defaults/up.png",
-    "images/defaults/down.png",
-    "images/defaults/left.png",
-    "images/defaults/right.png"
+    {
+      "resources": [
+        "images/defaults/up.png",
+        "images/defaults/down.png",
+        "images/defaults/left.png",
+        "images/defaults/right.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
