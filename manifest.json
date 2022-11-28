@@ -12,7 +12,7 @@
     "128": "appicons/icon128.png"
   },
   "options_page": "options.html",
-  "browser_action": {
+  "action": {
     "default_title": "Rescroller Settings",
     "default_icon": "appicons/icon19.png"
   },
