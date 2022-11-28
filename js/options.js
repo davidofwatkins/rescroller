@@ -510,19 +510,19 @@ $(document).ready(() => {
 
       Rescroller.properties.set(
         down,
-        chrome.extension.getURL('images/defaults/down.png')
+        chrome.runtime.getURL('images/defaults/down.png')
       );
       Rescroller.properties.set(
         up,
-        chrome.extension.getURL('images/defaults/up.png')
+        chrome.runtime.getURL('images/defaults/up.png')
       );
       Rescroller.properties.set(
         left,
-        chrome.extension.getURL('images/defaults/left.png')
+        chrome.runtime.getURL('images/defaults/left.png')
       );
       Rescroller.properties.set(
         right,
-        chrome.extension.getURL('images/defaults/right.png')
+        chrome.runtime.getURL('images/defaults/right.png')
       );
 
       $(`#${down}, #${up}, #${left}, #${right}`).each(function () {
