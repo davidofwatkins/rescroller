@@ -25,7 +25,8 @@
     ],
     "persistant": false
   },
-  "permissions": ["<all_urls>", "storage", "tabs"],
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     "images/defaults/up.png",
     "images/defaults/down.png",
