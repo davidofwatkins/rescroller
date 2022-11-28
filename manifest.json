@@ -17,14 +17,15 @@
     "default_icon": "appicons/icon19.png"
   },
   "background": {
-    "scripts": ["js/jquery.js", "js/cssjson.js", "js/rescroller.js", "js/background.js"],
+    "scripts": [
+      "js/jquery.js",
+      "js/cssjson.js",
+      "js/rescroller.js",
+      "js/background.js"
+    ],
     "persistant": false
   },
-  "permissions": [
-    "<all_urls>",
-    "storage",
-    "tabs"
-  ],
+  "permissions": ["<all_urls>", "storage", "tabs"],
   "web_accessible_resources": [
     "images/defaults/up.png",
     "images/defaults/down.png",

@@ -1,0 +1,23 @@
+{
+  "extends": ["airbnb-base", "prettier"],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "jquery": true,
+    "webextensions": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022
+  },
+  "globals": {
+    "Rescroller": "writable",
+    "CSSJSON": "readonly"
+  },
+  "rules": {
+    "func-names": "off",
+    "no-alert": "off",
+    "no-underscore-dangle": "off",
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  }
+}

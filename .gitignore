@@ -2,3 +2,5 @@
 .vagrant
 nohup.out
 Thumbs.db
+
+node_modules
