@@ -18,6 +18,7 @@
     "npm": "8.19.2"
   },
   "scripts": {
+    "build:extension": "zip -r build/extension.zip ./ -x './build/*' -x './node_modules/*' -x './.git/*'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --list-different  .",
