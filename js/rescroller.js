@@ -549,85 +549,75 @@ window.Rescroller = {
         '::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical':
           {
             attributes: {
-              width: '%spx'.fmt(this.properties.get('size')),
-              height: '%spx'.fmt(this.properties.get('size')),
-              'background-color': '%s'.fmt(
-                this.properties.get('subbackground-color')
-              ),
+              width: `${this.properties.get('size')}px`,
+              height: `${this.properties.get('size')}px`,
+              'background-color': `${this.properties.get(
+                'subbackground-color'
+              )}`,
             },
           },
 
         '::-webkit-scrollbar-track-piece': {
           attributes: {
             'background-color': this.properties.get('background-color'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('background-shadow-size'),
-                true
-              ),
-              this.properties.get('background-shadow-color')
-            ),
-            border: '%spx %s %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('background-border-size')
-              ),
-              this.properties.get('background-border-style'),
-              this.properties.get('background-border-color')
-            ),
-            'border-radius': '%spx'.fmt(
-              this._precentageToPixels(this.properties.get('background-radius'))
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('background-shadow-size'),
+              true
+            )}px ${this.properties.get('background-shadow-color')}`,
+            border: `${this._precentageToPixels(
+              this.properties.get('background-border-size')
+            )}px ${this.properties.get(
+              'background-border-style'
+            )} ${this.properties.get('background-border-color')}`,
+            'border-radius': `${this._precentageToPixels(
+              this.properties.get('background-radius')
+            )}px`,
           },
         },
         '::-webkit-scrollbar-track-piece:vertical': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('background-background-image-vertical')
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-vertical'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-track-piece:horizontal': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('background-background-image-horizontal')
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-horizontal'
+            )}')`,
           },
         },
 
         '::-webkit-scrollbar-thumb': {
           attributes: {
             'background-color': this.properties.get('slider-color'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('slider-shadow-size'),
-                true
-              ),
-              this.properties.get('slider-shadow-color')
-            ),
-            'border-radius': '%spx'.fmt(
-              this._precentageToPixels(this.properties.get('slider-radius'))
-            ),
-            border: '%spx %s %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('slider-border-size')
-              ),
-              this.properties.get('slider-border-style'),
-              this.properties.get('slider-border-color')
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('slider-shadow-size'),
+              true
+            )}px ${this.properties.get('slider-shadow-color')}`,
+            'border-radius': `${this._precentageToPixels(
+              this.properties.get('slider-radius')
+            )}px`,
+            border: `${this._precentageToPixels(
+              this.properties.get('slider-border-size')
+            )}px ${this.properties.get(
+              'slider-border-style'
+            )} ${this.properties.get('slider-border-color')}`,
           },
         },
         '::-webkit-scrollbar-thumb:vertical': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-vertical')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-vertical'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-thumb:horizontal': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-horizontal')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-horizontal'
+            )}')`,
           },
         },
 
@@ -651,62 +641,57 @@ window.Rescroller = {
         '::-webkit-scrollbar-button': {
           attributes: {
             'background-color': this.properties.get('buttons-color'),
-            'border-radius': '%spx'.fmt(
-              this._precentageToPixels(this.properties.get('buttons-radius'))
-            ),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('buttons-shadow-size'),
-                true
-              ),
-              this.properties.get('buttons-shadow-color')
-            ),
-            border: '%spx %s %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('buttons-border-size')
-              ),
-              this.properties.get('buttons-border-style'),
-              this.properties.get('buttons-border-color')
-            ),
+            'border-radius': `${this._precentageToPixels(
+              this.properties.get('buttons-radius')
+            )}px`,
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('buttons-shadow-size'),
+              true
+            )}px ${this.properties.get('buttons-shadow-color')}`,
+            border: `${this._precentageToPixels(
+              this.properties.get('buttons-border-size')
+            )}px ${this.properties.get(
+              'buttons-border-style'
+            )} ${this.properties.get('buttons-border-color')}`,
             display: 'block',
           },
         },
         '::-webkit-scrollbar-button:vertical': {
           attributes: {
-            height: '%spx'.fmt(this.properties.get('buttons-size')),
+            height: `${this.properties.get('buttons-size')}px`,
           },
         },
         '::-webkit-scrollbar-button:horizontal': {
           attributes: {
-            width: '%spx'.fmt(this.properties.get('buttons-size')),
+            width: `${this.properties.get('buttons-size')}px`,
           },
         },
         '::-webkit-scrollbar-button:vertical:decrement': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('buttons-background-image-up')
-            ),
+            'background-image': `url('${this.properties.get(
+              'buttons-background-image-up'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-button:vertical:increment': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('buttons-background-image-down')
-            ),
+            'background-image': `url('${this.properties.get(
+              'buttons-background-image-down'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-button:horizontal:increment': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('buttons-background-image-right')
-            ),
+            'background-image': `url('${this.properties.get(
+              'buttons-background-image-right'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-button:horizontal:decrement': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('buttons-background-image-left')
-            ),
+            'background-image': `url('${this.properties.get(
+              'buttons-background-image-left'
+            )}')`,
           },
         },
       });
@@ -715,42 +700,39 @@ window.Rescroller = {
         $.extend(json.children, {
           '::-webkit-scrollbar-button:vertical:decrement:hover': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-up-hover')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-up-hover'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:vertical:increment:hover': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-down-hover')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-down-hover'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:horizontal:increment:hover': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-right-hover')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-right-hover'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:horizontal:decrement:hover': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-left-hover')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-left-hover'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:hover': {
             attributes: {
               'background-color': this.properties.get('buttons-color-hover'),
-              'box-shadow': 'inset 0 0 %spx %s'.fmt(
-                this._precentageToPixels(
-                  this.properties.get('buttons-shadow-size-hover'),
-                  true
-                ),
-                this.properties.get('buttons-shadow-color-hover')
-              ),
+              'box-shadow': `inset 0 0 ${this._precentageToPixels(
+                this.properties.get('buttons-shadow-size-hover'),
+                true
+              )}px ${this.properties.get('buttons-shadow-color-hover')}`,
             },
           },
         });
@@ -760,42 +742,39 @@ window.Rescroller = {
         $.extend(json.children, {
           '::-webkit-scrollbar-button:vertical:decrement:active': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-up-active')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-up-active'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:vertical:increment:active': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-down-active')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-down-active'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:horizontal:increment:active': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-right-active')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-right-active'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:horizontal:decrement:active': {
             attributes: {
-              'background-image': "url('%s')".fmt(
-                this.properties.get('buttons-background-image-left-active')
-              ),
+              'background-image': `url('${this.properties.get(
+                'buttons-background-image-left-active'
+              )}')`,
             },
           },
           '::-webkit-scrollbar-button:active': {
             attributes: {
               'background-color': this.properties.get('buttons-color-active'),
-              'box-shadow': "inset 0 0 %spx %s')".fmt(
-                this._precentageToPixels(
-                  this.properties.get('buttons-shadow-size-active'),
-                  true
-                ),
-                this.properties.get('buttons-shadow-color-active')
-              ),
+              'box-shadow': `inset 0 0 ${this._precentageToPixels(
+                this.properties.get('buttons-shadow-size-active'),
+                true
+              )}px ${this.properties.get('buttons-shadow-color-active')}')`,
             },
           },
         });
@@ -816,30 +795,25 @@ window.Rescroller = {
       $.extend(json.children, {
         '::-webkit-scrollbar-track-piece:vertical:hover': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('background-background-image-vertical-hover')
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-vertical-hover'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-track-piece:horizontal:hover': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get(
-                'background-background-image-horizontal-hover'
-              )
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-horizontal-hover'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-track-piece:hover ': {
           attributes: {
             'background-color': this.properties.get('background-color-hover'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('background-shadow-size-hover'),
-                true
-              ),
-              this.properties.get('background-shadow-color-hover')
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('background-shadow-size-hover'),
+              true
+            )}px ${this.properties.get('background-shadow-color-hover')}`,
           },
         },
       });
@@ -849,30 +823,25 @@ window.Rescroller = {
       $.extend(json.children, {
         '::-webkit-scrollbar-track-piece:vertical:active': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('background-background-image-vertical-active')
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-vertical-active'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-track-piece:horizontal:active': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get(
-                'background-background-image-horizontal-active'
-              )
-            ),
+            'background-image': `url('${this.properties.get(
+              'background-background-image-horizontal-active'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-track-piece:active': {
           attributes: {
             'background-color': this.properties.get('background-color-active'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('background-shadow-size-active'),
-                true
-              ),
-              this.properties.get('background-shadow-color-active')
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('background-shadow-size-active'),
+              true
+            )}px ${this.properties.get('background-shadow-color-active')}`,
           },
         },
       });
@@ -883,27 +852,24 @@ window.Rescroller = {
         '::-webkit-scrollbar-thumb:hover': {
           attributes: {
             'background-color': this.properties.get('slider-color-hover'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('slider-shadow-size-hover'),
-                true
-              ),
-              this.properties.get('slider-shadow-color-hover')
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('slider-shadow-size-hover'),
+              true
+            )}px ${this.properties.get('slider-shadow-color-hover')}`,
           },
         },
         '::-webkit-scrollbar-thumb:vertical:hover': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-vertical-hover')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-vertical-hover'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-thumb:horizontal:hover': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-horizontal-hover')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-horizontal-hover'
+            )}')`,
           },
         },
       });
@@ -914,27 +880,24 @@ window.Rescroller = {
         '::-webkit-scrollbar-thumb:active': {
           attributes: {
             'background-color': this.properties.get('slider-color-active'),
-            'box-shadow': 'inset 0 0 %spx %s'.fmt(
-              this._precentageToPixels(
-                this.properties.get('slider-shadow-size-active'),
-                true
-              ),
-              this.properties.get('slider-shadow-color-active')
-            ),
+            'box-shadow': `inset 0 0 ${this._precentageToPixels(
+              this.properties.get('slider-shadow-size-active'),
+              true
+            )}px ${this.properties.get('slider-shadow-color-active')}`,
           },
         },
         '::-webkit-scrollbar-thumb:vertical:active': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-vertical-active')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-vertical-active'
+            )}')`,
           },
         },
         '::-webkit-scrollbar-thumb:horizontal:active': {
           attributes: {
-            'background-image': "url('%s')".fmt(
-              this.properties.get('slider-background-image-horizontal-active')
-            ),
+            'background-image': `url('${this.properties.get(
+              'slider-background-image-horizontal-active'
+            )}')`,
           },
         },
       });
