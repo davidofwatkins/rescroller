@@ -17,13 +17,8 @@
     "default_icon": "appicons/icon19.png"
   },
   "background": {
-    "scripts": [
-      "js/jquery.js",
-      "js/cssjson.js",
-      "js/rescroller.js",
-      "js/background.js"
-    ],
-    "persistant": false
+    "service_worker": "js/background.js",
+    "type": "module"
   },
   "permissions": ["storage", "tabs"],
   "host_permissions": ["<all_urls>"],
