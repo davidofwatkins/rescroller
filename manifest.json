@@ -17,6 +17,9 @@
     "default_icon": "appicons/icon19.png"
   },
   "background": {
+    // @todo:david need to convert this to a service worker, which may be a little tricky. Will require converting background.js to a module and importing dependenceis there.
+    // @see: https://developer.chrome.com/docs/extensions/mv3/mv3-migration/#man-sw
+    // @see: https://developer.chrome.com/docs/extensions/mv3/migrating_to_service_workers/
     "scripts": [
       "js/jquery.js",
       "js/cssjson.js",
