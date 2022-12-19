@@ -2,22 +2,6 @@
  * The Rescroller API and other utility methods.
  */
 
-if (!String.prototype.fmt) {
-  // @todo replace with codemod to use `${template literals}`
-  // eslint-disable-next-line no-extend-native
-  String.prototype.fmt = function () {
-    // eslint-disable-next-line prefer-rest-params
-    const args = arguments;
-    let i = 0;
-    return this.replace(/%((%)|s)/g, (match) => {
-      const ret = typeof args[i] !== 'undefined' ? args[i] : match;
-      // eslint-disable-next-line no-plusplus
-      i++;
-      return ret;
-    });
-  };
-}
-
 /**
  * Superficial class creator. It may be better to use something like Backbone in the future.
  */
