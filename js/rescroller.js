@@ -17,8 +17,6 @@ const createClass = function (proto = {}) {
 };
 
 export const Rescroller = {
-  version: chrome.app.getDetails().version,
-
   /**
    * An object that understands our image {} format and can handle image data values to and from localStorage
    */
