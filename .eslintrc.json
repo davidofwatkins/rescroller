@@ -18,6 +18,9 @@
     "func-names": "off",
     "no-alert": "off",
     "no-underscore-dangle": "off",
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "import/prefer-default-export": "off",
+    "import/extensions": ["error", "always"],
+    "import/no-cycle": "error"
   }
 }
