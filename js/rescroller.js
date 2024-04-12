@@ -1,3 +1,5 @@
+import CSSJSON from './cssjson.js';
+
 /**
  * The Rescroller API and other utility methods.
  */
@@ -14,7 +16,7 @@ const createClass = function (proto = {}) {
   return obj;
 };
 
-window.Rescroller = {
+export const Rescroller = {
   version: chrome.app.getDetails().version,
 
   /**

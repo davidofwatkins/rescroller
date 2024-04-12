@@ -1,3 +1,5 @@
+import { Rescroller } from './rescroller.js';
+
 /**
  * Javascript used to control the settings page, options.html
  */

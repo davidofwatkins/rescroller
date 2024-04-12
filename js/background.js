@@ -1,3 +1,5 @@
+import { Rescroller } from './rescroller.js';
+
 /**
  * Background Event page: this handles events for the extension between pages and performs the following:
  *
