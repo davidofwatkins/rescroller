@@ -20,7 +20,7 @@
     "service_worker": "js/service-worker.js",
     "type": "module"
   },
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "scripting"],
   "host_permissions": ["http://*/*", "https://*/*", "file://*/*"],
   "web_accessible_resources": [
     {
