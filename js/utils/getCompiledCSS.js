@@ -38,17 +38,17 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['background-shadow-size'],
-          true
+          true,
         )}px ${stylesWithDefaults['background-shadow-color']}`,
         border: `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['background-border-size']
+          stylesWithDefaults['background-border-size'],
         )}px ${stylesWithDefaults['background-border-style']} ${
           stylesWithDefaults['background-border-color']
         }`,
         'border-radius': `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['background-radius']
+          stylesWithDefaults['background-radius'],
         )}px`,
       },
     },
@@ -69,15 +69,15 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['slider-shadow-size'],
-          true
+          true,
         )}px ${stylesWithDefaults['slider-shadow-color']}`,
         'border-radius': `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['slider-radius']
+          stylesWithDefaults['slider-radius'],
         )}px`,
         border: `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['slider-border-size']
+          stylesWithDefaults['slider-border-size'],
         )}px ${stylesWithDefaults['slider-border-style']} ${
           stylesWithDefaults['slider-border-color']
         }`,
@@ -120,16 +120,16 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'background-color': stylesWithDefaults['buttons-color'],
         'border-radius': `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['buttons-radius']
+          stylesWithDefaults['buttons-radius'],
         )}px`,
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['buttons-shadow-size'],
-          true
+          true,
         )}px ${stylesWithDefaults['buttons-shadow-color']}`,
         border: `${precentageToPixels(
           stylesWithDefaults.size,
-          stylesWithDefaults['buttons-border-size']
+          stylesWithDefaults['buttons-border-size'],
         )}px ${stylesWithDefaults['buttons-border-style']} ${
           stylesWithDefaults['buttons-border-color']
         }`,
@@ -195,7 +195,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['buttons-shadow-size-hover'],
-          true
+          true,
         )}px ${stylesWithDefaults['buttons-shadow-color-hover']}`,
       },
     },
@@ -228,7 +228,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['buttons-shadow-size-active'],
-          true
+          true,
         )}px ${stylesWithDefaults['buttons-shadow-color-active']}`,
       },
     },
@@ -251,7 +251,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['background-shadow-size-hover'],
-          true
+          true,
         )}px ${stylesWithDefaults['background-shadow-color-hover']}`,
       },
     },
@@ -274,7 +274,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['background-shadow-size-active'],
-          true
+          true,
         )}px ${stylesWithDefaults['background-shadow-color-active']}`,
       },
     },
@@ -287,7 +287,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['slider-shadow-size-hover'],
-          true
+          true,
         )}px ${stylesWithDefaults['slider-shadow-color-hover']}`,
       },
     },
@@ -310,7 +310,7 @@ export const getCompiledCSS = (scrollbarStyles) => {
         'box-shadow': `inset 0 0 ${precentageToPixels(
           stylesWithDefaults.size,
           stylesWithDefaults['slider-shadow-size-active'],
-          true
+          true,
         )}px ${stylesWithDefaults['slider-shadow-color-active']}`,
       },
     },
