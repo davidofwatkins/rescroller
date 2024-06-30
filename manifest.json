@@ -21,7 +21,7 @@
     "type": "module"
   },
   "permissions": ["storage", "tabs"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["http://*/*", "https://*/*", "file://*/*"],
   "web_accessible_resources": [
     {
       "resources": [
@@ -30,7 +30,7 @@
         "images/defaults/left.png",
         "images/defaults/right.png"
       ],
-      "matches": ["<all_urls>"]
+      "matches": ["http://*/*", "https://*/*", "file://*/*"]
     }
   ]
 }
