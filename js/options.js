@@ -1,46 +1,99 @@
-import { Rescroller } from './rescroller.js';
+import {
+  getScrollbarStyles,
+  removeScrollbarStyle,
+  resetScrollbarImageStyle,
+  setDefaultStyling,
+  setScrollbarImageStyle,
+  setScrollbarStyle,
+  unpackImagesInSettings,
+  RESCROLLER_SETTINGS_KEY,
+} from './utils/index.js';
+import { getCompiledCSS } from './utils/getCompiledCSS.js';
+import {
+  getChromeStorageValue,
+  setChromeStorageValue,
+} from './utils/storage.js';
+
+window.PAGE_CACHE = null;
 
 /**
  * Javascript used to control the settings page, options.html
  */
 
-const LOAD_START = new Date().getTime(); // keep track of when the page loads so we know to show the save settings dialog
-const showSaveConfirmTime = 4000;
+/**
+ * @returns {Promise<import('./types.js').RescrollerSettings>}
+ */
+const initPageCache = async () => {
+  const allValues = await new Promise((resolve, reject) => {
+    chrome.storage.sync.get(null, (results) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+        return;
+      }
+
+      const parsedSettings = results[RESCROLLER_SETTINGS_KEY]
+        ? JSON.parse(results[RESCROLLER_SETTINGS_KEY])
+        : {};
+
+      resolve({
+        ...results,
+        [RESCROLLER_SETTINGS_KEY]: parsedSettings,
+      });
+    });
+  });
+
+  if (!allValues[RESCROLLER_SETTINGS_KEY]) {
+    return allValues;
+  }
+
+  const settingsWithImageData = await unpackImagesInSettings(
+    allValues[RESCROLLER_SETTINGS_KEY]
+  );
+
+  return {
+    ...allValues,
+    [RESCROLLER_SETTINGS_KEY]: settingsWithImageData,
+  };
+};
+
+const SHOW_SAVE_CONFIRM_TIME = 4000;
 let saveconfirmationTimeout;
 let lastClickedColorPickerPropertyID;
 
-Rescroller.onSettingsUpdated = function () {
-  if (
-    !Rescroller.settings.get('showSaveConfirmation') ||
-    new Date().getTime() - 500 <= LOAD_START
-  ) {
-    return;
-  }
-
-  // Show "saved" confirmation box
-  clearTimeout(saveconfirmationTimeout);
-  $('#save-confirm').fadeIn('slow');
-  saveconfirmationTimeout = setTimeout(() => {
-    $('#save-confirm').fadeOut('slow');
-  }, showSaveConfirmTime);
-};
-
-// Enable functionality of Confirm Box "Never Show Again" button
-$(document).ready(() => {
-  $('#save-confirm #hide-saved-confirm').click(() => {
-    Rescroller.settings.set('showSaveConfirmation', false);
-    $('#save-confirm').fadeOut('slow');
-    return false;
-  });
-});
-
 const refreshScrollbars = () => {
-  $('#rescroller').html(Rescroller.getCSSString());
+  const cachedScrollbarStyles = getScrollbarStyles(window.PAGE_CACHE);
+  const cssString = getCompiledCSS(cachedScrollbarStyles);
+
+  $('#rescroller').html(cssString);
   const originalOverflow = $('body').css('overflow');
   $('body').css('overflow', 'hidden');
   setTimeout(() => {
     $('body').css('overflow', originalOverflow);
   }, 0);
+};
+
+const showSaveConfirmIfEnabled = () => {
+  if (!window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].showSaveConfirmation) {
+    return;
+  }
+
+  clearTimeout(saveconfirmationTimeout);
+  $('#save-confirm').fadeIn('slow');
+  saveconfirmationTimeout = setTimeout(() => {
+    $('#save-confirm').fadeOut('slow');
+  }, SHOW_SAVE_CONFIRM_TIME);
+};
+
+const setScrollbarStyleAndRefresh = async (key, value) => {
+  await setScrollbarStyle(window.PAGE_CACHE, key, value);
+  refreshScrollbars();
+  showSaveConfirmIfEnabled();
+};
+
+const setScrollbarImageStyleAndRefresh = async (key, value) => {
+  await setScrollbarImageStyle(window.PAGE_CACHE, key, value);
+  refreshScrollbars();
+  showSaveConfirmIfEnabled();
 };
 
 // Following "plugin" function found here: http://stackoverflow.com/a/10310815/477632
@@ -99,56 +152,6 @@ const showErrorMessage = (msg) => {
   });
 };
 
-// Convert the styling stored in local storage into CSS:
-const newCSS = Rescroller.getCSSString();
-
-// Write the newly formatted CSS (from local storage) to the (beginning of the) page:
-document.write(`<style id="rescroller">${newCSS}</style>`);
-
-// When the page has loaded:
-$(document).ready(() => {
-  refreshScrollbars();
-
-  // show generated css in css div:
-  $('#generatedcss').html(newCSS);
-
-  // Fill the excludedsites textarea with the list of excluded sites:
-  $('#excludedsites').val(Rescroller.settings.get('excludedsites'));
-  $('#excludedsites').change(function () {
-    Rescroller.settings.set('excludedsites', $(this).val());
-  });
-
-  // Fill the custom CSS form with the custom CSS
-  $('#customcss').val(Rescroller.properties.get('customcss'));
-  $('#customcss').change(function () {
-    Rescroller.properties.set('customcss', $(this).val());
-    refreshScrollbars();
-  });
-
-  // Fill the form elements with data from local storage:
-  $('input').each(function () {
-    if ($(this).attr('type') !== 'submit') {
-      // Make sure we're not talking about the submit button here
-
-      if ($(this).attr('type') === 'checkbox') {
-        // If it's a check box...
-
-        // If local storage says this option should be checked, check it
-        if (Rescroller.properties.get($(this).attr('id')) === 'checked') {
-          $(this).attr(
-            'checked',
-            Rescroller.properties.get($(this).attr('id'))
-          );
-        }
-      }
-      // If it's an ordinary input, just fill the input with the corresponding value from local storage
-      else {
-        $(this).val(Rescroller.properties.get($(this).attr('id')));
-      }
-    }
-  });
-});
-
 const resetDragHoveringEventTriggering = () => {
   let originalBackground;
   let originalText;
@@ -177,7 +180,131 @@ const resetDragHoveringEventTriggering = () => {
     });
 };
 
-$(document).ready(() => {
+/** *********Image selector functionality**************** */
+
+const handleFiles = (files, frame, key) => {
+  const file = files[0];
+  const imageType = /image.*/;
+
+  if (!file.type.match(imageType)) {
+    showErrorMessage('Sorry, you must select an image file. Please try again.');
+    return;
+  }
+
+  // For now, restrict the user from using large images that won't sync. In the future, we could allow it,
+  // but we'll have to warn the user that it will not be synced and make sure our raw value (the reference to
+  // the actual data image localStorage item) doesn't overwrite any remote ones.
+  if (file.size >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+    showErrorMessage(
+      'Sorry, only very small images are allowed. Please choose one under 8 KB.'
+    );
+    return;
+  }
+
+  // hide any error messages
+  hideErrorMessage();
+
+  const img = document.createElement('img');
+  img.classList.add('obj');
+  img.file = file;
+
+  // eslint-disable-next-line no-param-reassign
+  frame.innerHTML = ''; // clear frame before putting new image in
+  frame.appendChild(img);
+
+  const reader = new FileReader();
+  reader.onload = (function (aImg) {
+    return function (e) {
+      // eslint-disable-next-line no-param-reassign
+      aImg.src = e.target.result;
+
+      // Save to local storage
+      setScrollbarImageStyleAndRefresh(key, aImg.src).then(() => {
+        // Change the "Select Image" button to an image frame
+        const container = $(frame).parents('.imagepicker-container');
+        container.children('.selector-button').hide();
+        container.children('.thumbframe').show();
+      });
+    };
+  })(img);
+  reader.readAsDataURL(file);
+};
+
+const handleDocReady = async () => {
+  window.PAGE_CACHE = await initPageCache();
+
+  refreshScrollbars();
+
+  // Fill the excludedsites textarea with the list of excluded sites:
+  $('#excludedsites').val(
+    window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].excludedsites
+  );
+  $('#excludedsites').change(async function () {
+    const newValue = $(this).val();
+
+    window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].excludedsites = newValue;
+
+    const allRescrollerSettings = await getChromeStorageValue(
+      RESCROLLER_SETTINGS_KEY
+    );
+
+    await setChromeStorageValue(
+      RESCROLLER_SETTINGS_KEY,
+      JSON.stringify({
+        ...allRescrollerSettings,
+        excludedsites: newValue,
+      })
+    );
+  });
+
+  // Fill the custom CSS form with the custom CSS
+  $('#customcss').val(getScrollbarStyles(window.PAGE_CACHE).customcss);
+  $('#customcss').change(function () {
+    setScrollbarStyleAndRefresh('customcss', $(this).val());
+  });
+
+  // Fill the form elements with data from local storage:
+  $('input').each(function () {
+    const id = $(this).attr('id');
+
+    if ($(this).attr('type') !== 'submit') {
+      // Make sure we're not talking about the submit button here
+
+      if ($(this).attr('type') === 'checkbox') {
+        // If it's a check box...
+
+        // If local storage says this option should be checked, check it
+        if (getScrollbarStyles(window.PAGE_CACHE)[id] === 'checked') {
+          $(this).attr('checked', getScrollbarStyles(window.PAGE_CACHE)[id]);
+        }
+      }
+      // If it's an ordinary input, just fill the input with the corresponding value from local storage
+      else {
+        $(this).val(getScrollbarStyles(window.PAGE_CACHE)[id]);
+      }
+    }
+  });
+
+  // Enable functionality of Confirm Box "Never Show Again" button
+  $('#save-confirm #hide-saved-confirm').click(async () => {
+    window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].showSaveConfirmation = false;
+    $('#save-confirm').fadeOut('slow');
+
+    const allRescrollerSettings = await getChromeStorageValue(
+      RESCROLLER_SETTINGS_KEY
+    );
+
+    await setChromeStorageValue(
+      RESCROLLER_SETTINGS_KEY,
+      JSON.stringify({
+        ...allRescrollerSettings,
+        showSaveConfirmation: false,
+      })
+    );
+
+    return false;
+  });
+
   $('#expandcss').click(() => {
     $('#generatedcss').slideToggle('fast');
     return false;
@@ -192,16 +319,18 @@ $(document).ready(() => {
     ) {
       return false;
     }
-    Rescroller.restoreDefaults();
 
-    // full refresh instead of refreshScrollbars() so all our settings bars are reset as well.
-    // An actual JS view framework will fix this later on.
-    window.location.reload(true);
+    setDefaultStyling(window.PAGE_CACHE).then(() => {
+      // full refresh instead of refreshScrollbars() so all our settings bars are reset as well.
+      // An actual JS view framework will fix this later on.
+      window.location.reload(true);
+    });
+
     return true;
   });
 
   // Expand/collapse all non-custom css areas when that checkbox is checked
-  if (Rescroller.properties.get('usecustomcss') === 'checked') {
+  if (getScrollbarStyles(window.PAGE_CACHE).usecustomcss === 'checked') {
     $('.section').not('#misc').not($('#general')).hide();
     $('.customcss-collapsible').hide();
   }
@@ -219,25 +348,29 @@ $(document).ready(() => {
   // Clear picture buttons
   $('.clearimage').click(function () {
     const key = $(this).parent().parent().attr('id');
-    Rescroller.properties.remove(key);
-    $(this).siblings('.thumbframe .thumbcontainer').html('No Image Loaded');
-    $(this)
-      .parents('.imagepicker-container')
-      .children('input[type=file].selector')
-      .val('');
+    removeScrollbarStyle(window.PAGE_CACHE, key).then(() => {
+      $(this).siblings('.thumbframe .thumbcontainer').html('No Image Loaded');
+      $(this)
+        .parents('.imagepicker-container')
+        .children('input[type=file].selector')
+        .val('');
 
-    // Hide the thumbframe and restore it with the "Select Image" button
-    $(`#${key}`).children('.thumbframe').hide();
-    $(`#${key}`).children('.selector-button').css('display', 'block');
+      // Hide the thumbframe and restore it with the "Select Image" button
+      $(`#${key}`).children('.thumbframe').hide();
+      $(`#${key}`).children('.selector-button').css('display', 'block');
 
-    refreshScrollbars();
+      refreshScrollbars();
+      showSaveConfirmIfEnabled();
+    });
     return false;
   });
 
   // Set correct value for <select>s
   $('select').each(function () {
     const thisProperty = $(this).attr('id');
-    const thisPropertyValue = Rescroller.properties.get(thisProperty);
+    const thisPropertyValue = getScrollbarStyles(window.PAGE_CACHE)[
+      thisProperty
+    ];
     $(this)
       .children()
       .each(function () {
@@ -251,8 +384,7 @@ $(document).ready(() => {
   $('select').change(function () {
     const thisProperty = $(this).attr('id');
     const currentValue = $(this).val();
-    Rescroller.properties.set(thisProperty, currentValue);
-    refreshScrollbars();
+    setScrollbarStyleAndRefresh(thisProperty, currentValue);
   });
 
   /** *********Set up Sliders*********** */
@@ -291,12 +423,12 @@ $(document).ready(() => {
 
     // Fill slider value with value from local storage
     $(`#${propertyName} .slider-value`).html(
-      Rescroller.properties.get(propertyName) + units
+      getScrollbarStyles(window.PAGE_CACHE)[propertyName] + units
     );
 
     // Set up slider for this property
     $(`#${propertyName} .slider`).slider({
-      value: Rescroller.properties.get(propertyName),
+      value: getScrollbarStyles(window.PAGE_CACHE)[propertyName],
       orientation: theOrientation,
       slide(event, ui) {
         $(this)
@@ -305,8 +437,7 @@ $(document).ready(() => {
       },
       change(event, ui) {
         // Update value in local storage
-        Rescroller.properties.set(propertyName, ui.value);
-        refreshScrollbars();
+        setScrollbarStyleAndRefresh(propertyName, ui.value);
       },
     });
   });
@@ -322,15 +453,14 @@ $(document).ready(() => {
         self.siblings('.colorvalue').val(hex);
       },
       close(hex) {
-        Rescroller.properties.set(localStorageKey, hex);
-        refreshScrollbars();
+        setScrollbarStyleAndRefresh(localStorageKey, hex);
       },
     });
 
     // Set default color to whatever it's been saved to
     $(this).miniColors(
       'value',
-      Rescroller.properties.get($(this).parent().attr('id'))
+      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
     );
 
     // Add "apply" button
@@ -386,11 +516,11 @@ $(document).ready(() => {
   // for (let i = 0; i < keys.length; i++) {
   keys.forEach((key) => {
     if (
-      Rescroller.properties.get(key) &&
-      Rescroller.properties.get(key) !== 0
+      getScrollbarStyles(window.PAGE_CACHE)[key] &&
+      getScrollbarStyles(window.PAGE_CACHE)[key] !== 0
     ) {
       $(`#${key} .thumbframe div.thumbcontainer`).html(
-        `<img src="${Rescroller.properties.get(key)}" />`
+        `<img src="${getScrollbarStyles(window.PAGE_CACHE)[key]}" />`
       );
       $(`#${key} .thumbframe`).css('display', 'inline-block'); // show the image frame for this image
     } else {
@@ -404,7 +534,9 @@ $(document).ready(() => {
 
   // Fill "colorvalue" inputs with color values
   $('.colorvalue').each(function () {
-    $(this).val(Rescroller.properties.get($(this).parent().attr('id')));
+    $(this).val(
+      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
+    );
   });
 
   // Automatically select text when clicking a color value
@@ -423,19 +555,19 @@ $(document).ready(() => {
     // If the value is a hex value, save it
     if (val.indexOf('#') === 0 && (val.length === 4 || val.length === 7)) {
       $(this).siblings('.colorselection').miniColors('value', val);
-      Rescroller.properties.set($(this).parent().attr('id'), val);
-      refreshScrollbars();
+      setScrollbarStyleAndRefresh($(this).parent().attr('id'), val);
     }
     // If the user just forgot the #, add it automatically and save
     else if (val.indexOf('#') !== 0 && (val.length === 3 || val.length === 6)) {
       $(this).siblings('.colorselection').miniColors('value', `#${val}`);
       $(this).val(`#${val}`);
-      Rescroller.properties.set($(this).parent().attr('id'), val);
-      refreshScrollbars();
+      setScrollbarStyleAndRefresh($(this).parent().attr('id'), val);
     }
     // If it's just a bad value, restore original
     else {
-      $(this).val(Rescroller.properties.get($(this).parent().attr('id')));
+      $(this).val(
+        getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
+      );
     }
   });
 
@@ -455,15 +587,13 @@ $(document).ready(() => {
   showButtons.change(function () {
     // Expand/collapse wrapper & save value to local storage
     if ($(this).is(':checked')) {
-      Rescroller.properties.set($(this).attr('id'), 'checked');
-      $('#buttons-toggleable').slideDown('fast', () => {
-        refreshScrollbars();
-      });
+      setScrollbarStyleAndRefresh($(this).attr('id'), 'checked').then(() =>
+        $('#buttons-toggleable').slideDown('fast')
+      );
     } else {
-      Rescroller.properties.set($(this).attr('id'), 'unchecked');
-      $('#buttons-toggleable').slideUp('fast', () => {
-        refreshScrollbars();
-      });
+      setScrollbarStyleAndRefresh($(this).attr('id'), 'unchecked').then(() =>
+        $('#buttons-toggleable').slideUp('fast')
+      );
     }
   });
 
@@ -484,19 +614,15 @@ $(document).ready(() => {
   $('.toggle-hover-active').change(function () {
     if ($(this).is(':checked')) {
       // alert("Checked!");
-      Rescroller.properties.set($(this).attr('id'), 'checked');
-      $(`#${$(this).attr('data-wrapperid')}`).slideDown('slow', () => {
-        refreshScrollbars();
-      });
+      setScrollbarStyleAndRefresh($(this).attr('id'), 'checked').then(() =>
+        $(`#${$(this).attr('data-wrapperid')}`).slideDown('slow')
+      );
     } else {
       // alert("Unchecked!");
-      Rescroller.properties.set($(this).attr('id'), 'unchecked');
-      $(`#${$(this).attr('data-wrapperid')}`).slideUp('slow', () => {
-        refreshScrollbars();
-      });
+      setScrollbarStyleAndRefresh($(this).attr('id'), 'unchecked').then(() =>
+        $(`#${$(this).attr('data-wrapperid')}`).slideUp('slow')
+      );
     }
-
-    refreshScrollbars();
   });
 
   const setRestoreArrowsDefaultImages = (
@@ -510,35 +636,45 @@ $(document).ready(() => {
       const left = `${propertyPrefix}left${propertySuffix}`;
       const right = `${propertyPrefix}right${propertySuffix}`;
 
-      Rescroller.properties.set(
+      resetScrollbarImageStyle(
+        window.PAGE_CACHE,
         down,
         chrome.runtime.getURL('images/defaults/down.png')
-      );
-      Rescroller.properties.set(
-        up,
-        chrome.runtime.getURL('images/defaults/up.png')
-      );
-      Rescroller.properties.set(
-        left,
-        chrome.runtime.getURL('images/defaults/left.png')
-      );
-      Rescroller.properties.set(
-        right,
-        chrome.runtime.getURL('images/defaults/right.png')
-      );
+      ).then(() => {
+        resetScrollbarImageStyle(
+          window.PAGE_CACHE,
+          up,
+          chrome.runtime.getURL('images/defaults/up.png')
+        ).then(() => {
+          resetScrollbarImageStyle(
+            window.PAGE_CACHE,
+            left,
+            chrome.runtime.getURL('images/defaults/left.png')
+          ).then(() => {
+            resetScrollbarImageStyle(
+              window.PAGE_CACHE,
+              right,
+              chrome.runtime.getURL('images/defaults/right.png')
+            ).then(() => {
+              $(`#${down}, #${up}, #${left}, #${right}`).each(function () {
+                $(this)
+                  .children('.thumbframe')
+                  .children('.thumbcontainer')
+                  .html(
+                    `<img src="${
+                      getScrollbarStyles(window.PAGE_CACHE)[$(this).attr('id')]
+                    }" />`
+                  );
+                $(this).children('.selector-button').hide();
+                $(this).children('.thumbframe').show();
+              });
 
-      $(`#${down}, #${up}, #${left}, #${right}`).each(function () {
-        $(this)
-          .children('.thumbframe')
-          .children('.thumbcontainer')
-          .html(
-            `<img src="${Rescroller.properties.get($(this).attr('id'))}" />`
-          );
-        $(this).children('.selector-button').hide();
-        $(this).children('.thumbframe').show();
+              showSaveConfirmIfEnabled();
+              refreshScrollbars();
+            });
+          });
+        });
       });
-
-      refreshScrollbars();
       return false;
     });
   };
@@ -559,62 +695,7 @@ $(document).ready(() => {
     'buttons-background-image-',
     '-active'
   );
-});
 
-/** *********Image selector functionality**************** */
-
-const handleFiles = (files, frame, key) => {
-  const file = files[0];
-  const imageType = /image.*/;
-
-  if (!file.type.match(imageType)) {
-    showErrorMessage('Sorry, you must select an image file. Please try again.');
-    return;
-  }
-
-  // For now, restrict the user from using large images that won't sync. In the future, we could allow it,
-  // but we'll have to warn the user that it will not be synced and make sure our raw value (the reference to
-  // the actual data image localStorage item) doesn't overwrite any remote ones.
-  if (file.size >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
-    showErrorMessage(
-      'Sorry, only very small images are allowed. Please choose one under 8 KB.'
-    );
-    return;
-  }
-
-  // hide any error messages
-  hideErrorMessage();
-
-  const img = document.createElement('img');
-  img.classList.add('obj');
-  img.file = file;
-
-  // eslint-disable-next-line no-param-reassign
-  frame.innerHTML = ''; // clear frame before putting new image in
-  frame.appendChild(img);
-
-  const reader = new FileReader();
-  reader.onload = (function (aImg) {
-    return function (e) {
-      // eslint-disable-next-line no-param-reassign
-      aImg.src = e.target.result;
-
-      // Save to local storage
-      Rescroller.properties.set(key, aImg.src);
-
-      // Change the "Select Image" button to an image frame
-      const container = $(frame).parents('.imagepicker-container');
-      container.children('.selector-button').hide();
-      container.children('.thumbframe').show();
-
-      // Redraw scrollbars
-      refreshScrollbars();
-    };
-  })(img);
-  reader.readAsDataURL(file);
-};
-
-$(document).ready(() => {
   // Whenever selectors (hidden <input type="file">s) are changed, save their valuese to local storage
   $('.selector').change(function () {
     handleFiles(
@@ -651,4 +732,8 @@ $(document).ready(() => {
     resetDragHoveringEventTriggering();
     return false;
   });
+};
+
+$(document).ready(() => {
+  handleDocReady().then(() => {});
 });
