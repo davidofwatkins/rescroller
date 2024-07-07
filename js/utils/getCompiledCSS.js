@@ -23,6 +23,14 @@ export const getCompiledCSS = (scrollbarStyles) => {
 
   // Build our CSS structure as JSON for readability and maintainability. Then, we'll convert it to CSS!
   const rootJsonStyle = {
+    '*': {
+      attributes: {
+        'scrollbar-width': `unset`,
+        'scrollbar-color': 'unset',
+        'scrollbar-gutter': 'unset',
+      },
+    },
+
     '::-webkit-scrollbar, ::-webkit-scrollbar:horizontal, ::-webkit-scrollbar:vertical':
       {
         attributes: {
