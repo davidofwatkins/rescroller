@@ -200,7 +200,7 @@ var CSSJSON = new function () {
         }
         if (node.children) {
             var first = true;
-            for (i in node.children) {
+            for (var i in node.children) {
                 if (breaks && !first) {
                     cssString += '\n';
                 } else {
@@ -295,3 +295,5 @@ var CSSJSON = new function () {
     };
 
 };
+
+export default CSSJSON;
