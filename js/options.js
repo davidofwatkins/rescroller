@@ -47,7 +47,7 @@ const initPageCache = async () => {
   }
 
   const settingsWithImageData = await unpackImagesInSettings(
-    allValues[RESCROLLER_SETTINGS_KEY]
+    allValues[RESCROLLER_SETTINGS_KEY],
   );
 
   return {
@@ -165,7 +165,7 @@ const resetDragHoveringEventTriggering = () => {
         originalText = $('.selector-button').html();
         $('.selector-button').animate(
           { 'background-color': '#C91313' },
-          'slow'
+          'slow',
         );
         $('.selector-button').html('Drop Here');
       },
@@ -173,7 +173,7 @@ const resetDragHoveringEventTriggering = () => {
         $('.selector-button').html(originalText);
         $('.selector-button').animate(
           { 'background-color': originalBackground },
-          'slow'
+          'slow',
         );
         return false;
       },
@@ -196,7 +196,7 @@ const handleFiles = (files, frame, key) => {
   // the actual data image localStorage item) doesn't overwrite any remote ones.
   if (file.size >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
     showErrorMessage(
-      'Sorry, only very small images are allowed. Please choose one under 8 KB.'
+      'Sorry, only very small images are allowed. Please choose one under 8 KB.',
     );
     return;
   }
@@ -237,7 +237,7 @@ const handleDocReady = async () => {
 
   // Fill the excludedsites textarea with the list of excluded sites:
   $('#excludedsites').val(
-    window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].excludedsites
+    window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].excludedsites,
   );
   $('#excludedsites').change(async function () {
     const newValue = $(this).val();
@@ -245,7 +245,7 @@ const handleDocReady = async () => {
     window.PAGE_CACHE[RESCROLLER_SETTINGS_KEY].excludedsites = newValue;
 
     const allRescrollerSettings = await getChromeStorageValue(
-      RESCROLLER_SETTINGS_KEY
+      RESCROLLER_SETTINGS_KEY,
     );
 
     await setChromeStorageValue(
@@ -253,7 +253,7 @@ const handleDocReady = async () => {
       JSON.stringify({
         ...allRescrollerSettings,
         excludedsites: newValue,
-      })
+      }),
     );
   });
 
@@ -291,7 +291,7 @@ const handleDocReady = async () => {
     $('#save-confirm').fadeOut('slow');
 
     const allRescrollerSettings = await getChromeStorageValue(
-      RESCROLLER_SETTINGS_KEY
+      RESCROLLER_SETTINGS_KEY,
     );
 
     await setChromeStorageValue(
@@ -299,7 +299,7 @@ const handleDocReady = async () => {
       JSON.stringify({
         ...allRescrollerSettings,
         showSaveConfirmation: false,
-      })
+      }),
     );
 
     return false;
@@ -314,7 +314,7 @@ const handleDocReady = async () => {
   $('#resetformatting').click(() => {
     if (
       !window.confirm(
-        'Are you sure you would like to reset your scrollbars to default? This cannot be undone.'
+        'Are you sure you would like to reset your scrollbars to default? This cannot be undone.',
       )
     ) {
       return false;
@@ -423,7 +423,7 @@ const handleDocReady = async () => {
 
     // Fill slider value with value from local storage
     $(`#${propertyName} .slider-value`).html(
-      getScrollbarStyles(window.PAGE_CACHE)[propertyName] + units
+      getScrollbarStyles(window.PAGE_CACHE)[propertyName] + units,
     );
 
     // Set up slider for this property
@@ -460,7 +460,7 @@ const handleDocReady = async () => {
     // Set default color to whatever it's been saved to
     $(this).miniColors(
       'value',
-      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
+      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')],
     );
 
     // Add "apply" button
@@ -476,7 +476,7 @@ const handleDocReady = async () => {
   $('body').on('click', '.miniColors-apply a', () => {
     // applies listener to the <a> that hasn't been created yet
     const colorSelectorInput = $(
-      `#${lastClickedColorPickerPropertyID}`
+      `#${lastClickedColorPickerPropertyID}`,
     ).children('input.colorselection');
     colorSelectorInput.miniColors('hide');
 
@@ -520,7 +520,7 @@ const handleDocReady = async () => {
       getScrollbarStyles(window.PAGE_CACHE)[key] !== 0
     ) {
       $(`#${key} .thumbframe div.thumbcontainer`).html(
-        `<img src="${getScrollbarStyles(window.PAGE_CACHE)[key]}" />`
+        `<img src="${getScrollbarStyles(window.PAGE_CACHE)[key]}" />`,
       );
       $(`#${key} .thumbframe`).css('display', 'inline-block'); // show the image frame for this image
     } else {
@@ -535,7 +535,7 @@ const handleDocReady = async () => {
   // Fill "colorvalue" inputs with color values
   $('.colorvalue').each(function () {
     $(this).val(
-      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
+      getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')],
     );
   });
 
@@ -566,7 +566,7 @@ const handleDocReady = async () => {
     // If it's just a bad value, restore original
     else {
       $(this).val(
-        getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')]
+        getScrollbarStyles(window.PAGE_CACHE)[$(this).parent().attr('id')],
       );
     }
   });
@@ -588,11 +588,11 @@ const handleDocReady = async () => {
     // Expand/collapse wrapper & save value to local storage
     if ($(this).is(':checked')) {
       setScrollbarStyleAndRefresh($(this).attr('id'), 'checked').then(() =>
-        $('#buttons-toggleable').slideDown('fast')
+        $('#buttons-toggleable').slideDown('fast'),
       );
     } else {
       setScrollbarStyleAndRefresh($(this).attr('id'), 'unchecked').then(() =>
-        $('#buttons-toggleable').slideUp('fast')
+        $('#buttons-toggleable').slideUp('fast'),
       );
     }
   });
@@ -615,12 +615,12 @@ const handleDocReady = async () => {
     if ($(this).is(':checked')) {
       // alert("Checked!");
       setScrollbarStyleAndRefresh($(this).attr('id'), 'checked').then(() =>
-        $(`#${$(this).attr('data-wrapperid')}`).slideDown('slow')
+        $(`#${$(this).attr('data-wrapperid')}`).slideDown('slow'),
       );
     } else {
       // alert("Unchecked!");
       setScrollbarStyleAndRefresh($(this).attr('id'), 'unchecked').then(() =>
-        $(`#${$(this).attr('data-wrapperid')}`).slideUp('slow')
+        $(`#${$(this).attr('data-wrapperid')}`).slideUp('slow'),
       );
     }
   });
@@ -628,7 +628,7 @@ const handleDocReady = async () => {
   const setRestoreArrowsDefaultImages = (
     triggerID,
     propertyPrefix,
-    propertySuffix
+    propertySuffix,
   ) => {
     $(`#${triggerID}`).click(() => {
       const up = `${propertyPrefix}up${propertySuffix}`;
@@ -639,22 +639,22 @@ const handleDocReady = async () => {
       resetScrollbarImageStyle(
         window.PAGE_CACHE,
         down,
-        chrome.runtime.getURL('images/defaults/down.png')
+        chrome.runtime.getURL('images/defaults/down.png'),
       ).then(() => {
         resetScrollbarImageStyle(
           window.PAGE_CACHE,
           up,
-          chrome.runtime.getURL('images/defaults/up.png')
+          chrome.runtime.getURL('images/defaults/up.png'),
         ).then(() => {
           resetScrollbarImageStyle(
             window.PAGE_CACHE,
             left,
-            chrome.runtime.getURL('images/defaults/left.png')
+            chrome.runtime.getURL('images/defaults/left.png'),
           ).then(() => {
             resetScrollbarImageStyle(
               window.PAGE_CACHE,
               right,
-              chrome.runtime.getURL('images/defaults/right.png')
+              chrome.runtime.getURL('images/defaults/right.png'),
             ).then(() => {
               $(`#${down}, #${up}, #${left}, #${right}`).each(function () {
                 $(this)
@@ -663,7 +663,7 @@ const handleDocReady = async () => {
                   .html(
                     `<img src="${
                       getScrollbarStyles(window.PAGE_CACHE)[$(this).attr('id')]
-                    }" />`
+                    }" />`,
                   );
                 $(this).children('.selector-button').hide();
                 $(this).children('.thumbframe').show();
@@ -683,17 +683,17 @@ const handleDocReady = async () => {
   setRestoreArrowsDefaultImages(
     'restore-arrow-defaults',
     'buttons-background-image-',
-    ''
+    '',
   );
   setRestoreArrowsDefaultImages(
     'restore-arrow-defaults-hover',
     'buttons-background-image-',
-    '-hover'
+    '-hover',
   );
   setRestoreArrowsDefaultImages(
     'restore-arrow-defaults-active',
     'buttons-background-image-',
-    '-active'
+    '-active',
   );
 
   // Whenever selectors (hidden <input type="file">s) are changed, save their valuese to local storage
@@ -701,7 +701,7 @@ const handleDocReady = async () => {
     handleFiles(
       this.files,
       $(this).siblings('.thumbframe').children('div.thumbcontainer').get()[0],
-      $(this).parent().attr('id')
+      $(this).parent().attr('id'),
     );
   });
 
@@ -723,7 +723,7 @@ const handleDocReady = async () => {
     handleFiles(
       files,
       $(this).siblings('.thumbframe').children('div.thumbcontainer').get()[0],
-      $(this).parent().attr('id')
+      $(this).parent().attr('id'),
     );
 
     // Hide the dropbox

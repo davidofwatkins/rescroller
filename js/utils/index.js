@@ -35,7 +35,7 @@ export const unpackImagesInSettings = async (rescrollerSettings) => {
 
       return acc;
     },
-    {}
+    {},
   );
 
   const updatedStyles = await promsedValue;
@@ -91,7 +91,7 @@ export const setScrollbarStyle = async (cache, key, value) => {
 
   await setChromeStorageValue(
     RESCROLLER_SETTINGS_KEY,
-    JSON.stringify(newSettings)
+    JSON.stringify(newSettings),
   );
 
   await generateScrollbarCSS(newSettings);
@@ -170,7 +170,7 @@ export const removeScrollbarStyle = async (cache, key) => {
 
   await setChromeStorageValue(
     RESCROLLER_SETTINGS_KEY,
-    JSON.stringify(newRescrollerSettings)
+    JSON.stringify(newRescrollerSettings),
   );
   await generateScrollbarCSS(newRescrollerSettings);
 };
@@ -197,7 +197,7 @@ export const setFirstTimeData = async () => {
 
   await setChromeStorageValue(
     RESCROLLER_SETTINGS_KEY,
-    JSON.stringify(newRescrollerSettings)
+    JSON.stringify(newRescrollerSettings),
   );
 
   await generateScrollbarCSS(newRescrollerSettings);
@@ -218,13 +218,13 @@ export const setDefaultStyling = async (cache) => {
 
   await setChromeStorageValue(
     RESCROLLER_SETTINGS_KEY,
-    JSON.stringify(newRescrollerSettings)
+    JSON.stringify(newRescrollerSettings),
   );
 };
 
 export const getListOfDisabledSites = async () => {
   const rescrollerSettings = await getChromeStorageValue(
-    RESCROLLER_SETTINGS_KEY
+    RESCROLLER_SETTINGS_KEY,
   );
 
   if (!rescrollerSettings) {

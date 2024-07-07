@@ -50,48 +50,48 @@ export const getScrollbarStyleDefaults = () => ({
   'buttons-border-color': '#666',
   'buttons-border-style': 'solid',
   'buttons-background-image-up': chrome.runtime.getURL(
-    'images/defaults/up.png'
+    'images/defaults/up.png',
   ),
   'buttons-background-image-down': chrome.runtime.getURL(
-    'images/defaults/down.png'
+    'images/defaults/down.png',
   ),
   'buttons-background-image-left': chrome.runtime.getURL(
-    'images/defaults/left.png'
+    'images/defaults/left.png',
   ),
   'buttons-background-image-right': chrome.runtime.getURL(
-    'images/defaults/right.png'
+    'images/defaults/right.png',
   ),
   // hovering
   'buttons-color-hover': '#666666',
   'buttons-shadow-color-hover': '#000000',
   'buttons-shadow-size-hover': 0,
   'buttons-background-image-up-hover': chrome.runtime.getURL(
-    'images/defaults/up.png'
+    'images/defaults/up.png',
   ),
   'buttons-background-image-down-hover': chrome.runtime.getURL(
-    'images/defaults/down.png'
+    'images/defaults/down.png',
   ),
   'buttons-background-image-left-hover': chrome.runtime.getURL(
-    'images/defaults/left.png'
+    'images/defaults/left.png',
   ),
   'buttons-background-image-right-hover': chrome.runtime.getURL(
-    'images/defaults/right.png'
+    'images/defaults/right.png',
   ),
   // active
   'buttons-color-active': '#666666',
   'buttons-shadow-color-active': '#000000',
   'buttons-shadow-size-active': 0,
   'buttons-background-image-up-active': chrome.runtime.getURL(
-    'images/defaults/up.png'
+    'images/defaults/up.png',
   ),
   'buttons-background-image-down-active': chrome.runtime.getURL(
-    'images/defaults/down.png'
+    'images/defaults/down.png',
   ),
   'buttons-background-image-left-active': chrome.runtime.getURL(
-    'images/defaults/left.png'
+    'images/defaults/left.png',
   ),
   'buttons-background-image-right-active': chrome.runtime.getURL(
-    'images/defaults/right.png'
+    'images/defaults/right.png',
   ),
 
   // Reset all non-button images

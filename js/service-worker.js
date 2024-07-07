@@ -14,7 +14,7 @@ let disabledSites = [];
 const isExpectedChromeError = (e) =>
   e.message.includes('Cannot access a chrome:// URL') ||
   e.message.includes(
-    'Extension manifest must request permission to access the respective host'
+    'Extension manifest must request permission to access the respective host',
   );
 
 /**
@@ -99,7 +99,7 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
   // Update scrollbars when another device has updated them
   if (areaName === 'sync') {
     const existingSettings = await getChromeStorageValue(
-      RESCROLLER_SETTINGS_KEY
+      RESCROLLER_SETTINGS_KEY,
     );
     await generateScrollbarCSS(existingSettings);
   }

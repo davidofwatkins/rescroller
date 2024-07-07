@@ -35,7 +35,7 @@ export const setChromeStorageValue = async (key, value, store = 'sync') =>
         }
 
         resolve();
-      }
+      },
     );
   });
 
